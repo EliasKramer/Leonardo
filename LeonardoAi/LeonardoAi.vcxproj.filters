@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="header">
+      <UniqueIdentifier>{6aadb53e-e8fb-4b9d-86c0-e13e00fef4ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{924db23e-7e3e-4b34-af6c-d02877302192}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\etc">
+      <UniqueIdentifier>{c6128192-9445-4907-ac30-455d3ac1e238}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\etc">
+      <UniqueIdentifier>{6d3863ff-9832-452b-9ffb-4e9f12a90b17}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="NeuroFox\convolutional_layer.cpp">
+      <Filter>source\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\data_space.cpp">
+      <Filter>source\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\fully_connected_layer.cpp">
+      <Filter>source\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\layer.cpp">
+      <Filter>source\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\math_functions.cpp">
+      <Filter>source\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\matrix.cpp">
+      <Filter>source\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\pooling_layer.cpp">
+      <Filter>source\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\neural_network.cpp">
+      <Filter>source\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\test_result.cpp">
+      <Filter>source\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\util.cpp">
+      <Filter>source\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\vector3.cpp">
+      <Filter>source\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="leonardo_overlord.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="NeuroFox\convolutional_layer.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\data_space.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\enum_space.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\fully_connected_layer.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\gpu_math.cuh">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\layer.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\matrix.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\math_functions.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\neural_network.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\pooling_layer.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\test_result.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\util.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\vector3.hpp">
+      <Filter>header\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="leonardo_overlord.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="NeuroFox\gpu_math.cu">
+      <Filter>source\etc</Filter>
+    </CudaCompile>
+  </ItemGroup>
+</Project>

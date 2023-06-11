@@ -10,6 +10,40 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="leonardo_overlord.cpp" />
+    <ClCompile Include="NeuroFox\convolutional_layer.cpp" />
+    <ClCompile Include="NeuroFox\data_space.cpp" />
+    <ClCompile Include="NeuroFox\fully_connected_layer.cpp" />
+    <ClCompile Include="NeuroFox\layer.cpp" />
+    <ClCompile Include="NeuroFox\main.cpp" />
+    <ClCompile Include="NeuroFox\math_functions.cpp" />
+    <ClCompile Include="NeuroFox\matrix.cpp" />
+    <ClCompile Include="NeuroFox\neural_network.cpp" />
+    <ClCompile Include="NeuroFox\pooling_layer.cpp" />
+    <ClCompile Include="NeuroFox\test_result.cpp" />
+    <ClCompile Include="NeuroFox\util.cpp" />
+    <ClCompile Include="NeuroFox\vector3.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="leonardo_overlord.hpp" />
+    <ClInclude Include="NeuroFox\convolutional_layer.hpp" />
+    <ClInclude Include="NeuroFox\data_space.hpp" />
+    <ClInclude Include="NeuroFox\enum_space.hpp" />
+    <ClInclude Include="NeuroFox\fully_connected_layer.hpp" />
+    <ClInclude Include="NeuroFox\gpu_math.cuh" />
+    <ClInclude Include="NeuroFox\layer.hpp" />
+    <ClInclude Include="NeuroFox\math_functions.hpp" />
+    <ClInclude Include="NeuroFox\matrix.hpp" />
+    <ClInclude Include="NeuroFox\neural_network.hpp" />
+    <ClInclude Include="NeuroFox\pooling_layer.hpp" />
+    <ClInclude Include="NeuroFox\test_result.hpp" />
+    <ClInclude Include="NeuroFox\util.hpp" />
+    <ClInclude Include="NeuroFox\vector3.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="NeuroFox\gpu_math.cu" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6065E741-45F5-4EDC-8583-D513CFE48A0B}</ProjectGuid>
     <RootNamespace>LeonardoAi</RootNamespace>
