@@ -1,16 +1,16 @@
+#include "pch.h"
 #include "CppUnitTest.h"
-#include "../LeonardoEngine/engine.hpp"
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace LeonardoTest
+namespace LeonardoEngineTest
 {
-	TEST_CLASS(LeonardoTest)
+	TEST_CLASS(LeonardoEngineTest)
 	{
 	public:
 		
 		TEST_METHOD(TestMethod1)
 		{
-			Assert::AreEqual(15, test());
 		}
 	};
 }

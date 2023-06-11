@@ -13,27 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\import">
-      <UniqueIdentifier>{4b36b3a6-9e8e-4489-b4d1-2ea26a093649}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\import">
-      <UniqueIdentifier>{514154d9-8890-4e79-8682-98ce9c1619c7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\test_functions">
-      <UniqueIdentifier>{139f4ae0-3793-4428-9651-8af0bd6c69d6}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\LeonardoEngine\Engine.cpp">
-      <Filter>Header Files\import</Filter>
+    <ClCompile Include="LeonardoEngineTest.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LeonardoTest.cpp">
-      <Filter>Source Files\test_functions</Filter>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\LeonardoEngine\engine.hpp">
-      <Filter>Source Files\import</Filter>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
