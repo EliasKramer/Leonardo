@@ -11,6 +11,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\MockChessEngine\AlphaBetaPruningBot.cpp" />
+    <ClCompile Include="..\MockChessEngine\BitBoard.cpp" />
+    <ClCompile Include="..\MockChessEngine\BoardRepresentation.cpp" />
+    <ClCompile Include="..\MockChessEngine\ChessBoard.cpp" />
+    <ClCompile Include="..\MockChessEngine\ChessPiece.cpp" />
+    <ClCompile Include="..\MockChessEngine\Constants.cpp" />
+    <ClCompile Include="..\MockChessEngine\DataAndTypes.cpp" />
+    <ClCompile Include="..\MockChessEngine\Game.cpp" />
+    <ClCompile Include="..\MockChessEngine\HelpMethods.cpp" />
+    <ClCompile Include="..\MockChessEngine\HumanPlayer.cpp" />
+    <ClCompile Include="..\MockChessEngine\Medicrius.cpp" />
+    <ClCompile Include="..\MockChessEngine\Move.cpp" />
+    <ClCompile Include="..\MockChessEngine\MoveCastle.cpp" />
+    <ClCompile Include="..\MockChessEngine\MoveDoublePawn.cpp" />
+    <ClCompile Include="..\MockChessEngine\MoveEnPassant.cpp" />
+    <ClCompile Include="..\MockChessEngine\MovePromote.cpp" />
+    <ClCompile Include="..\MockChessEngine\Player.cpp" />
+    <ClCompile Include="..\MockChessEngine\RandomPlayer.cpp" />
+    <ClCompile Include="chess_arena.cpp" />
     <ClCompile Include="leonardo_overlord.cpp" />
     <ClCompile Include="NeuroFox\convolutional_layer.cpp" />
     <ClCompile Include="NeuroFox\data_space.cpp" />
@@ -26,6 +45,25 @@
     <ClCompile Include="NeuroFox\vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\MockChessEngine\AlphaBetaPruningBot.h" />
+    <ClInclude Include="..\MockChessEngine\BitBoard.h" />
+    <ClInclude Include="..\MockChessEngine\BoardRepresentation.h" />
+    <ClInclude Include="..\MockChessEngine\ChessBoard.h" />
+    <ClInclude Include="..\MockChessEngine\ChessPiece.h" />
+    <ClInclude Include="..\MockChessEngine\Constants.h" />
+    <ClInclude Include="..\MockChessEngine\DataAndTypes.h" />
+    <ClInclude Include="..\MockChessEngine\Game.h" />
+    <ClInclude Include="..\MockChessEngine\HelpMethods.h" />
+    <ClInclude Include="..\MockChessEngine\HumanPlayer.h" />
+    <ClInclude Include="..\MockChessEngine\Medicrius.h" />
+    <ClInclude Include="..\MockChessEngine\Move.h" />
+    <ClInclude Include="..\MockChessEngine\MoveCastle.h" />
+    <ClInclude Include="..\MockChessEngine\MoveDoublePawn.h" />
+    <ClInclude Include="..\MockChessEngine\MoveEnPassant.h" />
+    <ClInclude Include="..\MockChessEngine\MovePromote.h" />
+    <ClInclude Include="..\MockChessEngine\Player.h" />
+    <ClInclude Include="..\MockChessEngine\RandomPlayer.h" />
+    <ClInclude Include="chess_arena.hpp" />
     <ClInclude Include="leonardo_overlord.hpp" />
     <ClInclude Include="NeuroFox\convolutional_layer.hpp" />
     <ClInclude Include="NeuroFox\data_space.hpp" />
@@ -43,6 +81,11 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="NeuroFox\gpu_math.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MockChessEngine\MockChessEngine.vcxproj">
+      <Project>{944091fe-c183-4ddf-b910-12047d02ed20}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6065E741-45F5-4EDC-8583-D513CFE48A0B}</ProjectGuid>

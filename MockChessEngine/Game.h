@@ -3,7 +3,7 @@
 #include <memory>
 #include <iostream>
 #include <string>
-class Game
+class ChessGame
 {
 private:
 	std::unique_ptr<Player> _whitePlayer;
@@ -11,7 +11,7 @@ private:
 
 	ChessBoard _board;
 public:
-	Game(
+	ChessGame(
 		std::unique_ptr<Player>&& player1,
 		std::unique_ptr<Player>&& player2,
 		std::string fen = STARTING_FEN);

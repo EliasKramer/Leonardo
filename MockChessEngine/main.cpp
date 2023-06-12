@@ -4,7 +4,7 @@
 #include "RandomPlayer.h"
 int main()
 {
-	Game game(
+	ChessGame game(
 		std::make_unique<RandomPlayer>(),
 		std::make_unique<RandomPlayer>(),
 		STARTING_FEN

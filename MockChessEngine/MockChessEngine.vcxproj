@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AlphaBetaPruningBot.cpp" />
     <ClCompile Include="BitBoard.cpp" />
     <ClCompile Include="BoardRepresentation.cpp" />
     <ClCompile Include="ChessBoard.cpp" />
@@ -137,6 +138,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="HelpMethods.cpp" />
     <ClCompile Include="HumanPlayer.cpp" />
+    <ClCompile Include="Medicrius.cpp" />
     <ClCompile Include="Move.cpp" />
     <ClCompile Include="MoveCastle.cpp" />
     <ClCompile Include="MoveDoublePawn.cpp" />
@@ -146,6 +148,7 @@
     <ClCompile Include="RandomPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AlphaBetaPruningBot.h" />
     <ClInclude Include="BitBoard.h" />
     <ClInclude Include="BoardRepresentation.h" />
     <ClInclude Include="ChessBoard.h" />
@@ -155,6 +158,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="HelpMethods.h" />
     <ClInclude Include="HumanPlayer.h" />
+    <ClInclude Include="Medicrius.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="MoveCastle.h" />
     <ClInclude Include="MoveDoublePawn.h" />

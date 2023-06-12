@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game(
+ChessGame::ChessGame(
 	std::unique_ptr<Player>&& player1,
 	std::unique_ptr<Player>&& player2,
 	std::string fen)
@@ -10,7 +10,7 @@ Game::Game(
 	_board(fen)
 {}
 
-void Game::start()
+void ChessGame::start()
 {
 	//this variable stores all the moves of the players as the game progresses
 	std::string movesMade = "";

@@ -72,6 +72,12 @@
     <ClCompile Include="RandomPlayer.cpp">
       <Filter>Source Files\etc</Filter>
     </ClCompile>
+    <ClCompile Include="AlphaBetaPruningBot.cpp">
+      <Filter>Source Files\etc</Filter>
+    </ClCompile>
+    <ClCompile Include="Medicrius.cpp">
+      <Filter>Source Files\etc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BitBoard.h">
@@ -120,6 +126,12 @@
       <Filter>Header Files\etc</Filter>
     </ClInclude>
     <ClInclude Include="RandomPlayer.h">
+      <Filter>Header Files\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="AlphaBetaPruningBot.h">
+      <Filter>Header Files\etc</Filter>
+    </ClInclude>
+    <ClInclude Include="Medicrius.h">
       <Filter>Header Files\etc</Filter>
     </ClInclude>
   </ItemGroup>
