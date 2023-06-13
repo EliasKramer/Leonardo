@@ -41,7 +41,7 @@ int chess_arena::play_game()
 		GameState currGameState = board.getGameState();
 		if (currGameState == GameState::WhiteWon )
 		{
-			std::cout << "white won. moves played moves: " << board.getNumberOfMovesPlayed() << "\ n";
+			std::cout << "white won. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
 			return 1;
 		}
 		else if (currGameState == GameState::BlackWon)

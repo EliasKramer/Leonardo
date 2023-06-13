@@ -48,7 +48,10 @@ void neural_arena::start_games_in_thread(size_t games)
 
 float neural_arena::join_and_get_score()
 {
-	thread.join();
+	if (thread.joinable())
+	{
+		thread.join();
+	}
 	//this score assumes that the mutated network is black
 	float tmp = score * -1;
 	score = 0;
