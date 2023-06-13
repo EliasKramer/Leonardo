@@ -30,7 +30,9 @@
     <ClCompile Include="..\MockChessEngine\Player.cpp" />
     <ClCompile Include="..\MockChessEngine\RandomPlayer.cpp" />
     <ClCompile Include="chess_arena.cpp" />
+    <ClCompile Include="leonardo_bot.cpp" />
     <ClCompile Include="leonardo_overlord.cpp" />
+    <ClCompile Include="neural_arena.cpp" />
     <ClCompile Include="NeuroFox\convolutional_layer.cpp" />
     <ClCompile Include="NeuroFox\data_space.cpp" />
     <ClCompile Include="NeuroFox\fully_connected_layer.cpp" />
@@ -64,7 +66,9 @@
     <ClInclude Include="..\MockChessEngine\Player.h" />
     <ClInclude Include="..\MockChessEngine\RandomPlayer.h" />
     <ClInclude Include="chess_arena.hpp" />
+    <ClInclude Include="leonardo_bot.hpp" />
     <ClInclude Include="leonardo_overlord.hpp" />
+    <ClInclude Include="neural_arena.hpp" />
     <ClInclude Include="NeuroFox\convolutional_layer.hpp" />
     <ClInclude Include="NeuroFox\data_space.hpp" />
     <ClInclude Include="NeuroFox\enum_space.hpp" />
@@ -129,6 +133,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Profile>true</Profile>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
@@ -148,6 +153,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Profile>true</Profile>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>

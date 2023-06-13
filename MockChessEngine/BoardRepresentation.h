@@ -15,7 +15,7 @@ public:
 	Square KingPos[DIFFERENT_CHESS_COLORS];
 
 	//maybe save the positions in a list
-	std::vector<Square> PiecePositions[DIFFERENT_CHESS_COLORS][NUMBER_OF_DIFFERENT_PIECE_TYPES];
+	//std::vector<Square> PiecePositions[DIFFERENT_CHESS_COLORS][NUMBER_OF_DIFFERENT_PIECE_TYPES];
 
 	BoardRepresentation();
 

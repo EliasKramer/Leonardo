@@ -431,6 +431,8 @@ bool ChessBoard::fieldGetsAttackedBySlidingPiece(Square pos, BitBoard moveBB) co
 				if (squareOverlapsWithBB(currentSquare, newCurrentColorBB))
 				{
 					//you cannot go on a square where a piece of the same color is
+					//your piece blocks the sliding attack
+
 					break;
 				}
 				else if (squareOverlapsWithBB(currentSquare, opponentColorBB))
