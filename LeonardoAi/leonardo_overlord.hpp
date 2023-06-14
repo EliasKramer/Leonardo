@@ -16,6 +16,7 @@ private:
 	std::vector<std::string> split(std::string str, char splitter);
 public:
 	leonardo_overlord(std::string name, size_t arena_count);
+	~leonardo_overlord();
 
 	void start_arenas(
 		size_t epochs, 

@@ -57,18 +57,30 @@ leonardo_overlord::leonardo_overlord(
 	size_t arena_count
 ) : name(name)
 {
+	//best_network = neural_network("models\\learner_epoch_500.parameters");
+	
 	best_network.set_input_format(vector3(8, 8, 1));
-	best_network.add_fully_connected_layer(16, sigmoid_fn);
+	best_network.add_fully_connected_layer(1024, sigmoid_fn);
+	best_network.add_fully_connected_layer(1024, sigmoid_fn);
 	//best_network.add_fully_connected_layer(16, sigmoid_fn);
 	//for learning reasons we set to sigmoid
 	best_network.add_fully_connected_layer(vector3(64, 64, 1), sigmoid_fn);
 	best_network.set_all_parameters(0.0f);
 	best_network.apply_noise(1);
-	//best_network.enable_gpu_mode();
+	
+	best_network.enable_gpu_mode();
 
 	for (size_t i = 0; i < arena_count; i++)
 	{
 		arenas.push_back(std::make_unique<neural_arena>("arena nr " + std::to_string(i), best_network));
+	}
+}
+
+leonardo_overlord::~leonardo_overlord()
+{
+	if (file_save_thread.joinable())
+	{
+		file_save_thread.join();
 	}
 }
 
@@ -83,7 +95,7 @@ void leonardo_overlord::start_arenas(
 		epochs_for_ever_save = epochs;
 	}
 
-	for (int curr_epoch = 1; curr_epoch <= epochs; curr_epoch++)
+	for (int curr_epoch = 0; curr_epoch < epochs; curr_epoch++)
 	{
 		std::cout << "start epoch " << curr_epoch << std::endl;
 		for (size_t i = 0; i < arenas.size(); i++)
@@ -133,6 +145,14 @@ void leonardo_overlord::start_arenas(
 			save_best_to_file(curr_epoch);
 		}
 	}
+
+	if (file_save_thread.joinable())
+	{
+		file_save_thread.join();
+	}
+
+	save_best_to_file(epochs);
+
 	if (file_save_thread.joinable())
 	{
 		file_save_thread.join();
@@ -161,11 +181,19 @@ void leonardo_overlord::learn_on_existing_games(const std::string& path)
 
 		bot.train_on_game(split_lines);
 
-		if (curr_line % 500 == 0)
+		if (curr_line != 0 && (curr_line) % 500 == 0)
 		{
 			std::cout << "saving model" << std::endl;
 			save_best_to_file(curr_line);
 		}
 		std::cout << "learn epoch: " << curr_line << "\n";
+	}
+
+	std::cout << "saving model" << std::endl;
+	save_best_to_file(all_lines.size());
+	
+	if (file_save_thread.joinable())
+	{
+		file_save_thread.join();
 	}
 }
