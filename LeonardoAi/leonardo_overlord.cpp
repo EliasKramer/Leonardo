@@ -15,73 +15,104 @@ void leonardo_overlord::save_best_to_file(size_t epoch)
 		best_policy_nnet.save_to_file(policy_path);
 	best_prediction_nnet.save_to_file(prediction_path); });
 }
-
-float leonardo_overlord::search(const ChessBoard& game)
+float leonardo_overlord::search(
+	const ChessBoard& game,
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& n,
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& p,
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& q,
+	std::unordered_set<ChessBoard, chess_board_hasher>& visited)
 {
-	/*def search(game, policy_network, prediction_nn) :
-		if gameOver(input_matrix) : return outcome(input_matrix)
+	if (game.getGameState() != GameState::Ongoing)
+	{
+		return game.getGameState() == GameState::WhiteWon ? 1.0f : -1.0f;
+	}
 
-			if game.input_matrix() not in visited :
-	visited.append(game.input_matrix())
-		output_matrix = policy_network.forward_prop(game.input_matrix())
-		for curr_move in legalMoves(game) :
-			P[game.input_matrix()][curr_move] = output_matrix[curr_move]
-			N[game.input_matrix()][curr_move] = 1 # number of times the current move was explored - maybe 0 ?
+	//current game state has not been visited
+	if (visited.find(game) == visited.end())
+	{
+		//now we visted the game
+		visited.insert(game);
 
-			evaluation = prediction_nn.forward_prop(game.input_matrix())
-			return -evaluation
+		//feed the input matrix into the policy network
+		matrix input_matrix(leonardo_util::get_input_format());
+		leonardo_util::set_matrix_from_chessboard(game, input_matrix);
+		new_policy_nnet.forward_propagation(input_matrix);
 
-			max_u = -float("inf")
-			best_move = random.choice(legalMoves(input_matrix))
-			for curr_move in legalMoves(game) :
-				# Q is the average evaluation of all moves that explored it
-				# c is a hyperparameter that controls exploration vs exploitation
-				# P indicates how promising a move is
-				# N is the number of times the current move was explored
-				# u is the best move - exploration - evaluation - score
-				u = \
-				#exploitation - which move has the highest average evaluation
-				Q[game.input_matrix()][curr_move] + c * \
-				#exploration - which move has the highest promise
-# - was evaluated very high, but not explored much
-				P[game.input_matrix()][curr_move] * \
-				sqrt(sum(N[game.input_matrix()])) \
-				/ (1 + N[game.input_matrix()][curr_move])
+		//see how "promising" the current position is for every move
+		p[game] = new_policy_nnet.get_output();
 
-				if u > max_u:
-	max_u = u
-		best_move = curr_move
+		//predict the position value by the prediction nnet and return the value (between -1 and 1) 
+		new_prediction_nnet.forward_propagation(input_matrix);
+		return -1 * leonardo_util::get_prediction_output(new_prediction_nnet.get_output());
+	}
 
-		new_game = makeMove(game, best_move)
-		# we make the best move with e & e in mind and then search again
-		# we do this recursively until we reach a leaf node
-		evaluation = search(new_game, policy_network, prediction_nn)
+	std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
 
-		Q[game.input_matrix()][best_move] = \
-		# current number of moves * current average evaluation + evaluation of current move
-		# divided by current number of moves + 1
-		(N[game.input_matrix()][curr_move] * Q[game.input_matrix()][curr_move] + evaluation) / \
-		(N[input_matrix][curr_move] + 1)
+	float max_utility = FLT_MIN;
+	Move& best_move = *legal_moves[random_idx(legal_moves.size())].get();
+	for (int i = 0; i < legal_moves.size(); i++)
+	{
+		Move& move = *legal_moves[i].get();
 
+		float c = 1;
 
-		# add 1 to the number of times the current move was explored
-		N[input_matrix][curr_move] += 1
-		return -evaluation*/
-	return 0.0f;
+		//TODO - loads of calculations
+		float n_sum = 1;
+		float n_at_move = 1;
+
+		float utility =
+			leonardo_util::matrix_map_get_float(q, game, move) +
+			c * leonardo_util::matrix_map_get_float(p, game, move) *
+			sqrt(n_sum) / (1 + n_at_move);
+
+		if (utility > max_utility)
+		{
+			max_utility = utility;
+			best_move = move;
+		}
+	}
+
+	ChessBoard new_game = game.getCopyByValue();
+	new_game.makeMove(best_move);
+
+	float evaluation = search(new_game, n, p, q, visited);
+
+	//calculate the new average evaulation for the current move
+	leonardo_util::matrix_map_set_float(q, game, best_move,
+		(leonardo_util::matrix_map_get_float(n, game, best_move) * leonardo_util::matrix_map_get_float(q, game, best_move) + evaluation) /
+		(leonardo_util::matrix_map_get_float(n, game, best_move) + 1)
+	);
+
+	//add 1 to the number of times the current move was explored
+	leonardo_util::matrix_map_set_float(n, game, best_move,
+		leonardo_util::matrix_map_get_float(n, game, best_move) + 1);
+
+	return -evaluation;
 }
-
 void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 {
-	/*def policy(game, policy_network, prediction_network) :
-		# number_of_simulations = 1600 on alphazero
-		for i in range(number_of_simulations) :
-			search(game, policy_network, prediction_network)
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher> n;
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher> p;
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher> q;
+	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
-			output_matrix;
-	for curr_move in legal_moves(game)
-		output_matrix[curr_move] = N[game.input_matrix()][curr_move]
+	for (int i = 0; i < 1600; i++)
+	{
+		search(game, n, p, q, visited);
+	}
 
-		return output_matrix*/
+	std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
+	for (int i = 0; i < legal_moves.size(); i++)
+	{
+		int idx = leonardo_util::get_matrix_idx_for_move(*legal_moves[i].get());
+
+		//N[game.input_matrix()][curr_move]
+		matrix& n_matrix = n[game];
+		n_matrix.sync_device_and_host(); // just in case
+		float value = n_matrix.get_at_flat_host(idx);
+
+		output_matrix.set_at_flat(idx, value);
+	}
 }
 
 void leonardo_overlord::get_training_data()

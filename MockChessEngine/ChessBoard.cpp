@@ -762,7 +762,7 @@ std::string ChessBoard::getString()
 	return result;
 }
 
-std::string ChessBoard::getFen()
+std::string ChessBoard::getFen() const
 {
 	std::string result = "";
 
@@ -1051,4 +1051,9 @@ bool operator==(const ChessBoard& first, const ChessBoard& second)
 bool operator!=(const ChessBoard& first, const ChessBoard& second)
 {
 	return !(first == second);
+}
+
+size_t chess_board_hasher::operator()(const ChessBoard& board) const
+{
+	return std::hash<std::string>()(board.getFen());
 }

@@ -99,6 +99,61 @@ void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game
 	{
 		throw std::exception("game is not over");
 	}
+	output.sync_device_and_host();
 	output.set_at_flat(0, game.getGameState() == GameState::WhiteWon ? 1.0f : 0.0f);
 	output.set_at_flat(1, game.getGameState() == GameState::BlackWon ? 1.0f : 0.0f);
+	output.sync_device_and_host();
+}
+
+float leonardo_util::get_prediction_output(matrix& output)
+{
+	if (matrix::equal_format(output.get_format(), get_prediction_output_format()) == false)
+	{
+		throw std::exception("output has wrong format");
+	}
+
+	output.sync_device_and_host();
+	float white_score = output.get_at_flat_host(0);
+	float black_score = output.get_at_flat_host(1);
+
+	return white_score - black_score;
+}
+
+matrix& leonardo_util::matrix_map_get(
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map, 
+	const ChessBoard& game)
+{
+	if (map.find(game) == map.end())
+	{
+		map.insert(std::make_pair(game, matrix(get_policy_output_format())));
+	}
+
+	matrix& m = map[game];
+	if (matrix::equal_format(m.get_format(), get_policy_output_format()) == false)
+	{
+		throw std::exception("output has wrong format");
+	}
+
+	return m;
+}
+
+float leonardo_util::matrix_map_get_float(
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map, 
+	const ChessBoard& game, 
+	const Move& move)
+{
+	matrix& m = matrix_map_get(map, game);
+	int idx = get_matrix_idx_for_move(move);
+	return m.get_at_flat_host(idx);
+}
+
+void leonardo_util::matrix_map_set_float(
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map, 
+	const ChessBoard& game, 
+	const Move& move, 
+	float value)
+{
+	matrix& m = matrix_map_get(map, game);
+	int idx = get_matrix_idx_for_move(move);
+	m.set_at_flat(idx, value);
 }

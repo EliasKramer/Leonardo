@@ -1,11 +1,11 @@
-# https://towardsdatascie   nce.com/alphazero-chess-how-it-works-what-sets-it-apart-and-what-it-can-tell-us-4ab3d2d08867
+# https://towardsdatascience.com/alphazero-chess-how-it-works-what-sets-it-apart-and-what-it-can-tell-us-4ab3d2d08867
 
 # data structure for visited states
 # append and check if visited
 
 # data structure for Q, N, P
-# | input matrix | move -> float
-# | input matrix | move -> float
+# | input matrix | output_matrix
+# | input matrix | output_matrix
 # random access
 # map(matrix, map(matrix, float))
 
@@ -95,7 +95,7 @@ def data(policy_network, prediction_network):
 
             chess_data_space.append
             data_space_for_win_prediction.append(input_matrix, inconclusive_ending)
-     
+
             if gameOver(game):
                 chess_data_space.set_last_outcomes(outcome(game))
                 break

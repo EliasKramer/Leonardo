@@ -104,7 +104,7 @@ public:
 	ChessBoard(std::string given_fen_code);
 
 	std::string getString();
-	std::string getFen();
+	std::string getFen() const;
 
 	ChessColor getCurrentTurnColor() const;
 	int getNumberOfMovesPlayed() const;
@@ -130,3 +130,8 @@ public:
 
 bool operator ==(const ChessBoard& first, const ChessBoard& second);
 bool operator !=(const ChessBoard& first, const ChessBoard& second);
+
+class chess_board_hasher {
+	public:
+		size_t operator()(const ChessBoard& board) const;
+};

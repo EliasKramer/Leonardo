@@ -2,6 +2,7 @@
 #include "NeuroFox/vector3.hpp"
 #include "../MockChessEngine/ChessBoard.h"
 #include "NeuroFox/matrix.hpp"
+#include <unordered_map>
 namespace leonardo_util 
 {
 	vector3 get_input_format();
@@ -17,4 +18,22 @@ namespace leonardo_util
 	int get_random_best_move(const matrix& output, const UniqueMoveList& allowed_moves);
 
 	void set_prediction_output(matrix& output, const ChessBoard& game);
+	//returns between -1 and 1 (1 means white won, -1 means black won)
+	float get_prediction_output(matrix& output);
+
+	matrix& matrix_map_get(
+		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
+		const ChessBoard& game);
+
+	float matrix_map_get_float(
+		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
+		const ChessBoard& game,
+		const Move& move
+	);
+	void matrix_map_set_float(
+		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
+		const ChessBoard& game,
+		const Move& move,
+		float value
+	);
 }

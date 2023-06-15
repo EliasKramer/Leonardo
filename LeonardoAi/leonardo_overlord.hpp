@@ -4,6 +4,9 @@
 #include <thread>
 #include "../MockChessEngine/ChessBoard.h"
 #include "leonardo_util.hpp"
+#include <unordered_map>
+#include <unordered_set>
+
 class leonardo_overlord
 {
 private:
@@ -18,7 +21,13 @@ private:
 	std::thread file_save_thread;
 	void save_best_to_file(size_t epoch);
 
-	float search(const ChessBoard& game);
+	float search(
+		const ChessBoard& game,
+		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& n,
+		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& p,
+		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& q,
+		std::unordered_set<ChessBoard, chess_board_hasher>& visited
+	);
 	void policy(matrix& output_matrix, const ChessBoard& game);
 	void get_training_data();
 	void upgrade();
