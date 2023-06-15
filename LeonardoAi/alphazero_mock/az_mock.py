@@ -95,7 +95,7 @@ def data(policy_network, prediction_network):
 
             chess_data_space.append
             data_space_for_win_prediction.append(input_matrix, inconclusive_ending)
-
+     
             if gameOver(game):
                 chess_data_space.set_last_outcomes(outcome(game))
                 break
@@ -109,8 +109,6 @@ def upgrade(
         new_win_prediction_model):
     chess_data_space = data(policy_network, win_prediction_model)
 
-    new_policy_network.copy_parameter(policy_network)
-    new_win_prediction_model.copy_parameter(win_prediction_model)
     new_policy_network.train(chess_data_space)
     new_win_prediction_model.train(chess_data_space)
 
