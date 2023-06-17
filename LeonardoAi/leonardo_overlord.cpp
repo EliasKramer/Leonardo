@@ -1,8 +1,4 @@
 #include "leonardo_overlord.hpp"
-#include "chess_arena.hpp"
-#include "leonardo_bot.hpp"
-#include <memory>
-#include "NeuroFox/data_space.hpp"
 
 void leonardo_overlord::save_best_to_file(size_t epoch)
 {
@@ -13,7 +9,7 @@ void leonardo_overlord::save_best_to_file(size_t epoch)
 	//start thread and save once
 	std::thread file_save_thread([this, policy_path, prediction_path]() {
 		best_policy_nnet.save_to_file(policy_path);
-	best_prediction_nnet.save_to_file(prediction_path); });
+		best_prediction_nnet.save_to_file(prediction_path); });
 }
 float leonardo_overlord::search(
 	const ChessBoard& game,
@@ -89,6 +85,38 @@ float leonardo_overlord::search(
 
 	return -evaluation;
 }
+void leonardo_overlord::train_nn_on_ds(
+	neural_network& nnet,
+	data_space& ds,
+	size_t epochs,
+	size_t batch_size,
+	float learning_rate)
+{
+	for (size_t epoch = 0; epoch < epochs; epoch++)
+	{
+		ds.iterator_reset();
+
+		size_t batch_item_idx = 0;
+		while (ds.iterator_has_next())
+		{
+			nnet.back_propagation(ds.get_current_data(), ds.get_current_label());
+
+			if (batch_item_idx >= batch_size)
+			{
+				nnet.apply_deltas(batch_size, learning_rate);
+				batch_item_idx = 0;
+			}
+			else
+			{
+				batch_item_idx++;
+			}
+			if (ds.iterator_has_next())
+			{
+				ds.iterator_next();
+			}
+		}
+	}
+}
 void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 {
 	std::unordered_map<ChessBoard, matrix, chess_board_hasher> n;
@@ -96,7 +124,8 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	std::unordered_map<ChessBoard, matrix, chess_board_hasher> q;
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
-	for (int i = 0; i < 1600; i++)
+	//1600 in openai
+	for (int i = 0; i < 16; i++)
 	{
 		search(game, n, p, q, visited);
 	}
@@ -115,21 +144,12 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	}
 }
 
-void leonardo_overlord::get_training_data()
+void leonardo_overlord::get_training_data(
+	size_t number_of_selfplay_games,
+	size_t number_of_moves_per_game,
+	data_space& policy_training_ds,
+	data_space& prediction_training_ds)
 {
-	size_t number_of_selfplay_games = 100;
-	size_t number_of_moves_per_game = 100;
-
-	data_space policy_training_ds(
-		number_of_selfplay_games * number_of_moves_per_game,
-		leonardo_util::get_input_format(),
-		leonardo_util::get_policy_output_format()
-	);
-	data_space prediction_training_ds(
-		number_of_selfplay_games * number_of_moves_per_game,
-		leonardo_util::get_input_format(),
-		leonardo_util::get_prediction_output_format()
-	);
 
 	policy_training_ds.iterator_reset();
 	prediction_training_ds.iterator_reset();
@@ -138,8 +158,13 @@ void leonardo_overlord::get_training_data()
 	{
 		ChessBoard game(STARTING_FEN);
 
+		size_t move_count = 0;
 		while (true)
 		{
+			move_count++;
+
+			std::cout << "move count: " << move_count << std::endl;
+
 			//quick check if the iterators are valid
 			if (prediction_training_ds.get_iterator_idx() != policy_training_ds.get_iterator_idx())
 			{
@@ -157,9 +182,12 @@ void leonardo_overlord::get_training_data()
 
 			policy(output_matrix, game);
 
-			policy_training_ds.set_current_data(input_matrix);
-			policy_training_ds.set_current_label(output_matrix);
-			prediction_training_ds.set_current_data(input_matrix);
+			if (move_count <= number_of_moves_per_game)
+			{
+				policy_training_ds.set_current_data(input_matrix);
+				policy_training_ds.set_current_label(output_matrix);
+				prediction_training_ds.set_current_data(input_matrix);
+			}
 
 			//make move
 			std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
@@ -195,14 +223,41 @@ void leonardo_overlord::get_training_data()
 
 void leonardo_overlord::upgrade()
 {
-	//chess data space
-	//input pos - output pos - win or lose
+	size_t number_of_selfplay_games = 1;
+	size_t number_of_moves_per_game = 100;
 
-	//get data
+	data_space policy_training_ds(
+		number_of_selfplay_games * number_of_moves_per_game,
+		leonardo_util::get_input_format(),
+		leonardo_util::get_policy_output_format()
+	);
+	data_space prediction_training_ds(
+		number_of_selfplay_games * number_of_moves_per_game,
+		leonardo_util::get_input_format(),
+		leonardo_util::get_prediction_output_format()
+	);
 
-	//train on data
-	//policy nnet
-	//prediction nnet
+	get_training_data(
+		number_of_selfplay_games, 
+		number_of_moves_per_game, 
+		policy_training_ds, 
+		prediction_training_ds);
+
+	train_nn_on_ds(
+		new_policy_nnet,
+		policy_training_ds,
+		20,
+		20,
+		0.1f
+	);
+
+	train_nn_on_ds(
+		new_prediction_nnet,
+		prediction_training_ds,
+		20,
+		20,
+		0.1f
+	);
 }
 
 leonardo_overlord::leonardo_overlord(
@@ -251,19 +306,13 @@ void leonardo_overlord::train()
 	//# training 25000 apparently
 	//for i in range(iterations) :
 	//	# learn on games
-	for (int i = 0; i < 25000; i++)
+	for (int i = 0; i < 1; i++)
 	{
-		//	upgrade(
-		//		policy_nn,
-		//		prediction_nn,
-		//		new_policy_nn,
-		//		new_prediction_nn)
-		//todo
-		void upgrade();
+		upgrade();
 
 		//	# arena - with biased random instead of applying noise to input
 		//	win_ratio = pit(policy_nn, new_policy_nn, n = number_of_games)
-		int win_score = arena.play(1000);
+		int win_score = arena.play(1);
 
 		//	# best input for next iteration
 		//	threshold = 0.55  # hyperparameter - how much better the new net has to be

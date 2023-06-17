@@ -6,6 +6,11 @@
 #include "leonardo_util.hpp"
 #include <unordered_map>
 #include <unordered_set>
+#include "chess_arena.hpp"
+#include "leonardo_bot.hpp"
+#include <memory>
+#include "NeuroFox/data_space.hpp"
+
 
 class leonardo_overlord
 {
@@ -28,8 +33,22 @@ private:
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& q,
 		std::unordered_set<ChessBoard, chess_board_hasher>& visited
 	);
+
+	void train_nn_on_ds(
+		neural_network& nnet,
+		data_space& ds,
+		size_t epochs,
+		size_t batch_size,
+		float learning_rate
+	);
+
 	void policy(matrix& output_matrix, const ChessBoard& game);
-	void get_training_data();
+	void get_training_data(
+		size_t number_of_selfplay_games,
+		size_t number_of_moves_per_game,
+		data_space& policy_training_ds,
+		data_space& prediction_training_ds
+	);
 	void upgrade();
 public:
 	leonardo_overlord(std::string name);

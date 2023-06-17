@@ -36,7 +36,7 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 			int multiplier = piece.getColor() == board.getCurrentTurnColor() ? 1 : -1;
 
 			float value = piece.getType() == PieceType::King ? 1000 : PIECETYPE_VALUE[piece.getType()];
-			m.set_at(
+			m.set_at_flat(
 				i,
 				value * multiplier
 			);
