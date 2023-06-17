@@ -54,9 +54,6 @@
     <ClCompile Include="NeuroFox\vector3.cpp">
       <Filter>source\etc</Filter>
     </ClCompile>
-    <ClCompile Include="NeuroFox\main.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="leonardo_overlord.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -121,6 +118,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="leonardo_util.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

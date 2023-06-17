@@ -33,11 +33,11 @@
     <ClCompile Include="leonardo_bot.cpp" />
     <ClCompile Include="leonardo_overlord.cpp" />
     <ClCompile Include="leonardo_util.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="NeuroFox\convolutional_layer.cpp" />
     <ClCompile Include="NeuroFox\data_space.cpp" />
     <ClCompile Include="NeuroFox\fully_connected_layer.cpp" />
     <ClCompile Include="NeuroFox\layer.cpp" />
-    <ClCompile Include="NeuroFox\main.cpp" />
     <ClCompile Include="NeuroFox\math_functions.cpp" />
     <ClCompile Include="NeuroFox\matrix.cpp" />
     <ClCompile Include="NeuroFox\neural_network.cpp" />

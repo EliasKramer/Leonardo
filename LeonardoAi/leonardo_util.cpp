@@ -22,17 +22,19 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 		throw std::exception("input_board has wrong format");
 	}
 
+	BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
+
 	for (int i = 0; i < 64; i++)
 	{
 		Square square = (Square)i;
 
-		if (bitboardsOverlap(square, BB_SQUARE[square]))
+		if (bitboardsOverlap(all_pieces, BB_SQUARE[square]))
 		{
 			ChessPiece piece = board.getBoardRepresentation().getPieceAt((Square)i);
 
 			//the own pieces are 1 the others are -1
 			int multiplier = piece.getColor() == board.getCurrentTurnColor() ? 1 : -1;
-			this should have thrown an error
+
 			float value = piece.getType() == PieceType::King ? 1000 : PIECETYPE_VALUE[piece.getType()];
 			m.set_at(
 				i,
@@ -44,7 +46,6 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 			m.set_at_flat(i, 0.0f);
 		}
 	}
-	m.apply_noise(0.5);
 }
 
 int leonardo_util::get_matrix_idx_for_move(const Move& move)
@@ -87,8 +88,36 @@ int leonardo_util::get_random_best_move(
 	const matrix& output,
 	const UniqueMoveList& allowed_moves)
 {
-	throw std::exception("not implemented");
-	return 0;
+	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
+	{
+		throw std::exception("output has wrong format");
+	}
+
+	float sum = 0;
+	for (const std::unique_ptr<Move>& move : allowed_moves)
+	{
+		size_t matrix_idx = get_matrix_idx_for_move(*move);
+		float value = output.get_at_flat_host(matrix_idx);
+		sum += value;
+	}
+
+	float random = random_float_excl(0, sum);
+
+	float current_sum = 0;
+	int move_idx = 0;
+	for (const std::unique_ptr<Move>& move : allowed_moves)
+	{
+		size_t matrix_idx = get_matrix_idx_for_move(*move);
+		float value = output.get_at_flat_host(matrix_idx);
+		current_sum += value;
+		if (current_sum >= random)
+		{
+			return move_idx;
+		}
+		move_idx++;
+	}
+
+	throw std::exception("no move found");
 }
 
 void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game)
