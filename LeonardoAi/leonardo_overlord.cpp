@@ -125,7 +125,7 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		search(game, n, p, q, visited);
 	}
@@ -243,21 +243,23 @@ void leonardo_overlord::upgrade()
 		policy_training_ds, 
 		prediction_training_ds);
 
+	policy_training_ds.iterator_reset();
+	prediction_training_ds.iterator_reset();
+
+
 	train_nn_on_ds(
 		new_policy_nnet,
 		policy_training_ds,
 		20,
 		20,
-		0.1f
-	);
+		0.1f);
 
 	train_nn_on_ds(
 		new_prediction_nnet,
 		prediction_training_ds,
 		20,
 		20,
-		0.1f
-	);
+		0.1f);
 }
 
 leonardo_overlord::leonardo_overlord(
