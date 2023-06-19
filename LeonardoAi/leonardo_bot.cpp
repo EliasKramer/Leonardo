@@ -1,10 +1,12 @@
 #include "leonardo_bot.hpp"
 
 leonardo_bot::leonardo_bot(
-	neural_network& given_nn
+	neural_network& given_nn,
+	e_playstyle_t given_playstyle
 ) :
 	Player("LeonardoBot"),
 	nn(given_nn),
+	playstyle(given_playstyle),
 	input_board(leonardo_util::get_input_format())
 {
 	if (nn.is_in_gpu_mode())
@@ -22,5 +24,8 @@ int leonardo_bot::getMove(const ChessBoard& board, const UniqueMoveList& legal_m
 
 	nn.get_output().sync_device_and_host();
 
-	return leonardo_util::get_random_best_move(nn.get_output(), legal_moves);
+	return 
+		playstyle == e_playstyle_t::max ? leonardo_util::get_best_move(nn.get_output(), legal_moves) :
+		playstyle == e_playstyle_t::distributed_random ? leonardo_util::get_random_best_move(nn.get_output(), legal_moves) :
+		throw std::exception("unknown playstyle");
 }

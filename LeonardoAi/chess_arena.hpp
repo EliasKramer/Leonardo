@@ -2,24 +2,32 @@
 #include <memory>
 #include "../MockChessEngine/Player.h"
 
+class arena_result {
+public:
+	int player_1_won;
+	int player_2_won;
+	int draws;
+};
+
 class chess_arena
 {
 private:
 	std::string name;
 
-	std::unique_ptr<Player> _whitePlayer;
-	std::unique_ptr<Player> _blackPlayer;
+	std::unique_ptr<Player> player1;
+	std::unique_ptr<Player> player2;
 
 	ChessBoard board;
 
-	int play_game();
+	bool player1_plays_white = true;
+
+	void play_game(arena_result& result);
 public:
 	chess_arena(
 		std::string given_name,
 		std::unique_ptr<Player>&& player1,
 		std::unique_ptr<Player>&& player2);
 
-	int play(size_t number_of_games);
-	int play(size_t number_of_games, bool print);
+	arena_result play(size_t number_of_games);
 };
 

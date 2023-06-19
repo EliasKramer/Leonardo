@@ -284,8 +284,8 @@ void leonardo_overlord::train()
 {
 	chess_arena arena(
 		"pit",
-		std::make_unique<leonardo_bot>(best_policy_nnet),
-		std::make_unique<leonardo_bot>(new_policy_nnet)
+		std::make_unique<leonardo_bot>(best_policy_nnet, distributed_random),
+		std::make_unique<leonardo_bot>(new_policy_nnet, distributed_random)
 	);
 
 	//training 25000 apparently
@@ -303,12 +303,13 @@ void leonardo_overlord::train()
 		}
 
 		std::cout << "throwing new and best nnet into a arena" << std::endl;
-		int win_score = arena.play(50);
+		arena_result arena_result = arena.play(50);
+		int win_score = arena_result.player_2_won - arena_result.player_1_won;
 
 		//	# best input for next iteration
 		//	threshold = 0.55  # hyperparameter - how much better the new net has to be
 		//	if win_ratio > threshold:
-		if (win_score < 0) // because our new network is alway black - TODO CHANGE
+		if (win_score > 0)
 		{
 			//policy_nn = new_policy_nn
 			//syncing host and device gets done inside ?

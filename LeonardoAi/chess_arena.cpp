@@ -6,19 +6,22 @@ chess_arena::chess_arena(
 	std::unique_ptr<Player>&& player2
 ) :
 	name(given_name),
-	_whitePlayer(std::move(player1)),
-	_blackPlayer(std::move(player2)),
+	player1(std::move(player1)),
+	player2(std::move(player2)),
 	board(STARTING_FEN)
 {}
 
-int chess_arena::play_game()
+void chess_arena::play_game(arena_result& result)
 {
 	size_t loop_count = 0;
+
+	Player& white_player = player1_plays_white ? *player1.get() : *player2.get();
+	Player& black_player = player1_plays_white ? *player2.get() : *player1.get();
 
 	while (true)
 	{
 		ChessColor currentTurnColor = board.getCurrentTurnColor();
-		Player& currPlayer = currentTurnColor == White ? *_whitePlayer.get() : *_blackPlayer.get();
+		Player& currPlayer = currentTurnColor == White ? white_player : black_player;
 
 		//get the move from the current player
 		UniqueMoveList legalMoves = board.getAllLegalMoves();
@@ -39,61 +42,51 @@ int chess_arena::play_game()
 
 		//get the gamestate and evaluate if the game has ended
 		GameState currGameState = board.getGameState();
-		if (currGameState == GameState::WhiteWon)
+
+		if (currGameState != GameState::Ongoing)
 		{
-			//std::cout << "white won. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
-			return 1;
-		}
-		else if (currGameState == GameState::BlackWon)
-		{
-			//std::cout << "black won. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
-			return -1;
-		}
-		else if (currGameState != GameState::Ongoing)
-		{
-			if (currGameState == GameState::Stalemate)
+			if (currGameState == GameState::WhiteWon)
 			{
-				//std::cout << "stalemate. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
+				player1_plays_white ?
+					result.player_1_won++ :
+					result.player_2_won++;
 			}
-			else if (currGameState == GameState::Draw)
+			else if (currGameState == GameState::BlackWon)
 			{
-				//std::cout << "draw. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
+				player1_plays_white ?
+					result.player_2_won++ :
+					result.player_1_won++;
+			}
+			else
+			{
+				result.draws++;
 			}
 
-			return 0;
+			break;
 		}
+
 		loop_count++;
 
-		if (loop_count > 1000)
+		if (loop_count > 500)
 		{
-			//just in case
-			//std::cout << "loop count exceeded 1000. returning" << "\n";
-			return 0;
+			result.draws++;
+			break;
 		}
 	}
-	throw std::exception("game should return inside the gameloop");
+
+	player1_plays_white = !player1_plays_white;
 }
 
-int chess_arena::play(size_t number_of_games)
+arena_result chess_arena::play(size_t number_of_games)
 {
-	return play(number_of_games, false);
-}
-
-int chess_arena::play(size_t number_of_games, bool print)
-{
-	int white_wins = 0;
+	arena_result result = arena_result();
 
 	for (int i = 0; i < number_of_games; i++)
 	{
-		white_wins += play_game();
-		//reset the board - not tested
+		play_game(result);
 		board = ChessBoard(STARTING_FEN);
-
-		if (print)
-		{
-			std::cout << name << " finished " << i << " games. score: " << white_wins << "\n\n";
-		}
+		std::cout << "Game " << i + 1 << " finished" << std::endl;
 	}
 
-	return white_wins;
+	return result;
 }
