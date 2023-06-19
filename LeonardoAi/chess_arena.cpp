@@ -85,7 +85,7 @@ arena_result chess_arena::play(size_t number_of_games)
 	{
 		play_game(result);
 		board = ChessBoard(STARTING_FEN);
-		std::cout << "Game " << i + 1 << " finished" << std::endl;
+		//std::cout << "Game " << i + 1 << " finished" << std::endl;
 	}
 
 	return result;

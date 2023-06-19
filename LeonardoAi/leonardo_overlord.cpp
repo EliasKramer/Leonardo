@@ -288,8 +288,12 @@ void leonardo_overlord::train()
 		std::make_unique<leonardo_bot>(new_policy_nnet, distributed_random)
 	);
 
+	//start timer
+	std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+
 	//training 25000 apparently
-	for (int i = 0; i < 5; i++)
+	int iterations = 25000;
+	for (int i = 0; i < iterations; i++)
 	{
 		std::cout << "upgrade time. iteration: " << i << std::endl;
 		upgrade();
@@ -330,6 +334,16 @@ void leonardo_overlord::train()
 
 			file_save_thread = std::thread(&leonardo_overlord::save_best_to_file, this, i);
 		}
+
+		std::chrono::steady_clock::time_point stop = std::chrono::high_resolution_clock::now();
+
+		//elapsed seconds since start
+		long long elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
+
+		std::cout << "elapsed: " << ms_to_str(elapsed_ms) << std::endl;
+		//remaining - TODO check if this is correct
+		long long remaining_seconds = (elapsed_ms / (i + 1)) * (iterations - i - 1);
+		std::cout << "remaining: " << ms_to_str(remaining_seconds) << std::endl;
 	}
 }
 
