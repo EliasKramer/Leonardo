@@ -39,25 +39,25 @@ int chess_arena::play_game()
 
 		//get the gamestate and evaluate if the game has ended
 		GameState currGameState = board.getGameState();
-		if (currGameState == GameState::WhiteWon )
+		if (currGameState == GameState::WhiteWon)
 		{
-			std::cout << "white won. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
+			//std::cout << "white won. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
 			return 1;
 		}
 		else if (currGameState == GameState::BlackWon)
 		{
-			std::cout << "black won. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
+			//std::cout << "black won. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
 			return -1;
 		}
 		else if (currGameState != GameState::Ongoing)
 		{
 			if (currGameState == GameState::Stalemate)
 			{
-				std::cout << "stalemate. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
+				//std::cout << "stalemate. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
 			}
 			else if (currGameState == GameState::Draw)
 			{
-				std::cout << "draw. moves played moves: "<< board.getNumberOfMovesPlayed() << "\n";
+				//std::cout << "draw. moves played moves: " << board.getNumberOfMovesPlayed() << "\n";
 			}
 
 			return 0;
@@ -67,7 +67,7 @@ int chess_arena::play_game()
 		if (loop_count > 1000)
 		{
 			//just in case
-			std::cout << "loop count exceeded 1000. returning" << "\n";
+			//std::cout << "loop count exceeded 1000. returning" << "\n";
 			return 0;
 		}
 	}
@@ -91,7 +91,8 @@ int chess_arena::play(size_t number_of_games, bool print)
 
 		if (print)
 		{
-			std::cout << name << " finished " << i << " games. score: " << white_wins << "\n\n";		}
+			std::cout << name << " finished " << i << " games. score: " << white_wins << "\n\n";
+		}
 	}
 
 	return white_wins;

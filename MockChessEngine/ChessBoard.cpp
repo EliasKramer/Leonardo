@@ -738,7 +738,7 @@ ChessBoard::ChessBoard(std::string given_fen_code)
 	_moveNumber = std::stoi(split_fen_code[5]);
 }
 
-std::string ChessBoard::getString()
+std::string ChessBoard::getString() const 
 {
 	std::string result = "";
 	std::string rowSeperatorString = "\n+---+---+---+---+---+---+---+---+\n";

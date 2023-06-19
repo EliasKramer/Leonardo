@@ -23,6 +23,8 @@ private:
 	neural_network new_policy_nnet;
 	neural_network new_prediction_nnet;
 
+	bool gpu_mode = true;
+
 	std::thread file_save_thread;
 	void save_best_to_file(size_t epoch);
 
@@ -32,14 +34,6 @@ private:
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& p,
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& q,
 		std::unordered_set<ChessBoard, chess_board_hasher>& visited
-	);
-
-	void train_nn_on_ds(
-		neural_network& nnet,
-		data_space& ds,
-		size_t epochs,
-		size_t batch_size,
-		float learning_rate
 	);
 
 	void policy(matrix& output_matrix, const ChessBoard& game);

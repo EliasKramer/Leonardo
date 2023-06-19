@@ -103,7 +103,7 @@ protected:
 public:
 	ChessBoard(std::string given_fen_code);
 
-	std::string getString();
+	std::string getString() const;
 	std::string getFen() const;
 
 	ChessColor getCurrentTurnColor() const;

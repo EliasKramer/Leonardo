@@ -3,6 +3,7 @@
 #include "DataAndTypes.h"
 #include <vector>
 #include <map>
+#include <string>
 
 const Direction KNIGHT_DIRECTIONS[8] = {
 	NORTH_NORTH_EAST,
@@ -116,4 +117,12 @@ const int GAME_STATE_EVALUATION[5] = {
 	0, //stalemate
 	0, //draw
 	-1 //ongoing
+};
+
+const std::string GAME_STATE_STRING[5] = {
+	"white wins",
+	"black wins",
+	"stalemate",
+	"draw",
+	"ongoing"
 };

@@ -22,5 +22,5 @@ int leonardo_bot::getMove(const ChessBoard& board, const UniqueMoveList& legal_m
 
 	nn.get_output().sync_device_and_host();
 
-	return leonardo_util::get_best_move(nn.get_output(), legal_moves);
+	return leonardo_util::get_random_best_move(nn.get_output(), legal_moves);
 }

@@ -3,13 +3,12 @@
 void leonardo_overlord::save_best_to_file(size_t epoch)
 {
 	//best_network.save_to_file(name);
+	std::cout << "\nsaving best network to file\n";
 	std::string policy_path = "models\\" + name + "_policy_epoch_" + std::to_string(epoch) + ".parameters";
 	std::string prediction_path = "models\\" + name + "_prediction_epoch_" + std::to_string(epoch) + ".parameters";
-
-	//start thread and save once
-	std::thread file_save_thread([this, policy_path, prediction_path]() {
-		best_policy_nnet.save_to_file(policy_path);
-		best_prediction_nnet.save_to_file(prediction_path); });
+	best_policy_nnet.save_to_file(policy_path);
+	best_prediction_nnet.save_to_file(prediction_path);
+	std::cout << "\nsaved best network to file\n";
 }
 float leonardo_overlord::search(
 	const ChessBoard& game,
@@ -32,6 +31,10 @@ float leonardo_overlord::search(
 		//feed the input matrix into the policy network
 		matrix input_matrix(leonardo_util::get_input_format());
 		leonardo_util::set_matrix_from_chessboard(game, input_matrix);
+		if (gpu_mode)
+		{
+			input_matrix.enable_gpu_mode();
+		}
 		new_policy_nnet.forward_propagation(input_matrix);
 
 		//see how "promising" the current position is for every move
@@ -50,11 +53,12 @@ float leonardo_overlord::search(
 	{
 		Move& move = *legal_moves[i].get();
 
+		//if c is high - lots of exploration
+		//if c is low - lots of exploitation
 		float c = 1;
 
-		//TODO - loads of calculations
-		float n_sum = 1;
-		float n_at_move = 1;
+		float n_sum = leonardo_util::matrix_map_sum(n, game, legal_moves);
+		float n_at_move = leonardo_util::matrix_map_get_float(n, game, move);
 
 		float utility =
 			leonardo_util::matrix_map_get_float(q, game, move) +
@@ -85,38 +89,7 @@ float leonardo_overlord::search(
 
 	return -evaluation;
 }
-void leonardo_overlord::train_nn_on_ds(
-	neural_network& nnet,
-	data_space& ds,
-	size_t epochs,
-	size_t batch_size,
-	float learning_rate)
-{
-	for (size_t epoch = 0; epoch < epochs; epoch++)
-	{
-		ds.iterator_reset();
 
-		size_t batch_item_idx = 0;
-		while (ds.iterator_has_next())
-		{
-			nnet.back_propagation(ds.get_current_data(), ds.get_current_label());
-
-			if (batch_item_idx >= batch_size)
-			{
-				nnet.apply_deltas(batch_size, learning_rate);
-				batch_item_idx = 0;
-			}
-			else
-			{
-				batch_item_idx++;
-			}
-			if (ds.iterator_has_next())
-			{
-				ds.iterator_next();
-			}
-		}
-	}
-}
 void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 {
 	std::unordered_map<ChessBoard, matrix, chess_board_hasher> n;
@@ -162,8 +135,6 @@ void leonardo_overlord::get_training_data(
 		while (true)
 		{
 			move_count++;
-
-			std::cout << "move count: " << move_count << std::endl;
 
 			//quick check if the iterators are valid
 			if (prediction_training_ds.get_iterator_idx() != policy_training_ds.get_iterator_idx())
@@ -212,6 +183,10 @@ void leonardo_overlord::get_training_data(
 
 				policy_training_ds.iterator_next();
 				prediction_training_ds.iterator_next();
+				std::cout
+					<< "game ended. move count: " << move_count
+					<< " game_state: " << GAME_STATE_STRING[game.getGameState()]
+					<< std::endl;
 				break;
 			}
 
@@ -223,7 +198,7 @@ void leonardo_overlord::get_training_data(
 
 void leonardo_overlord::upgrade()
 {
-	size_t number_of_selfplay_games = 1;
+	size_t number_of_selfplay_games = 5;
 	size_t number_of_moves_per_game = 100;
 
 	data_space policy_training_ds(
@@ -231,35 +206,38 @@ void leonardo_overlord::upgrade()
 		leonardo_util::get_input_format(),
 		leonardo_util::get_policy_output_format()
 	);
+	policy_training_ds.copy_to_gpu();
+
 	data_space prediction_training_ds(
 		number_of_selfplay_games * number_of_moves_per_game,
 		leonardo_util::get_input_format(),
 		leonardo_util::get_prediction_output_format()
 	);
+	prediction_training_ds.copy_to_gpu();
 
 	get_training_data(
-		number_of_selfplay_games, 
-		number_of_moves_per_game, 
-		policy_training_ds, 
+		number_of_selfplay_games,
+		number_of_moves_per_game,
+		policy_training_ds,
 		prediction_training_ds);
 
 	policy_training_ds.iterator_reset();
 	prediction_training_ds.iterator_reset();
 
-
-	train_nn_on_ds(
-		new_policy_nnet,
+	std::cout << "training policy network" << std::endl;
+	new_policy_nnet.learn_on_ds(
 		policy_training_ds,
-		20,
+		2,
 		20,
 		0.1f);
-
-	train_nn_on_ds(
-		new_prediction_nnet,
+	std::cout << "training prediction network" << std::endl;
+	new_prediction_nnet.learn_on_ds(
 		prediction_training_ds,
+		2,
 		20,
-		20,
-		0.1f);
+		0.1f
+	);
+	std::cout << "training done" << std::endl;
 }
 
 leonardo_overlord::leonardo_overlord(
@@ -269,15 +247,15 @@ leonardo_overlord::leonardo_overlord(
 	//best_network = neural_network("models\\learner_epoch_500.parameters");
 
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
-	best_policy_nnet.add_fully_connected_layer(16, sigmoid_fn);
-	best_policy_nnet.add_fully_connected_layer(16, sigmoid_fn);
+	best_policy_nnet.add_fully_connected_layer(512, sigmoid_fn);
+	best_policy_nnet.add_fully_connected_layer(512, sigmoid_fn);
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), sigmoid_fn);
 	best_policy_nnet.set_all_parameters(0.0f);
 	best_policy_nnet.apply_noise(1);
 
 	best_prediction_nnet.set_input_format(leonardo_util::get_input_format());
-	best_prediction_nnet.add_fully_connected_layer(16, sigmoid_fn);
-	best_prediction_nnet.add_fully_connected_layer(16, sigmoid_fn);
+	best_prediction_nnet.add_fully_connected_layer(512, sigmoid_fn);
+	best_prediction_nnet.add_fully_connected_layer(512, sigmoid_fn);
 	best_prediction_nnet.add_fully_connected_layer(leonardo_util::get_prediction_output_format(), sigmoid_fn);
 	best_prediction_nnet.set_all_parameters(0.0f);
 	best_prediction_nnet.apply_noise(1);
@@ -285,8 +263,13 @@ leonardo_overlord::leonardo_overlord(
 	new_policy_nnet = neural_network(best_policy_nnet);
 	new_prediction_nnet = neural_network(best_prediction_nnet);
 
-	//best_policy_nnet.enable_gpu_mode();
-	//best_prediction_nnet.enable_gpu_mode();
+	if (gpu_mode)
+	{
+		best_policy_nnet.enable_gpu_mode();
+		best_prediction_nnet.enable_gpu_mode();
+		new_policy_nnet.enable_gpu_mode();
+		new_prediction_nnet.enable_gpu_mode();
+	}
 }
 
 leonardo_overlord::~leonardo_overlord()
@@ -305,16 +288,22 @@ void leonardo_overlord::train()
 		std::make_unique<leonardo_bot>(new_policy_nnet)
 	);
 
-	//# training 25000 apparently
-	//for i in range(iterations) :
-	//	# learn on games
-	for (int i = 0; i < 1; i++)
+	//training 25000 apparently
+	for (int i = 0; i < 5; i++)
 	{
+		std::cout << "upgrade time. iteration: " << i << std::endl;
 		upgrade();
 
 		//	# arena - with biased random instead of applying noise to input
 		//	win_ratio = pit(policy_nn, new_policy_nn, n = number_of_games)
-		int win_score = arena.play(1);
+
+		if (file_save_thread.joinable())
+		{
+			file_save_thread.join();
+		}
+
+		std::cout << "throwing new and best nnet into a arena" << std::endl;
+		int win_score = arena.play(50);
 
 		//	# best input for next iteration
 		//	threshold = 0.55  # hyperparameter - how much better the new net has to be
@@ -323,8 +312,22 @@ void leonardo_overlord::train()
 		{
 			//policy_nn = new_policy_nn
 			//syncing host and device gets done inside ?
+			std::cout << "new network is better" << std::endl;
 			best_policy_nnet.set_parameters(new_policy_nnet);
 			best_prediction_nnet.set_parameters(new_prediction_nnet);
+		}
+		else
+		{
+			std::cout << "new network is worse" << std::endl;
+			//new_policy_nnet.set_parameters(best_policy_nnet);
+			//new_prediction_nnet.set_parameters(new_prediction_nnet);
+		}
+
+		if (i % 50 == 0)
+		{
+			//start save_best_to_file in save_in_file_thread 
+
+			file_save_thread = std::thread(&leonardo_overlord::save_best_to_file, this, i);
 		}
 	}
 }

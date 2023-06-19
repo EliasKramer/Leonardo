@@ -3,6 +3,9 @@
 #include "../MockChessEngine/ChessBoard.h"
 #include "NeuroFox/matrix.hpp"
 #include <unordered_map>
+#include <vector>
+#include <memory>
+
 namespace leonardo_util 
 {
 	vector3 get_input_format();
@@ -36,4 +39,9 @@ namespace leonardo_util
 		const Move& move,
 		float value
 	);
+
+	float matrix_map_sum(
+		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
+		const ChessBoard& game,
+		std::vector<std::unique_ptr<Move>>& legal_moves);
 }

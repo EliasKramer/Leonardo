@@ -24,10 +24,13 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 
 	BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
 
+	//we do this in order to have the same order as the input format - no matter black or white's turn
+	bool reverse = board.getCurrentTurnColor() == ChessColor::Black;
+
 	for (int i = 0; i < 64; i++)
 	{
 		Square square = (Square)i;
-
+		int flat_idx = reverse ? 63 - i : i;
 		if (bitboardsOverlap(all_pieces, BB_SQUARE[square]))
 		{
 			ChessPiece piece = board.getBoardRepresentation().getPieceAt((Square)i);
@@ -37,13 +40,13 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 
 			float value = piece.getType() == PieceType::King ? 1000 : PIECETYPE_VALUE[piece.getType()];
 			m.set_at_flat(
-				i,
+				flat_idx,
 				value * multiplier
 			);
 		}
 		else
 		{
-			m.set_at_flat(i, 0.0f);
+			m.set_at_flat(flat_idx, 0.0f);
 		}
 	}
 }
@@ -151,7 +154,7 @@ float leonardo_util::get_prediction_output(matrix& output)
 }
 
 matrix& leonardo_util::matrix_map_get(
-	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map, 
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
 	const ChessBoard& game)
 {
 	if (map.find(game) == map.end())
@@ -169,8 +172,8 @@ matrix& leonardo_util::matrix_map_get(
 }
 
 float leonardo_util::matrix_map_get_float(
-	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map, 
-	const ChessBoard& game, 
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
+	const ChessBoard& game,
 	const Move& move)
 {
 	matrix& m = matrix_map_get(map, game);
@@ -179,12 +182,27 @@ float leonardo_util::matrix_map_get_float(
 }
 
 void leonardo_util::matrix_map_set_float(
-	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map, 
-	const ChessBoard& game, 
-	const Move& move, 
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
+	const ChessBoard& game,
+	const Move& move,
 	float value)
 {
 	matrix& m = matrix_map_get(map, game);
 	int idx = get_matrix_idx_for_move(move);
 	m.set_at_flat(idx, value);
+}
+
+float leonardo_util::matrix_map_sum(
+	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
+	const ChessBoard& game,
+	std::vector<std::unique_ptr<Move>>& legal_moves)
+{
+	matrix& m = matrix_map_get(map, game);
+	float sum = 0;
+	for (const std::unique_ptr<Move>& move : legal_moves)
+	{
+		int idx = get_matrix_idx_for_move(*move);
+		sum += m.get_at_flat_host(idx);
+	}
+	return sum;
 }
