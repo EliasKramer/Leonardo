@@ -1,5 +1,6 @@
-#include "ChessBoard.h"
-
+﻿#include "ChessBoard.h"
+#include <iostream>
+#include <random>
 bool ChessBoard::destinationIsSameColor(Square start, Direction direction, ChessColor color) const
 {
 	int newPos = (start + direction);
@@ -628,7 +629,12 @@ char ChessBoard::getPieceCharAt(Square pos) const
 
 	if (pieceChar == '~')
 	{
-		throw "Could not find PieceType in the Chessboard configuration";
+		std::cout
+			<< "Could not find PieceType on pos" << pos <<
+			" in the Chessboard configuration\n"
+			<< getString() << "\n";
+
+		return ' ';
 	}
 
 	if (bitboardsOverlap(_board.PiecesOfColor[Black], posBB))
@@ -738,7 +744,7 @@ ChessBoard::ChessBoard(std::string given_fen_code)
 	_moveNumber = std::stoi(split_fen_code[5]);
 }
 
-std::string ChessBoard::getString() const 
+std::string ChessBoard::getString() const
 {
 	std::string result = "";
 	std::string rowSeperatorString = "\n+---+---+---+---+---+---+---+---+\n";
@@ -1052,8 +1058,47 @@ bool operator!=(const ChessBoard& first, const ChessBoard& second)
 {
 	return !(first == second);
 }
-
 size_t chess_board_hasher::operator()(const ChessBoard& board) const
 {
-	return std::hash<std::string>()(board.getFen());
+	static std::random_device rd;
+	static std::mt19937_64 generator(rd());
+	static std::uniform_int_distribution<BitBoard> distribution(0, std::numeric_limits<BitBoard>::max());
+
+	const static BitBoard black_to_move_zobrist = distribution(generator);
+
+	const static std::array<std::array<BitBoard, 6>, 2> zobrist_table =
+		[]()->std::array<std::array<BitBoard, 6>, 2>
+	{
+		std::array<std::array<BitBoard, 6>, 2> result = {};
+
+		for (int i = 0; i < 2; i++)
+		{
+			for (int j = 0; j < 6; j++)
+			{
+				result[i][j] = distribution(generator);
+			}
+		}
+
+		return result;
+	}();
+
+	const BoardRepresentation& rep = board.getBoardRepresentation();
+
+	BitBoard hash = 0ULL;
+
+	if (board.getCurrentTurnColor() == ChessColor::Black)
+	{
+		hash ^= black_to_move_zobrist;
+	}
+
+	for (int piece_type = 0; piece_type < 6; piece_type++)
+	{
+		for (int color = 0; color < 2; color++)
+		{
+			BitBoard piece_table = (rep.PiecesOfType[piece_type] | rep.PiecesOfColor[color]) ^ zobrist_table[color][piece_type];
+			hash ^= piece_table;
+		}
+	}
+
+	return hash;
 }

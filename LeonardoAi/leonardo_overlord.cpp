@@ -38,10 +38,13 @@ float leonardo_overlord::search(
 		new_policy_nnet.forward_propagation(input_matrix);
 
 		//see how "promising" the current position is for every move
+		new_policy_nnet.get_output().sync_device_and_host();
 		p[game] = new_policy_nnet.get_output();
+
 
 		//predict the position value by the prediction nnet and return the value (between -1 and 1) 
 		new_prediction_nnet.forward_propagation(input_matrix);
+		new_prediction_nnet.get_output().sync_device_and_host();
 		return -1 * leonardo_util::get_prediction_output(new_prediction_nnet.get_output());
 	}
 
@@ -98,7 +101,7 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		search(game, n, p, q, visited);
 	}
@@ -184,7 +187,8 @@ void leonardo_overlord::get_training_data(
 				policy_training_ds.iterator_next();
 				prediction_training_ds.iterator_next();
 				std::cout
-					<< "game ended. move count: " << move_count
+					<< (i + 1) << "/" << number_of_selfplay_games
+					<< " game ended. move count: " << move_count
 					<< " game_state: " << GAME_STATE_STRING[game.getGameState()]
 					<< std::endl;
 				break;
@@ -199,7 +203,7 @@ void leonardo_overlord::get_training_data(
 void leonardo_overlord::upgrade()
 {
 	size_t number_of_selfplay_games = 5;
-	size_t number_of_moves_per_game = 100;
+	size_t number_of_moves_per_game = 200;
 
 	data_space policy_training_ds(
 		number_of_selfplay_games * number_of_moves_per_game,
@@ -224,19 +228,32 @@ void leonardo_overlord::upgrade()
 	policy_training_ds.iterator_reset();
 	prediction_training_ds.iterator_reset();
 
-	std::cout << "training policy network" << std::endl;
-	new_policy_nnet.learn_on_ds(
-		policy_training_ds,
-		2,
-		20,
-		0.1f);
-	std::cout << "training prediction network" << std::endl;
-	new_prediction_nnet.learn_on_ds(
-		prediction_training_ds,
+	std::cout << "start training\n";
+	
+	//train policy and prediction in parallel
+	//if a game has less than number_of_moves_per_game moves, the rest of the data is not used - it will train on 0 data
+	std::thread policy_thread = std::thread(
+		&neural_network::learn_on_ds,
+		&new_policy_nnet,
+		std::ref(policy_training_ds),
 		2,
 		20,
 		0.1f
 	);
+	std::thread prediction_thread = std::thread(
+		&neural_network::learn_on_ds,
+		&new_prediction_nnet,
+		std::ref(prediction_training_ds),
+		2,
+		20,
+		0.1f
+	);
+
+	if(policy_thread.joinable())
+		policy_thread.join();
+	if(prediction_thread.joinable())
+		prediction_thread.join();
+
 	std::cout << "training done" << std::endl;
 }
 
@@ -292,7 +309,7 @@ void leonardo_overlord::train()
 	std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
 
 	//training 25000 apparently
-	int iterations = 25000;
+	int iterations = 21;
 	for (int i = 0; i < iterations; i++)
 	{
 		std::cout << "upgrade time. iteration: " << i << std::endl;
@@ -328,7 +345,7 @@ void leonardo_overlord::train()
 			//new_prediction_nnet.set_parameters(new_prediction_nnet);
 		}
 
-		if (i % 50 == 0)
+		if (i % 20 == 0)
 		{
 			//start save_best_to_file in save_in_file_thread 
 

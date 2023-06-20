@@ -10,6 +10,7 @@
 #include "MovePromote.h"
 #include "Constants.h"
 #include "BoardRepresentation.h"
+#include <mutex>
 
 const std::string STARTING_FEN =
 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -45,7 +46,7 @@ protected:
 	/*Move Generation*/
 	bool destinationIsSameColor(Square start, Direction direction, ChessColor color) const;
 	bool positionIsSameColor(Square pos, ChessColor color) const;
-	
+
 	void addIfDestinationIsValid(
 		UniqueMoveList& moves,
 		Square start,
@@ -72,7 +73,7 @@ protected:
 		UniqueMoveList& moves, Square start, Square dest) const;
 	void getCastlingMoves(UniqueMoveList& moves) const;
 	void getEnPassantMove(UniqueMoveList& moves) const;
-	
+
 	void addRayMoves(
 		UniqueMoveList& moves,
 		Square start,
@@ -86,16 +87,16 @@ protected:
 
 	bool moveIsLegal(const std::unique_ptr<Move>& move) const;
 	bool isCaptureMove(const std::unique_ptr<Move>& move) const;
-	
+
 	void udpateCastlingRightsAfterMove(Move& m);
-	
+
 	void updateEnPassantRightsAfterMove(Move& m);
 
 	void update50MoveRule(Move& m);
 
 	//checks if any side has enough material/pieces to win the game
 	bool insufficientMaterialCheck() const;
-	
+
 	char getPieceCharAt(Square pos) const;
 
 	friend bool operator ==(const ChessBoard& first, const ChessBoard& second);
@@ -108,7 +109,7 @@ public:
 
 	ChessColor getCurrentTurnColor() const;
 	int getNumberOfMovesPlayed() const;
-	
+
 	//returns true if the king is in check
 	bool isKingInCheck() const;
 
@@ -132,6 +133,6 @@ bool operator ==(const ChessBoard& first, const ChessBoard& second);
 bool operator !=(const ChessBoard& first, const ChessBoard& second);
 
 class chess_board_hasher {
-	public:
-		size_t operator()(const ChessBoard& board) const;
+public:
+	size_t operator()(const ChessBoard& board) const;
 };
