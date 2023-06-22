@@ -110,15 +110,12 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	}
 
 	std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
+	matrix& n_matrix = n[game];
+	n_matrix.sync_device_and_host();
 	for (int i = 0; i < legal_moves.size(); i++)
 	{
-		int idx = leonardo_util::get_matrix_idx_for_move(*legal_moves[i].get());
-
-		matrix& n_matrix = n[game];
-		n_matrix.sync_device_and_host(); // just in case, but it should be on cpu
-		float value = n_matrix.get_at_flat_host(idx);
-
-		output_matrix.set_at_flat(idx, value);
+		float value = leonardo_util::get_move_value(*legal_moves[i].get(), n_matrix);
+		leonardo_util::set_move_value(*legal_moves[i].get(), output_matrix, value);
 	}
 }
 

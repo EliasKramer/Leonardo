@@ -13,7 +13,8 @@ namespace leonardo_util
 	vector3 get_prediction_output_format();
 
 	void set_matrix_from_chessboard(const ChessBoard& board, matrix& input);
-	int get_matrix_idx_for_move(const Move& move);
+	float get_move_value(const Move& move, const matrix& policy_output);
+	void set_move_value(const Move& move, matrix& output, float value);
 	
 	//has a matrix and picks the one with the highest value
 	int get_best_move(const matrix& output, const UniqueMoveList& allowed_moves);
