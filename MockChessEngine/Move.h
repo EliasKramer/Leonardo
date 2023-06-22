@@ -22,7 +22,7 @@ public:
 	Square getStart() const;
 	Square getDestination() const;
 	
-	virtual void execute(BoardRepresentation& board);
+	virtual void execute(BoardRepresentation& board) const;
 
 	//xor this map to get a board for checking if king is in check
 	virtual BitBoard getBBWithMoveDone();

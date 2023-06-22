@@ -9,7 +9,7 @@ private:
 public:
 	MovePromote(Square givenStart, Square givenDest, ChessPiece promotingPiece);
 
-	void execute(BoardRepresentation& board) override;
+	void execute(BoardRepresentation& board) const override;
 
 	std::string getString() const override;
 	//no overriding of getBBWithMoveDone, because it acts the same as the normal move

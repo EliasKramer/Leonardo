@@ -5,7 +5,7 @@ MoveEnPassant::MoveEnPassant(Square givenStart, Square givenDest, Square posToDe
 	_posToDel(posToDel)
 {}
 
-void MoveEnPassant::execute(BoardRepresentation & board)
+void MoveEnPassant::execute(BoardRepresentation & board) const
 {
 	Move::execute(board);
 	board.delAtPos(_posToDel);

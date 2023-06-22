@@ -14,10 +14,9 @@ public:
 
 	Square KingPos[DIFFERENT_CHESS_COLORS];
 
-	//maybe save the positions in a list
-	//std::vector<Square> PiecePositions[DIFFERENT_CHESS_COLORS][NUMBER_OF_DIFFERENT_PIECE_TYPES];
-
 	BoardRepresentation();
+
+	void validation(const std::string& s) const;
 
 	ChessPiece getPieceAt(Square square) const;
 

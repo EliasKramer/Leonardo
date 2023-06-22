@@ -15,7 +15,7 @@ Square Move::getDestination() const
 	return _destination;
 }
 
-void Move::execute(BoardRepresentation& board)
+void Move::execute(BoardRepresentation& board) const
 {
 	board.copySquareToPos(_start, _destination);
 	board.delAtPos(_start);

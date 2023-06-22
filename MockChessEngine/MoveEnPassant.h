@@ -8,7 +8,7 @@ private:
 public:
 	MoveEnPassant(Square givenStart, Square givenDest, Square posToDel);
 
-	void execute(BoardRepresentation& board) override;
+	void execute(BoardRepresentation& board) const override;
 
 	//xor this map to get a board for checking if king is in check
 	BitBoard getBBWithMoveDone() override;

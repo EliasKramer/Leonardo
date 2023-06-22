@@ -5,7 +5,7 @@ MovePromote::MovePromote(Square givenStart, Square givenDest, ChessPiece promoti
 	_promotingPiece(promotingPiece)
 {}
 
-void MovePromote::execute(BoardRepresentation& board)
+void MovePromote::execute(BoardRepresentation& board) const
 {
 	board.delAtPos(_start);
 	board.delAtPos(_destination);

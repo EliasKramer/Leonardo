@@ -5,21 +5,21 @@ const std::array<std::array<std::array<Square, 3>, 2>, 2> SQUARES_FOR_KING_CASTL
 
 	std::array<std::array<std::array<Square, 3>, 2>, 2> result = {};
 
-	result[White][CastleShort][0] = E1;
-	result[White][CastleShort][1] = F1;
-	result[White][CastleShort][2] = G1;
+	result[White][CastleShort][0] = E1; //start 
+	result[White][CastleShort][1] = F1; //rook dest - not used
+	result[White][CastleShort][2] = G1; //end
 
-	result[White][CastleLong][0] = E1;
-	result[White][CastleLong][1] = D1;
-	result[White][CastleLong][2] = C1;
+	result[White][CastleLong][0] = E1; //start
+	result[White][CastleLong][1] = D1; //rook dest - not used
+	result[White][CastleLong][2] = C1; //end
 
-	result[Black][CastleShort][0] = E8;
-	result[Black][CastleShort][1] = F8;
-	result[Black][CastleShort][2] = G8;
+	result[Black][CastleShort][0] = E8; //start
+	result[Black][CastleShort][1] = F8; //rook dest - not used
+	result[Black][CastleShort][2] = G8; //end
 
-	result[Black][CastleLong][0] = E8;
-	result[Black][CastleLong][1] = D8;
-	result[Black][CastleLong][2] = C8;
+	result[Black][CastleLong][0] = E8; //start
+	result[Black][CastleLong][1] = D8; //rook dest - not used
+	result[Black][CastleLong][2] = C8; //end
 
 	return result;
 }();
@@ -28,17 +28,17 @@ const std::array<std::array<std::array<Square, 2>, 2>, 2> SQUARES_FOR_ROOK_CASTL
 []()->std::array<std::array<std::array<Square, 2>, 2>, 2> {
 	std::array<std::array<std::array<Square, 2>, 2>, 2> result = {};
 
-	result[White][CastleShort][0] = H1;
-	result[White][CastleShort][1] = F1;
+	result[White][CastleShort][0] = H1; //start
+	result[White][CastleShort][1] = F1; //end
 
-	result[White][CastleLong][0] = A1;
-	result[White][CastleLong][1] = D1;
+	result[White][CastleLong][0] = A1; //start
+	result[White][CastleLong][1] = D1; //end
 
-	result[Black][CastleShort][0] = H8;
-	result[Black][CastleShort][1] = F8;
+	result[Black][CastleShort][0] = H8; //start
+	result[Black][CastleShort][1] = F8; //end
 
-	result[Black][CastleLong][0] = A8;
-	result[Black][CastleLong][1] = D8;
+	result[Black][CastleLong][0] = A8; //start
+	result[Black][CastleLong][1] = D8; //end
 
 	return result;
 }();

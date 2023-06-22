@@ -13,7 +13,9 @@ public:
 	const Square getRookStart();
 	const Square getRookDest();
 
-	void execute(BoardRepresentation& board) override;
+	void execute(BoardRepresentation& board) const override;
+
+	std::string getString() const override;
 
 	//castling does not produce a a bitboard, that you can use
 	//it will just throw an error
