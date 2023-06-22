@@ -30,7 +30,7 @@ float leonardo_overlord::search(
 
 		//feed the input matrix into the policy network
 		matrix input_matrix(leonardo_util::get_input_format());
-		leonardo_util::set_matrix_from_chessboard(game, input_matrix);
+		leonardo_util::set_matrix_from_chessboard(game, input_matrix); //cpu
 		if (gpu_mode)
 		{
 			input_matrix.enable_gpu_mode();
@@ -39,22 +39,23 @@ float leonardo_overlord::search(
 
 		//see how "promising" the current position is for every move
 		new_policy_nnet.get_output().sync_device_and_host();
-		p[game] = new_policy_nnet.get_output();
+		p[game] = new_policy_nnet.get_output(); //cpu
 
 
 		//predict the position value by the prediction nnet and return the value (between -1 and 1) 
 		new_prediction_nnet.forward_propagation(input_matrix);
 		new_prediction_nnet.get_output().sync_device_and_host();
-		return -1 * leonardo_util::get_prediction_output(new_prediction_nnet.get_output());
+		return -1 * leonardo_util::get_prediction_output(new_prediction_nnet.get_output()); //cpu
 	}
 
 	std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
 
 	float max_utility = FLT_MIN;
-	Move& best_move = *legal_moves[random_idx(legal_moves.size())].get();
+	int best_move_idx = 0; // replace with random idx
 	for (int i = 0; i < legal_moves.size(); i++)
 	{
-		Move& move = *legal_moves[i].get();
+		const Move& move = *legal_moves[i].get();
+		std::string s = move.getString();
 
 		//if c is high - lots of exploration
 		//if c is low - lots of exploitation
@@ -71,11 +72,49 @@ float leonardo_overlord::search(
 		if (utility > max_utility)
 		{
 			max_utility = utility;
-			best_move = move;
+			//best_move = move;
+			best_move_idx = i;
+		}
+	}
+	const Move& best_move = *legal_moves[best_move_idx].get();
+
+
+	std::string fen = game.getFen();
+	if (fen == "r1bqk2r/ppp1pp2/n2p1npb/6Bp/P7/N2P1N2/1PP1PPPP/R2QKB1R b Qkq - 1 7")
+	{
+
+		std::vector<std::string> moves_s;
+		int i = 0;
+		for (auto& move : legal_moves)
+		{
+			moves_s.push_back(move->getString());
+			if (move->getString() == "O-O-O")
+			{
+				//std::cout << SQUARE_STRING[(int)move->getStart()] << "|" << SQUARE_STRING[(int)move->getDestination()] << "\n";
+				move->getString();
+				//std::cout << "found move\n" << move->getString() << " idx " << i << "\n";
+
+				for (auto& s : moves_s)
+				{
+					std::cout << s << " " << "\n";
+				}
+				auto lm = game.getAllLegalMoves();
+				for (auto& s : lm)
+				{
+					std::cout << s.get()->getString() << " " << "\n";
+				}
+
+			}
+			i++;
 		}
 	}
 
+
 	ChessBoard new_game = game.getCopyByValue();
+	//DEBUG
+	std::string board_s = game.getString();
+	//std::string move = best_move.getString();
+	//DEBUG
 	new_game.makeMove(best_move);
 
 	float evaluation = search(new_game, n, p, q, visited);
@@ -88,7 +127,7 @@ float leonardo_overlord::search(
 
 	//add 1 to the number of times the current move was explored
 	leonardo_util::matrix_map_set_float(n, game, best_move,
-		leonardo_util::matrix_map_get_float(n, game, best_move) + 1);
+		leonardo_util::matrix_map_get_float(n, game, best_move) + 1); //all on cpu
 
 	return -evaluation;
 }
@@ -101,7 +140,7 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < 50; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		search(game, n, p, q, visited);
 	}
@@ -111,9 +150,8 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	{
 		int idx = leonardo_util::get_matrix_idx_for_move(*legal_moves[i].get());
 
-		//N[game.input_matrix()][curr_move]
 		matrix& n_matrix = n[game];
-		n_matrix.sync_device_and_host(); // just in case
+		n_matrix.sync_device_and_host(); // just in case, but it should be on cpu
 		float value = n_matrix.get_at_flat_host(idx);
 
 		output_matrix.set_at_flat(idx, value);
@@ -132,12 +170,13 @@ void leonardo_overlord::get_training_data(
 
 	for (int i = 0; i < number_of_selfplay_games; i++)
 	{
-		ChessBoard game(STARTING_FEN);
+		ChessBoard game(STARTING_FEN); // replace with starting pos TODO
 
 		size_t move_count = 0;
 		while (true)
 		{
 			move_count++;
+
 
 			//quick check if the iterators are valid
 			if (prediction_training_ds.get_iterator_idx() != policy_training_ds.get_iterator_idx())
@@ -152,21 +191,36 @@ void leonardo_overlord::get_training_data(
 			//output_matrix = policy(game, policy_network, prediction_network)
 			matrix output_matrix(leonardo_util::get_policy_output_format());
 			matrix input_matrix(leonardo_util::get_input_format());
-			leonardo_util::set_matrix_from_chessboard(game, input_matrix);
+			leonardo_util::set_matrix_from_chessboard(game, input_matrix); //all on cpu
 
 			policy(output_matrix, game);
 
 			if (move_count <= number_of_moves_per_game)
 			{
+				/*
+				if (gpu_mode)
+				{
+					input_matrix.enable_gpu_mode();
+					output_matrix.enable_gpu_mode();
+				}
+				//TODO - promotion is not working rn
 				policy_training_ds.set_current_data(input_matrix);
 				policy_training_ds.set_current_label(output_matrix);
 				prediction_training_ds.set_current_data(input_matrix);
+				*/
 			}
 
 			//make move
 			std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
 			int move_idx = leonardo_util::get_random_best_move(output_matrix, legal_moves);
+			std::string s = "game: " + std::to_string(i) + " move: " + std::to_string(move_count) + " " + legal_moves[move_idx].get()->getString();
+			std::cout << s << "\n";
 			game.makeMove(*legal_moves[move_idx].get());
+
+			if (move_count > 40)
+			{
+				break;
+			}
 
 			if (game.getGameState() != GameState::Ongoing)
 			{
@@ -176,6 +230,10 @@ void leonardo_overlord::get_training_data(
 				//set the win matrix - 0 0 if draw - 1 0 for white winning and 0 1 for black winning
 				matrix final_game_state(leonardo_util::get_prediction_output_format());
 				leonardo_util::set_prediction_output(final_game_state, game);
+				if (gpu_mode)
+				{
+					final_game_state.enable_gpu_mode();
+				}
 
 				//the whole game was saved, but we do not know the outcome, so we add that now
 				for (size_t prediction_idx = start_idx; prediction_idx <= end_idx; prediction_idx++)
@@ -202,8 +260,8 @@ void leonardo_overlord::get_training_data(
 
 void leonardo_overlord::upgrade()
 {
-	size_t number_of_selfplay_games = 5;
-	size_t number_of_moves_per_game = 200;
+	size_t number_of_selfplay_games = 1000;
+	size_t number_of_moves_per_game = 10;
 
 	data_space policy_training_ds(
 		number_of_selfplay_games * number_of_moves_per_game,
@@ -229,7 +287,7 @@ void leonardo_overlord::upgrade()
 	prediction_training_ds.iterator_reset();
 
 	std::cout << "start training\n";
-	
+
 	//train policy and prediction in parallel
 	//if a game has less than number_of_moves_per_game moves, the rest of the data is not used - it will train on 0 data
 	std::thread policy_thread = std::thread(
@@ -249,9 +307,9 @@ void leonardo_overlord::upgrade()
 		0.1f
 	);
 
-	if(policy_thread.joinable())
+	if (policy_thread.joinable())
 		policy_thread.join();
-	if(prediction_thread.joinable())
+	if (prediction_thread.joinable())
 		prediction_thread.join();
 
 	std::cout << "training done" << std::endl;
@@ -361,6 +419,66 @@ void leonardo_overlord::train()
 		//remaining - TODO check if this is correct
 		long long remaining_seconds = (elapsed_ms / (i + 1)) * (iterations - i - 1);
 		std::cout << "remaining: " << ms_to_str(remaining_seconds) << std::endl;
+	}
+}
+
+void leonardo_overlord::debug()
+{
+	ChessBoard board(STARTING_FEN);
+
+	std::vector<std::string> inputs = {
+		"d2d3",
+		"h7h5",
+		"c1g5",
+		"g7g6",
+		"g1f3",
+		"b8a6",
+		"h1g1",
+		"g8f6",
+		"a2a4",
+		"f8h6",
+		"b1a3",
+		"d7d6",
+		"g1h1"
+	};
+
+	for (int i = 0; i < inputs.size(); i++)
+	{
+		auto legal_moves = board.getAllLegalMoves();
+		bool found_move = false;
+		for (int j = 0; j < legal_moves.size(); j++)
+		{
+			if (legal_moves[j].get()->getString() == inputs[i])
+			{
+				std::cout << "move: " << inputs[i] << std::endl;
+				board.makeMove(*legal_moves[j].get());
+				found_move = true;
+				break;
+			}
+		}
+		if (!found_move)
+		{
+			std::cout << "move not found: " << inputs[i] << std::endl;
+			break;
+		}
+	}
+
+	for (int x = 0; x < 100; x++)
+	{
+		std::cout << "# " << x << "\n";
+		new_policy_nnet.set_all_parameters(0);
+		new_policy_nnet.apply_noise(1);
+		new_prediction_nnet.set_all_parameters(0);
+		new_prediction_nnet.apply_noise(1);
+
+		std::unordered_map<ChessBoard, matrix, chess_board_hasher> n;
+		std::unordered_map<ChessBoard, matrix, chess_board_hasher> p;
+		std::unordered_map<ChessBoard, matrix, chess_board_hasher> q;
+		std::unordered_set<ChessBoard, chess_board_hasher> visited;
+		for (int i = 0; i < 50; i++)
+		{
+			search(board.getCopyByValue(), n, p, q, visited);
+		}
 	}
 }
 

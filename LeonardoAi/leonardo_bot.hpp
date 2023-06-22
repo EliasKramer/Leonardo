@@ -6,7 +6,7 @@
 
 enum _playstyle_t {
 	max,
-	distributed_random
+	distributed_random //stochastic
 } typedef e_playstyle_t;
 
 class leonardo_bot : public Player

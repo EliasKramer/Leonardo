@@ -3,32 +3,59 @@
 #include "../MockChessEngine/RandomPlayer.h"
 int main()
 {
-	//leonardo_overlord overlord("helo");
-	//overlord.train();
+	
+	leonardo_overlord overlord("helo");
+	overlord.debug();
 
-	int hashset_sum = 0;
-	int move_sum = 0;
-	for (int i = 0; i < 10000000000; i++)
+	return 0;
+	
+	ChessBoard board(STARTING_FEN);
+	
+	std::vector<std::string> inputs = {
+			"d2d3",
+			"h7h5",
+			"c1g5",
+			"g7g6",
+			"g1f3",
+			"b8a6",
+			"h1g1",
+			"g8f6",
+			"a2a4",
+			"f8h6",
+			"b1a3",
+			"d7d6",
+			"g1h1"
+	};
+
+	for (int i = 0; i < inputs.size(); i++)
 	{
-		ChessBoard board(STARTING_FEN);
-		RandomPlayer bot;
-		std::unordered_set<ChessBoard, chess_board_hasher> hashset;
-
-		while (board.getGameState() == GameState::Ongoing)
+		auto legal_moves = board.getAllLegalMoves();
+		bool found_move = false;
+		for (int j = 0; j < legal_moves.size(); j++)
 		{
-			hashset.insert(board);
-			auto moves = board.getAllLegalMoves();
-			int move_idx = bot.getMove(board, moves);
-			board.makeMove(*moves[move_idx].get());
+			if (legal_moves[j].get()->getString() == inputs[i])
+			{
+				std::cout << "move: " << inputs[i] << std::endl;
+				board.makeMove(*legal_moves[j].get());
+				found_move = true;
+				break;
+			}
 		}
-		hashset_sum += hashset.size();
-		move_sum += (board.getNumberOfMovesPlayed() * 2);
-
-		std::cout 
-			<< i << " " 
-			<< "hashset_sum: " << hashset_sum << " "
-			<< "move_sum: " << move_sum 
-			<< " percent: " << (((float)hashset_sum/ (float)move_sum)*100)
-			<< std::endl;
+		if (!found_move)
+		{
+			std::cout << "move not found: " << inputs[i] << std::endl;
+			break;
+		}
+	}
+	auto moves = board.getAllLegalMoves();
+	for (auto& move : moves)
+	{
+		std::cout << move.get()->getString() << std::endl;
+		if (move.get()->getString() == "O-O-O")
+		{
+			ChessBoard copy = board.getCopyByValue();
+			copy.makeMove(*move.get());
+			std::cout << copy.getFen();
+		}
 	}
 }
