@@ -49,7 +49,6 @@ public:
 	~leonardo_overlord();
 
 	void train();
-	void debug();
 
 	const neural_network& get_best_network() const;
 };

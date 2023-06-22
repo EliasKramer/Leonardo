@@ -1,61 +1,36 @@
 #include "leonardo_overlord.hpp"
 #include "../MockChessEngine/AlphaBetaPruningBot.h"
 #include "../MockChessEngine/RandomPlayer.h"
+#include <iomanip>
 int main()
 {
-	
-	leonardo_overlord overlord("helo");
-	overlord.debug();
-
-	return 0;
-	
+	//leonardo_overlord overlord("debugless");
+	//overlord.train();
 	ChessBoard board(STARTING_FEN);
-	
-	std::vector<std::string> inputs = {
-			"d2d3",
-			"h7h5",
-			"c1g5",
-			"g7g6",
-			"g1f3",
-			"b8a6",
-			"h1g1",
-			"g8f6",
-			"a2a4",
-			"f8h6",
-			"b1a3",
-			"d7d6",
-			"g1h1"
-	};
+	RandomPlayer random_player;
 
-	for (int i = 0; i < inputs.size(); i++)
+	while (board.getGameState() == Ongoing)
 	{
-		auto legal_moves = board.getAllLegalMoves();
-		bool found_move = false;
-		for (int j = 0; j < legal_moves.size(); j++)
+		matrix m(leonardo_util::get_input_format());
+		leonardo_util::set_matrix_from_chessboard(board, m);
+		std::cout << "----------------------\n";
+		board.getCurrentTurnColor() == White ? std::cout << "White to move\n" : std::cout << "Black to move\n";
+
+		for (int y = 0; y < 8; y++)
 		{
-			if (legal_moves[j].get()->getString() == inputs[i])
+			std::cout << "|";
+			for (int x = 0; x < 8; x++)
 			{
-				std::cout << "move: " << inputs[i] << std::endl;
-				board.makeMove(*legal_moves[j].get());
-				found_move = true;
-				break;
+				std::cout << std::setw(5) << m.get_at_host(vector3(x, y)) << "|";
 			}
+			std::cout << std::endl;
 		}
-		if (!found_move)
-		{
-			std::cout << "move not found: " << inputs[i] << std::endl;
-			break;
-		}
-	}
-	auto moves = board.getAllLegalMoves();
-	for (auto& move : moves)
-	{
-		std::cout << move.get()->getString() << std::endl;
-		if (move.get()->getString() == "O-O-O")
-		{
-			ChessBoard copy = board.getCopyByValue();
-			copy.makeMove(*move.get());
-			std::cout << copy.getFen();
-		}
+		std::cout << "++++++++++++++++++++++\n";
+		std::cout << board.getString();
+		std::cout << "----------------------\n";
+
+		auto moves = board.getAllLegalMoves();
+		int move_idx = random_player.getMove(board, moves);
+		board.makeMove(*moves[move_idx].get());
 	}
 }

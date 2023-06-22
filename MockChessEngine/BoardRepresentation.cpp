@@ -18,30 +18,8 @@ BoardRepresentation::BoardRepresentation()
 	KingPos{ E1, E8 }
 {}
 
-void BoardRepresentation::validation(const std::string& s) const
-{
-	if (AllPieces != (PiecesOfColor[White] | PiecesOfColor[Black]))
-	{
-		std::cout << "not valid \n"
-			<< s << "\n"
-			<< "PiecesOfColor[White]: " << PiecesOfColor[White] << "\n"
-			<< "PiecesOfColor[Black]: " << PiecesOfColor[Black] << "\n"
-			<< "PiecesOfType[King]: " << PiecesOfType[King] << "\n"
-			<< "PiecesOfType[Queen]: " << PiecesOfType[Queen] << "\n"
-			<< "PiecesOfType[Rook]: " << PiecesOfType[Rook] << "\n"
-			<< "PiecesOfType[Bishop]: " << PiecesOfType[Bishop] << "\n"
-			<< "PiecesOfType[Knight]: " << PiecesOfType[Knight] << "\n"
-			<< "PiecesOfType[Pawn]: " << PiecesOfType[Pawn] << "\n"
-			<< "AllPieces: " << AllPieces << "\n";
-		throw std::exception("AllPieces is not equal to the sum of PiecesOfColor[White] and PiecesOfColor[Black]");
-	}
-}
-
 ChessPiece BoardRepresentation::getPieceAt(Square square) const
 {
-	validation("get piece at " + std::to_string(square) + "start");
-
-
 	BitBoard squareBB = BB_SQUARE[square];
 	//can be improved by adding null types
 	ChessColor colFound = White;
@@ -87,16 +65,12 @@ ChessPiece BoardRepresentation::getPieceAt(Square square) const
 			<< "AllPieces: " << AllPieces << "\n";
 		throw std::exception("There was no piece found at the given square");
 	}
-	validation("get piece at " + std::to_string(square) + "end");
 
 	return ChessPiece(colFound, typeFound);
 }
 
-
 void BoardRepresentation::copySquareToPos(Square copyField, Square pasteField)
 {
-	validation("copy field " + std::to_string(copyField) + " paste field " + std::to_string(pasteField) + " start ");
-
 	BitBoard copyPos = BB_SQUARE[copyField];
 	BitBoard pastePos = BB_SQUARE[pasteField];
 
@@ -132,28 +106,20 @@ void BoardRepresentation::copySquareToPos(Square copyField, Square pasteField)
 	{
 		AllPieces = AllPieces | pastePos;
 	}
-	validation("copy field " + std::to_string(copyField) + " paste field " + std::to_string(pasteField) + " end ");
-
 }
 
 void BoardRepresentation::setAtPosition(ChessPiece piece, Square position)
 {
-	validation("copy field " + std::to_string(PIECETYPE_CHAR[piece.getType()]) + " | " + std::to_string(piece.getColor()) + " pos" + std::to_string(position) + "start ");
-
 	if (AllPieces != (PiecesOfColor[White] | PiecesOfColor[Black]))
 		throw std::exception("AllPieces is not equal to the sum of PiecesOfColor[White] and PiecesOfColor[Black]");
 
 	BitBoard piecePos = BB_SQUARE[position];
 
 	setPieceBitBoard(piece, piecePos);
-
-	validation("copy field " + std::to_string(PIECETYPE_CHAR[piece.getType()]) + " | " + std::to_string(piece.getColor()) + " pos" + std::to_string(position) + "end ");
 }
 
 void BoardRepresentation::setPieceBitBoard(ChessPiece piece, BitBoard bitboard)
 {
-	validation("set piece bitboard field " + std::to_string(PIECETYPE_CHAR[piece.getType()]) + " | " + std::to_string(piece.getColor()) + " bb " + std::to_string(bitboard) + "start ");
-
 	AllPieces = AllPieces | bitboard;
 
 	ChessColor col = piece.getColor();
@@ -161,14 +127,10 @@ void BoardRepresentation::setPieceBitBoard(ChessPiece piece, BitBoard bitboard)
 
 	PieceType type = piece.getType();
 	PiecesOfType[type] = PiecesOfType[type] | bitboard;
-	validation("set piece bitboard field " + std::to_string(PIECETYPE_CHAR[piece.getType()]) + " | " + std::to_string(piece.getColor()) + " bb " + std::to_string(bitboard) + "end ");
-
 }
 
 void BoardRepresentation::delAtPos(Square position)
 {
-	validation("del at pos start " + std::to_string(position));
-
 	BitBoard keepPiecesMask = ~(BB_SQUARE[position]);
 
 	AllPieces = AllPieces & keepPiecesMask;
@@ -184,8 +146,6 @@ void BoardRepresentation::delAtPos(Square position)
 		PieceType currType = (PieceType)i;
 		PiecesOfType[currType] = PiecesOfType[currType] & keepPiecesMask;
 	}
-	validation("del at pos end " + std::to_string(position));
-
 }
 
 bool operator==(const BoardRepresentation& first, const BoardRepresentation& second)

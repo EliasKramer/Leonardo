@@ -78,43 +78,7 @@ float leonardo_overlord::search(
 	}
 	const Move& best_move = *legal_moves[best_move_idx].get();
 
-
-	std::string fen = game.getFen();
-	if (fen == "r1bqk2r/ppp1pp2/n2p1npb/6Bp/P7/N2P1N2/1PP1PPPP/R2QKB1R b Qkq - 1 7")
-	{
-
-		std::vector<std::string> moves_s;
-		int i = 0;
-		for (auto& move : legal_moves)
-		{
-			moves_s.push_back(move->getString());
-			if (move->getString() == "O-O-O")
-			{
-				//std::cout << SQUARE_STRING[(int)move->getStart()] << "|" << SQUARE_STRING[(int)move->getDestination()] << "\n";
-				move->getString();
-				//std::cout << "found move\n" << move->getString() << " idx " << i << "\n";
-
-				for (auto& s : moves_s)
-				{
-					std::cout << s << " " << "\n";
-				}
-				auto lm = game.getAllLegalMoves();
-				for (auto& s : lm)
-				{
-					std::cout << s.get()->getString() << " " << "\n";
-				}
-
-			}
-			i++;
-		}
-	}
-
-
 	ChessBoard new_game = game.getCopyByValue();
-	//DEBUG
-	std::string board_s = game.getString();
-	//std::string move = best_move.getString();
-	//DEBUG
 	new_game.makeMove(best_move);
 
 	float evaluation = search(new_game, n, p, q, visited);
@@ -164,7 +128,6 @@ void leonardo_overlord::get_training_data(
 	data_space& policy_training_ds,
 	data_space& prediction_training_ds)
 {
-
 	policy_training_ds.iterator_reset();
 	prediction_training_ds.iterator_reset();
 
@@ -176,7 +139,6 @@ void leonardo_overlord::get_training_data(
 		while (true)
 		{
 			move_count++;
-
 
 			//quick check if the iterators are valid
 			if (prediction_training_ds.get_iterator_idx() != policy_training_ds.get_iterator_idx())
@@ -197,7 +159,6 @@ void leonardo_overlord::get_training_data(
 
 			if (move_count <= number_of_moves_per_game)
 			{
-				/*
 				if (gpu_mode)
 				{
 					input_matrix.enable_gpu_mode();
@@ -207,20 +168,12 @@ void leonardo_overlord::get_training_data(
 				policy_training_ds.set_current_data(input_matrix);
 				policy_training_ds.set_current_label(output_matrix);
 				prediction_training_ds.set_current_data(input_matrix);
-				*/
 			}
 
 			//make move
 			std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
 			int move_idx = leonardo_util::get_random_best_move(output_matrix, legal_moves);
-			std::string s = "game: " + std::to_string(i) + " move: " + std::to_string(move_count) + " " + legal_moves[move_idx].get()->getString();
-			std::cout << s << "\n";
 			game.makeMove(*legal_moves[move_idx].get());
-
-			if (move_count > 40)
-			{
-				break;
-			}
 
 			if (game.getGameState() != GameState::Ongoing)
 			{
@@ -260,23 +213,31 @@ void leonardo_overlord::get_training_data(
 
 void leonardo_overlord::upgrade()
 {
-	size_t number_of_selfplay_games = 1000;
-	size_t number_of_moves_per_game = 10;
+	size_t number_of_selfplay_games = 10;
+	size_t number_of_moves_per_game = 200;
 
+	std::cout << "initalizing data space\n";
+	//CREATE DATA SPACE
 	data_space policy_training_ds(
 		number_of_selfplay_games * number_of_moves_per_game,
 		leonardo_util::get_input_format(),
 		leonardo_util::get_policy_output_format()
 	);
-	policy_training_ds.copy_to_gpu();
 
 	data_space prediction_training_ds(
 		number_of_selfplay_games * number_of_moves_per_game,
 		leonardo_util::get_input_format(),
 		leonardo_util::get_prediction_output_format()
 	);
-	prediction_training_ds.copy_to_gpu();
+	if (gpu_mode)
+	{
+		policy_training_ds.copy_to_gpu();
+		prediction_training_ds.copy_to_gpu();
+	}
 
+	std::cout << "starting selfplay to get data \n";
+
+	//get training data through selfplay
 	get_training_data(
 		number_of_selfplay_games,
 		number_of_moves_per_game,
@@ -287,7 +248,6 @@ void leonardo_overlord::upgrade()
 	prediction_training_ds.iterator_reset();
 
 	std::cout << "start training\n";
-
 	//train policy and prediction in parallel
 	//if a game has less than number_of_moves_per_game moves, the rest of the data is not used - it will train on 0 data
 	std::thread policy_thread = std::thread(
@@ -312,7 +272,7 @@ void leonardo_overlord::upgrade()
 	if (prediction_thread.joinable())
 		prediction_thread.join();
 
-	std::cout << "training done" << std::endl;
+	std::cout << "training done\n";
 }
 
 leonardo_overlord::leonardo_overlord(
@@ -406,7 +366,6 @@ void leonardo_overlord::train()
 		if (i % 20 == 0)
 		{
 			//start save_best_to_file in save_in_file_thread 
-
 			file_save_thread = std::thread(&leonardo_overlord::save_best_to_file, this, i);
 		}
 
@@ -419,66 +378,6 @@ void leonardo_overlord::train()
 		//remaining - TODO check if this is correct
 		long long remaining_seconds = (elapsed_ms / (i + 1)) * (iterations - i - 1);
 		std::cout << "remaining: " << ms_to_str(remaining_seconds) << std::endl;
-	}
-}
-
-void leonardo_overlord::debug()
-{
-	ChessBoard board(STARTING_FEN);
-
-	std::vector<std::string> inputs = {
-		"d2d3",
-		"h7h5",
-		"c1g5",
-		"g7g6",
-		"g1f3",
-		"b8a6",
-		"h1g1",
-		"g8f6",
-		"a2a4",
-		"f8h6",
-		"b1a3",
-		"d7d6",
-		"g1h1"
-	};
-
-	for (int i = 0; i < inputs.size(); i++)
-	{
-		auto legal_moves = board.getAllLegalMoves();
-		bool found_move = false;
-		for (int j = 0; j < legal_moves.size(); j++)
-		{
-			if (legal_moves[j].get()->getString() == inputs[i])
-			{
-				std::cout << "move: " << inputs[i] << std::endl;
-				board.makeMove(*legal_moves[j].get());
-				found_move = true;
-				break;
-			}
-		}
-		if (!found_move)
-		{
-			std::cout << "move not found: " << inputs[i] << std::endl;
-			break;
-		}
-	}
-
-	for (int x = 0; x < 100; x++)
-	{
-		std::cout << "# " << x << "\n";
-		new_policy_nnet.set_all_parameters(0);
-		new_policy_nnet.apply_noise(1);
-		new_prediction_nnet.set_all_parameters(0);
-		new_prediction_nnet.apply_noise(1);
-
-		std::unordered_map<ChessBoard, matrix, chess_board_hasher> n;
-		std::unordered_map<ChessBoard, matrix, chess_board_hasher> p;
-		std::unordered_map<ChessBoard, matrix, chess_board_hasher> q;
-		std::unordered_set<ChessBoard, chess_board_hasher> visited;
-		for (int i = 0; i < 50; i++)
-		{
-			search(board.getCopyByValue(), n, p, q, visited);
-		}
 	}
 }
 

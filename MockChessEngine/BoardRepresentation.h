@@ -16,8 +16,6 @@ public:
 
 	BoardRepresentation();
 
-	void validation(const std::string& s) const;
-
 	ChessPiece getPieceAt(Square square) const;
 
 	void copySquareToPos(Square copyField, Square pasteField);

@@ -24,10 +24,14 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 
 	BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
 
+	bool flipped = board.getCurrentTurnColor() == Black;
+
 	//we do this in order to have the same order as the input format - no matter black or white's turn
 	for (int i = 0; i < 64; i++)
 	{
 		Square square = (Square)i;
+
+		int flat_idx = flipped ? 63 - i : i;
 		if (bitboardsOverlap(all_pieces, BB_SQUARE[square]))
 		{
 			ChessPiece piece = board.getBoardRepresentation().getPieceAt((Square)i);
@@ -37,13 +41,13 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 
 			float value = piece.getType() == PieceType::King ? 1000 : PIECETYPE_VALUE[piece.getType()];
 			m.set_at_flat(
-				i,
+				flat_idx,
 				value * multiplier
 			);
 		}
 		else
 		{
-			m.set_at_flat(i, 0.0f);
+			m.set_at_flat(flat_idx, 0.0f);
 		}
 	}
 }

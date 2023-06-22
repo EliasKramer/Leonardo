@@ -25,8 +25,6 @@ void ChessBoard::addIfDestinationIsValid(UniqueMoveList& moves, Square start, Di
 		if (!destinationIsSameColor(start, dir, _currentTurnColor))
 		{
 			moves.push_back(std::make_unique<Move>(start, (Square)(start + dir)));
-					moves[moves.size() - 1].get()->getString();
-
 		}
 	}
 }
@@ -43,8 +41,6 @@ void ChessBoard::addIfDestinationIsColor(
 		if (positionIsSameColor(newPos, color))
 		{
 			moves.push_back(std::make_unique<Move>(start, newPos));
-					moves[moves.size() - 1].get()->getString();
-
 		}
 	}
 }
@@ -102,8 +98,6 @@ void ChessBoard::getPawnMoves(UniqueMoveList& moves) const
 						(BB_SQUARE[doubleForward] & _board.AllPieces) == 0ULL)
 					{
 						moves.push_back(std::make_unique<Move>(currSquare, doubleForward));
-								moves[moves.size() - 1].get()->getString();
-
 					}
 				}
 			}
@@ -225,20 +219,13 @@ void ChessBoard::addPawnMove(UniqueMoveList& moves, Square start, Square dest) c
 	if ((BB_SQUARE[dest] & promotionRank) != 0ULL)
 	{
 		moves.push_back(std::make_unique<MovePromote>(start, dest, ChessPiece(_currentTurnColor, Queen)));
-				moves[moves.size() - 1].get()->getString();
-
 		moves.push_back(std::make_unique<MovePromote>(start, dest, ChessPiece(_currentTurnColor, Rook)));
-				moves[moves.size() - 1].get()->getString();
-
 		moves.push_back(std::make_unique<MovePromote>(start, dest, ChessPiece(_currentTurnColor, Bishop)));
-				moves[moves.size() - 1].get()->getString();
 		moves.push_back(std::make_unique<MovePromote>(start, dest, ChessPiece(_currentTurnColor, Knight)));
 	}
 	else
 	{
 		moves.push_back(std::make_unique<Move>(start, dest));
-				moves[moves.size() - 1].get()->getString();
-
 	}
 }
 
@@ -280,7 +267,6 @@ void ChessBoard::getCastlingMoves(UniqueMoveList& moves) const
 			if (castlingAllowed)
 			{
 				moves.push_back(std::make_unique<MoveCastle>(_currentTurnColor, currCastlingType));
-						moves[moves.size() - 1].get()->getString();
 			}
 		}
 	}
@@ -311,8 +297,6 @@ void ChessBoard::getEnPassantMove(UniqueMoveList& moves) const
 				moves.push_back(std::make_unique<MoveEnPassant>(
 					ownPawnPos, _enPassantSquare,
 					pawnPosToDelete));
-						moves[moves.size() - 1].get()->getString();
-
 			}
 		}
 	}
@@ -350,13 +334,12 @@ void ChessBoard::addRayMoves(
 					//if an opponent is on the new field you can take him,
 					//but cannot continue after that (you cannot jump over opponents)
 					moves.push_back(std::make_unique<Move>(start, currentSquare));
-							moves[moves.size() - 1].get()->getString();
+							 
 					break;
 				}
 				else {
 					//if there is no piece at the new position you can move there.
 					moves.push_back(std::make_unique<Move>(start, currentSquare));
-							moves[moves.size() - 1].get()->getString();
 				}
 			}
 			else {
