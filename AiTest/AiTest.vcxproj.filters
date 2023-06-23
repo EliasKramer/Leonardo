@@ -13,227 +13,197 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\dependencies">
-      <UniqueIdentifier>{387134a2-96b1-49f6-924d-fc9ce24be491}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\dependencies">
-      <UniqueIdentifier>{0b4f60f3-aece-4b93-8176-7162c26e9b34}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LeonardoAiTest.cpp">
+    <ClCompile Include="AiTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\AlphaBetaPruningBot.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\BitBoard.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\BoardRepresentation.cpp">
-      <Filter>Source Files\dependencies</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\chess_arena.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\ChessBoard.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\ChessPiece.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\Constants.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\DataAndTypes.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\Game.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\HelpMethods.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\HumanPlayer.cpp">
-      <Filter>Source Files\dependencies</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\leonardo_bot.cpp">
-      <Filter>Source Files\dependencies</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\leonardo_overlord.cpp">
-      <Filter>Source Files\dependencies</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\leonardo_util.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\Medicrius.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\Move.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\MoveCastle.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\MoveDoublePawn.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\MoveEnPassant.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\MovePromote.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\Player.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MockChessEngine\RandomPlayer.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\convolutional_layer.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\data_space.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\fully_connected_layer.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\layer.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\math_functions.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\matrix.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\neural_network.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\pooling_layer.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\test_result.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\util.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\vector3.cpp">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\LeonardoAi\chess_arena.hpp">
-      <Filter>Header Files\dependencies</Filter>
-    </ClInclude>
-    <ClInclude Include="..\LeonardoAi\leonardo_bot.hpp">
-      <Filter>Header Files\dependencies</Filter>
-    </ClInclude>
-    <ClInclude Include="..\LeonardoAi\leonardo_overlord.hpp">
-      <Filter>Header Files\dependencies</Filter>
-    </ClInclude>
-    <ClInclude Include="..\LeonardoAi\leonardo_util.hpp">
-      <Filter>Header Files\dependencies</Filter>
-    </ClInclude>
     <ClInclude Include="..\MockChessEngine\AlphaBetaPruningBot.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\BitBoard.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\BoardRepresentation.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\ChessBoard.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\ChessPiece.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\Constants.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\DataAndTypes.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\Game.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\HelpMethods.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\HumanPlayer.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\Medicrius.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\Move.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\MoveCastle.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\MoveDoublePawn.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\MoveEnPassant.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\MovePromote.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\Player.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\RandomPlayer.h">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\convolutional_layer.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\data_space.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\enum_space.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\fully_connected_layer.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\layer.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\math_functions.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\matrix.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\neural_network.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\pooling_layer.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\test_result.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\util.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\vector3.hpp">
-      <Filter>Header Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\LeonardoAi\NeuroFox\gpu_math.cuh">
-      <Filter>Header Files\dependencies</Filter>
-    </None>
     <None Include="..\LeonardoAi\NeuroFox\gpu_math.cu">
-      <Filter>Source Files\dependencies</Filter>
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\LeonardoAi\NeuroFox\gpu_math.cuh">
+      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
 </Project>

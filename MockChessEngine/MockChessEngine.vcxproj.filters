@@ -13,11 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\etc">
-      <UniqueIdentifier>{f3dba2b1-13af-444f-961e-84ca0f7b7471}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\etc">
+    <Filter Include="Header Files\chess">
       <UniqueIdentifier>{2b6db2aa-b7f9-4ac1-8503-a7f62d172d9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\chess">
+      <UniqueIdentifier>{f3dba2b1-13af-444f-961e-84ca0f7b7471}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -25,114 +25,114 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BitBoard.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="BoardRepresentation.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="ChessBoard.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="ChessPiece.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="Constants.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="DataAndTypes.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="HelpMethods.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="HumanPlayer.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="Move.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="MoveCastle.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="MoveDoublePawn.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="MoveEnPassant.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="MovePromote.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="RandomPlayer.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="AlphaBetaPruningBot.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="Medicrius.cpp">
-      <Filter>Source Files\etc</Filter>
+      <Filter>Source Files\chess</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BitBoard.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="BoardRepresentation.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="ChessBoard.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="ChessPiece.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="Constants.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="DataAndTypes.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="Game.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="HelpMethods.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="HumanPlayer.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="Move.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="MoveCastle.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="MoveDoublePawn.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="MoveEnPassant.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="MovePromote.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="RandomPlayer.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="AlphaBetaPruningBot.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="Medicrius.h">
-      <Filter>Header Files\etc</Filter>
+      <Filter>Header Files\chess</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

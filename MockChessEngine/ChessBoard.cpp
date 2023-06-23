@@ -647,7 +647,7 @@ char ChessBoard::getPieceCharAt(Square pos) const
 }
 
 
-ChessBoard::ChessBoard(std::string given_fen_code)
+ChessBoard::ChessBoard(const std::string& given_fen_code)
 {
 	//set all castling rights to false at the beginning
 	for (int i = 0; i < 2; i++)

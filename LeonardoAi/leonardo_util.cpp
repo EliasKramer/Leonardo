@@ -37,8 +37,8 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 	{
 		for (int x = 0; x < 8; x++)
 		{
-			vector3 coord(x, flipped ? 7 - y : y);
-			Square square = (Square)coord.get_index(vector3(8, 8, 1));
+			vector3 coord(x, flipped ? y : 7 - y);
+			Square square = (Square)vector3(x, y).get_index(vector3(8, 8, 1));
 
 			if (bitboardsOverlap(all_pieces, BB_SQUARE[square]))
 			{
