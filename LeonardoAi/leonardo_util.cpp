@@ -7,10 +7,10 @@ vector3 leonardo_util::get_input_format()
 
 vector3 leonardo_util::get_policy_output_format()
 {
-	//y0 is the start field of the move
-	//y1 is the destination field of the move
-	//x dimension is the square_idx
-	return vector3(64, 2, 1);
+	//z0 is the start field of the move
+	//z1 is the destination field of the move
+	//xy dimensions are the board
+	return vector3(64, 64, 1);
 }
 
 vector3 leonardo_util::get_prediction_output_format()
@@ -61,8 +61,26 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 	}
 }
 
-float leonardo_util::get_move_value(const Move& move, const matrix& policy_output)
+int leonardo_util::square_to_flat_idx(Square s, ChessColor color_to_move)
 {
+	static const vector3 board_dimensions(8, 8, 1);
+	static vector3 coord(0, 0, 0);
+
+	int x = s % 8;
+	int y = s / 8;
+	if (color_to_move == Black)
+	{
+		y = 7 - y;
+	}
+	coord.x = x;
+	coord.y = y;
+
+	return coord.get_index(board_dimensions);
+}
+
+float leonardo_util::get_move_value(const Move& move, const matrix& policy_output, ChessColor color)
+{
+	//remove statements for more speed
 	if (matrix::equal_format(policy_output.get_format(), get_policy_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
@@ -71,20 +89,19 @@ float leonardo_util::get_move_value(const Move& move, const matrix& policy_outpu
 	{
 		throw std::exception("output is not updated");
 	}
+	
+	static vector3 coord(0, 0, 0);
 
-	Square start = move.getStart();
-	Square dest = move.getDestination();
+	int flat_start_idx = square_to_flat_idx(move.getStart(), color);
+	int flat_dest_idx = square_to_flat_idx(move.getDestination(), color);
 
-	int flat_start_idx = start;
-	int flat_dest_idx = 64 + dest;
+	coord.x = flat_start_idx;
+	coord.y = flat_dest_idx;
 
-	float start_value = policy_output.get_at_flat_host(flat_start_idx);
-	float dest_value = policy_output.get_at_flat_host(flat_dest_idx);
-
-	return start_value * dest_value;
+	return policy_output.get_at_host(coord);
 }
 
-void leonardo_util::set_move_value(const Move& move, matrix& output, float value)
+void leonardo_util::set_move_value(const Move& move, matrix& output, float value, const ChessColor color_to_move)
 {
 	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
 	{
@@ -95,37 +112,21 @@ void leonardo_util::set_move_value(const Move& move, matrix& output, float value
 		throw std::exception("output is not synced");
 	}
 
-	vector3 start_coord = vector3(move.getStart(), 0, 0);
-	vector3 dest_coord = vector3(move.getDestination(), 1, 0);
+	static vector3 coord(0, 0, 0);
 
-	float start_value = output.get_at_host(start_coord);
-	float dest_value = output.get_at_host(dest_coord);
+	int flat_start_idx = square_to_flat_idx(move.getStart(), color_to_move);
+	int flat_dest_idx = square_to_flat_idx(move.getDestination(), color_to_move);
 
-	if (start_value < 0 || dest_value < 0 || value < 0)
-	{
-		throw std::exception("negative value");
-	}
-	if (start_value != 0 && dest_value != 0)
-	{
-		throw std::exception("move already set");
-	}
+	coord.x = flat_start_idx;
+	coord.y = flat_dest_idx;
 
-	if (start_value != 0.0f)
-	{
-		output.set_at_host(dest_coord, value / start_value);
-	}
-	else if (dest_value != 0.0f)
-	{
-		output.set_at_host(start_coord, value / dest_value);
-	}
-	else
-	{
-		//coud be set at the start aswell
-		output.set_at_host(dest_coord, value);
-	}
+	output.set_at_host(coord, value);
 }
 
-int leonardo_util::get_best_move(const matrix& output, const UniqueMoveList& allowed_moves)
+int leonardo_util::get_best_move(
+	const matrix& output,
+	const UniqueMoveList& allowed_moves,
+	ChessColor curr_turn_col)
 {
 	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
 	{
@@ -138,7 +139,7 @@ int leonardo_util::get_best_move(const matrix& output, const UniqueMoveList& all
 	int move_idx = 0;
 	for (const std::unique_ptr<Move>& move : allowed_moves)
 	{
-		float value = get_move_value(*move, output);
+		float value = get_move_value(*move, output, curr_turn_col);
 
 		if (value > max_value)
 		{
@@ -154,7 +155,8 @@ int leonardo_util::get_best_move(const matrix& output, const UniqueMoveList& all
 
 int leonardo_util::get_random_best_move(
 	const matrix& output,
-	const UniqueMoveList& allowed_moves)
+	const UniqueMoveList& allowed_moves,
+	ChessColor curr_turn_col)
 {
 	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
 	{
@@ -164,7 +166,7 @@ int leonardo_util::get_random_best_move(
 	float sum = 0;
 	for (const std::unique_ptr<Move>& move : allowed_moves)
 	{
-		float value = get_move_value(*move, output);
+		float value = get_move_value(*move, output, curr_turn_col);
 		sum += value;
 	}
 
@@ -174,7 +176,7 @@ int leonardo_util::get_random_best_move(
 	int move_idx = 0;
 	for (const std::unique_ptr<Move>& move : allowed_moves)
 	{
-		float value = get_move_value(*move, output);
+		float value = get_move_value(*move, output, curr_turn_col);
 		current_sum += value;
 		if (current_sum >= random)
 		{
@@ -242,7 +244,7 @@ float leonardo_util::matrix_map_get_float(
 	const Move& move)
 {
 	matrix& m = matrix_map_get(map, game);
-	return get_move_value(move, m);
+	return get_move_value(move, m, game.getCurrentTurnColor());
 }
 
 void leonardo_util::matrix_map_set_float(
@@ -252,7 +254,7 @@ void leonardo_util::matrix_map_set_float(
 	float value)
 {
 	matrix& m = matrix_map_get(map, game);
-	set_move_value(move, m, value);
+	set_move_value(move, m, value, game.getCurrentTurnColor());
 }
 
 float leonardo_util::matrix_map_sum(
@@ -264,7 +266,7 @@ float leonardo_util::matrix_map_sum(
 	float sum = 0;
 	for (const std::unique_ptr<Move>& move : legal_moves)
 	{
-		sum += get_move_value(*move, m);
+		sum += get_move_value(*move, m, game.getCurrentTurnColor());
 	}
 	return sum;
 }

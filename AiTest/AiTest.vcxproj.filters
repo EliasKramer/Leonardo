@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AiTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\MockChessEngine\AlphaBetaPruningBot.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
@@ -104,6 +101,27 @@
     </ClCompile>
     <ClCompile Include="..\LeonardoAi\NeuroFox\vector3.cpp">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="board_flipper_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\chess_arena.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\leonardo_overlord.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\leonardo_bot.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\leonardo_util.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="move_flipper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="move_value.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,13 +215,20 @@
     <ClInclude Include="..\LeonardoAi\NeuroFox\vector3.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\LeonardoAi\chess_arena.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LeonardoAi\leonardo_bot.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LeonardoAi\leonardo_overlord.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LeonardoAi\leonardo_util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\LeonardoAi\NeuroFox\gpu_math.cu">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="..\LeonardoAi\NeuroFox\gpu_math.cuh">
-      <Filter>Header Files</Filter>
-    </None>
+    <CudaCompile Include="..\LeonardoAi\NeuroFox\gpu_math.cu" />
   </ItemGroup>
 </Project>

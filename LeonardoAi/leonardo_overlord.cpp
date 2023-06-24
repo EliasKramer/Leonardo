@@ -85,7 +85,8 @@ float leonardo_overlord::search(
 
 	//calculate the new average evaulation for the current move
 	leonardo_util::matrix_map_set_float(q, game, best_move,
-		(leonardo_util::matrix_map_get_float(n, game, best_move) * leonardo_util::matrix_map_get_float(q, game, best_move) + evaluation) /
+		(leonardo_util::matrix_map_get_float(n, game, best_move) * leonardo_util::matrix_map_get_float(q, game, best_move) + evaluation) 
+		/
 		(leonardo_util::matrix_map_get_float(n, game, best_move) + 1)
 	);
 
@@ -114,8 +115,8 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	n_matrix.sync_device_and_host();
 	for (int i = 0; i < legal_moves.size(); i++)
 	{
-		float value = leonardo_util::get_move_value(*legal_moves[i].get(), n_matrix);
-		leonardo_util::set_move_value(*legal_moves[i].get(), output_matrix, value);
+		float value = leonardo_util::get_move_value(*legal_moves[i].get(), n_matrix, game.getCurrentTurnColor());
+		leonardo_util::set_move_value(*legal_moves[i].get(), output_matrix, value, game.getCurrentTurnColor());
 	}
 }
 
@@ -135,6 +136,7 @@ void leonardo_overlord::get_training_data(
 		size_t move_count = 0;
 		while (true)
 		{
+			//std::cout << "move count: " << move_count << std::endl;
 			move_count++;
 
 			//quick check if the iterators are valid
@@ -169,7 +171,7 @@ void leonardo_overlord::get_training_data(
 
 			//make move
 			std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
-			int move_idx = leonardo_util::get_random_best_move(output_matrix, legal_moves);
+			int move_idx = leonardo_util::get_random_best_move(output_matrix, legal_moves, game.getCurrentTurnColor());
 			game.makeMove(*legal_moves[move_idx].get());
 
 			if (game.getGameState() != GameState::Ongoing)

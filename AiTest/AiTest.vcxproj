@@ -193,6 +193,8 @@
     <ClCompile Include="..\MockChessEngine\Player.cpp" />
     <ClCompile Include="..\MockChessEngine\RandomPlayer.cpp" />
     <ClCompile Include="board_flipper_test.cpp" />
+    <ClCompile Include="move_flipper.cpp" />
+    <ClCompile Include="move_value.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LeonardoAi\LeonardoAi.vcxproj">

@@ -13,13 +13,14 @@ namespace leonardo_util
 	vector3 get_prediction_output_format();
 
 	void set_matrix_from_chessboard(const ChessBoard& board, matrix& input);
-	float get_move_value(const Move& move, const matrix& policy_output);
-	void set_move_value(const Move& move, matrix& output, float value);
+	int square_to_flat_idx(Square s, ChessColor color_to_move);
+	float get_move_value(const Move& move, const matrix& policy_output, ChessColor color);
+	void set_move_value(const Move& move, matrix& output, float value, const ChessColor color_to_move);
 	
 	//has a matrix and picks the one with the highest value
-	int get_best_move(const matrix& output, const UniqueMoveList& allowed_moves);
+	int get_best_move(const matrix& output, const UniqueMoveList& allowed_moves, ChessColor curr_turn_col);
 	//has a matrix and picks the best move at random, but moves with higher value get picked more often
-	int get_random_best_move(const matrix& output, const UniqueMoveList& allowed_moves);
+	int get_random_best_move(const matrix& output, const UniqueMoveList& allowed_moves, ChessColor curr_turn_col);
 
 	void set_prediction_output(matrix& output, const ChessBoard& game);
 	//returns between -1 and 1 (1 means white won, -1 means black won)

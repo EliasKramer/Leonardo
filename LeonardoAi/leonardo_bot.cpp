@@ -25,7 +25,9 @@ int leonardo_bot::getMove(const ChessBoard& board, const UniqueMoveList& legal_m
 	nn.get_output().sync_device_and_host();
 
 	return 
-		playstyle == e_playstyle_t::max ? leonardo_util::get_best_move(nn.get_output(), legal_moves) :
-		playstyle == e_playstyle_t::distributed_random ? leonardo_util::get_random_best_move(nn.get_output(), legal_moves) :
+		playstyle == e_playstyle_t::max ? 
+			leonardo_util::get_best_move(nn.get_output(), legal_moves, board.getCurrentTurnColor()) :
+		playstyle == e_playstyle_t::distributed_random ? 
+			leonardo_util::get_random_best_move(nn.get_output(), legal_moves, board.getCurrentTurnColor()) :
 		throw std::exception("unknown playstyle");
 }
