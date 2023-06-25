@@ -4,8 +4,6 @@
 #include <cassert>
 int main()
 {
-	//leonardo_overlord overlord("debuglesses");
-	//overlord.train();
-	assert(false);
-	std::cout << "Hello World!\n";
+	leonardo_overlord overlord("debuglesseses");
+	overlord.train();
 }

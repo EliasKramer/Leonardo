@@ -235,7 +235,7 @@ void leonardo_overlord::upgrade()
 	}
 
 	std::cout << "starting selfplay to get data \n";
-
+	auto start = std::chrono::high_resolution_clock::now();
 	//get training data through selfplay
 	get_training_data(
 		number_of_selfplay_games,
@@ -243,10 +243,15 @@ void leonardo_overlord::upgrade()
 		policy_training_ds,
 		prediction_training_ds);
 
-	policy_training_ds.iterator_reset();
-	prediction_training_ds.iterator_reset();
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+	std::cout << "selfplay done. took: " << ms_to_str(duration.count()) << std::endl;
+
 
 	std::cout << "start training\n";
+	start = std::chrono::high_resolution_clock::now();
+	policy_training_ds.iterator_reset();
+	prediction_training_ds.iterator_reset();
 	//train policy and prediction in parallel
 	//if a game has less than number_of_moves_per_game moves, the rest of the data is not used - it will train on 0 data
 	std::thread policy_thread = std::thread(
@@ -271,7 +276,9 @@ void leonardo_overlord::upgrade()
 	if (prediction_thread.joinable())
 		prediction_thread.join();
 
-	std::cout << "training done\n";
+	stop = std::chrono::high_resolution_clock::now();
+	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+	std::cout << "training done. took: " << ms_to_str(duration.count()) << std::endl;
 }
 
 leonardo_overlord::leonardo_overlord(
@@ -281,15 +288,15 @@ leonardo_overlord::leonardo_overlord(
 	//best_network = neural_network("models\\learner_epoch_500.parameters");
 
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
-	best_policy_nnet.add_fully_connected_layer(512, sigmoid_fn);
-	best_policy_nnet.add_fully_connected_layer(512, sigmoid_fn);
+	best_policy_nnet.add_fully_connected_layer(1024, sigmoid_fn);
+	best_policy_nnet.add_fully_connected_layer(1024, sigmoid_fn);
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), sigmoid_fn);
 	best_policy_nnet.set_all_parameters(0.0f);
 	best_policy_nnet.apply_noise(1);
 
 	best_prediction_nnet.set_input_format(leonardo_util::get_input_format());
-	best_prediction_nnet.add_fully_connected_layer(512, sigmoid_fn);
-	best_prediction_nnet.add_fully_connected_layer(512, sigmoid_fn);
+	best_prediction_nnet.add_fully_connected_layer(1024, sigmoid_fn);
+	best_prediction_nnet.add_fully_connected_layer(1024, sigmoid_fn);
 	best_prediction_nnet.add_fully_connected_layer(leonardo_util::get_prediction_output_format(), sigmoid_fn);
 	best_prediction_nnet.set_all_parameters(0.0f);
 	best_prediction_nnet.apply_noise(1);
@@ -323,7 +330,8 @@ void leonardo_overlord::train()
 	);
 
 	//start timer
-	std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+	std::chrono::steady_clock::time_point start = 
+		std::chrono::high_resolution_clock::now();
 
 	//training 25000 apparently
 	int iterations = 21;
@@ -341,7 +349,13 @@ void leonardo_overlord::train()
 		}
 
 		std::cout << "throwing new and best nnet into a arena" << std::endl;
+		auto arena_start = std::chrono::high_resolution_clock::now();
 		arena_result arena_result = arena.play(50);
+		auto arena_stop = std::chrono::high_resolution_clock::now();
+		auto arena_duration = 
+			std::chrono::duration_cast<std::chrono::milliseconds>(arena_stop - arena_start);
+		std::cout << "arena done. took: " << ms_to_str(arena_duration.count()) << std::endl;
+		
 		int win_score = arena_result.player_2_won - arena_result.player_1_won;
 
 		//	# best input for next iteration
@@ -368,7 +382,8 @@ void leonardo_overlord::train()
 			file_save_thread = std::thread(&leonardo_overlord::save_best_to_file, this, i);
 		}
 
-		std::chrono::steady_clock::time_point stop = std::chrono::high_resolution_clock::now();
+		std::chrono::steady_clock::time_point stop = 
+			std::chrono::high_resolution_clock::now();
 
 		//elapsed seconds since start
 		long long elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();

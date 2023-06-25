@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
-
+#include <cassert>
 namespace leonardo_util 
 {
 	vector3 get_input_format();

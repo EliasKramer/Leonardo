@@ -6,7 +6,7 @@
 
 enum _playstyle_t {
 	max,
-	distributed_random //stochastic
+	distributed_random //not really stochastic - stochastic would roll a dice for each move - this works a bit different
 } typedef e_playstyle_t;
 
 class leonardo_bot : public Player
