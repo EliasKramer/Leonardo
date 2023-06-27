@@ -209,6 +209,7 @@
     <ClInclude Include="..\LeonardoAi\leonardo_bot.hpp" />
     <ClInclude Include="..\LeonardoAi\leonardo_overlord.hpp" />
     <ClInclude Include="..\LeonardoAi\leonardo_util.hpp" />
+    <ClInclude Include="..\LeonardoAi\NeuroFox\assert_throw.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\convolutional_layer.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\data_space.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\enum_space.hpp" />

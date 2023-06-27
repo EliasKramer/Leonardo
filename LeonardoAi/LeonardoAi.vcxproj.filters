@@ -230,6 +230,9 @@
     <ClInclude Include="leonardo_util.hpp">
       <Filter>header</Filter>
     </ClInclude>
+    <ClInclude Include="NeuroFox\assert_throw.hpp">
+      <Filter>header\nnet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="NeuroFox\gpu_math.cu">

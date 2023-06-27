@@ -20,7 +20,7 @@ vector3 leonardo_util::get_prediction_output_format()
 
 void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& m)
 {
-	if (matrix::equal_format(m.get_format(), leonardo_util::get_input_format()) == false)
+	if (matrix::nn_equal_format(m.get_format(), leonardo_util::get_input_format()) == false)
 	{
 		throw std::exception("input_board has wrong format");
 	}
@@ -81,7 +81,7 @@ int leonardo_util::square_to_flat_idx(Square s, ChessColor color_to_move)
 float leonardo_util::get_move_value(const Move& move, const matrix& policy_output, ChessColor color)
 {
 	//remove statements for more speed
-	if (matrix::equal_format(policy_output.get_format(), get_policy_output_format()) == false)
+	if (matrix::nn_equal_format(policy_output.get_format(), get_policy_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
@@ -89,7 +89,7 @@ float leonardo_util::get_move_value(const Move& move, const matrix& policy_outpu
 	{
 		throw std::exception("output is not updated");
 	}
-	
+
 	static vector3 coord(0, 0, 0);
 
 	int flat_start_idx = square_to_flat_idx(move.getStart(), color);
@@ -103,7 +103,7 @@ float leonardo_util::get_move_value(const Move& move, const matrix& policy_outpu
 
 void leonardo_util::set_move_value(const Move& move, matrix& output, float value, const ChessColor color_to_move)
 {
-	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
+	if (matrix::nn_equal_format(output.get_format(), get_policy_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
@@ -128,7 +128,7 @@ int leonardo_util::get_best_move(
 	const UniqueMoveList& allowed_moves,
 	ChessColor curr_turn_col)
 {
-	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
+	if (matrix::nn_equal_format(output.get_format(), get_policy_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
@@ -158,39 +158,77 @@ int leonardo_util::get_random_best_move(
 	const UniqueMoveList& allowed_moves,
 	ChessColor curr_turn_col)
 {
-	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
+	if (matrix::nn_equal_format(output.get_format(), get_policy_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
+	//the implementation has negative values in mind
+	float sum_positive = 0;
+	float sum_negative = 0;
 
-	float sum = 0;
 	for (const std::unique_ptr<Move>& move : allowed_moves)
 	{
 		float value = get_move_value(*move, output, curr_turn_col);
-		sum += value;
+		value > 0 ? sum_positive += value : sum_negative += value;
 	}
-
-	float random = random_float_excl(0, sum);
-
-	float current_sum = 0;
-	int move_idx = 0;
-	for (const std::unique_ptr<Move>& move : allowed_moves)
+	
+	if (sum_positive > 0)
 	{
-		float value = get_move_value(*move, output, curr_turn_col);
-		current_sum += value;
-		if (current_sum >= random)
+		float random = random_float_excl(0, sum_positive);
+
+		float current_sum = 0;
+		int move_idx = 0;
+		for (const std::unique_ptr<Move>& move : allowed_moves)
 		{
-			return move_idx;
+			float value = get_move_value(*move, output, curr_turn_col);
+			if (value > 0)
+			{
+				current_sum += value;
+				if (current_sum >= random)
+				{
+					return move_idx;
+				}
+				move_idx++;
+			}
 		}
-		move_idx++;
 	}
+	else if (sum_negative < 0)
+	{
+		float random = random_float_excl(sum_negative, 0);
+		
+		float current_sum = 0;
+		int move_idx = 0;
 
-	throw std::exception("no move found");
+		for (const std::unique_ptr<Move>& move : allowed_moves)
+		{
+			float value = get_move_value(*move, output, curr_turn_col);
+			if (value < 0)
+			{
+				current_sum += value;
+				if (current_sum <= random)
+				{
+					return move_idx;
+				}
+				move_idx++;
+			}
+		}
+	}
+	else if (sum_positive == 0 && sum_negative == 0)
+	{
+		std::cout
+			<< "all move values are 0 -> moves.size() = "
+			<< allowed_moves.size() << std::endl;
+		return random_idx(allowed_moves.size());
+	}
+	else
+	{
+		throw std::exception("something went wrong\n");
+	}
 }
 
 void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game)
 {
-	if (matrix::equal_format(output.get_format(), get_prediction_output_format()) == false)
+	if (matrix::nn_equal_format(output.get_format(), get_prediction_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
@@ -206,7 +244,7 @@ void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game
 
 float leonardo_util::get_prediction_output(matrix& output)
 {
-	if (matrix::equal_format(output.get_format(), get_prediction_output_format()) == false)
+	if (matrix::nn_equal_format(output.get_format(), get_prediction_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
@@ -230,7 +268,7 @@ matrix& leonardo_util::matrix_map_get(
 	//find it
 	matrix& m = map[game];
 	//format has to be correct
-	if (matrix::equal_format(m.get_format(), get_policy_output_format()) == false)
+	if (matrix::nn_equal_format(m.get_format(), get_policy_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}

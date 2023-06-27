@@ -260,7 +260,8 @@ void leonardo_overlord::upgrade()
 		std::ref(policy_training_ds),
 		2,
 		20,
-		0.1f
+		0.1f,
+		true
 	);
 	std::thread prediction_thread = std::thread(
 		&neural_network::learn_on_ds,
@@ -268,7 +269,8 @@ void leonardo_overlord::upgrade()
 		std::ref(prediction_training_ds),
 		2,
 		20,
-		0.1f
+		0.1f,
+		true
 	);
 
 	if (policy_thread.joinable())
@@ -288,16 +290,20 @@ leonardo_overlord::leonardo_overlord(
 	//best_network = neural_network("models\\learner_epoch_500.parameters");
 
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
-	best_policy_nnet.add_fully_connected_layer(1024, sigmoid_fn);
-	best_policy_nnet.add_fully_connected_layer(1024, sigmoid_fn);
-	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), sigmoid_fn);
+	best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
 	best_policy_nnet.set_all_parameters(0.0f);
 	best_policy_nnet.apply_noise(1);
 
 	best_prediction_nnet.set_input_format(leonardo_util::get_input_format());
-	best_prediction_nnet.add_fully_connected_layer(1024, sigmoid_fn);
-	best_prediction_nnet.add_fully_connected_layer(1024, sigmoid_fn);
-	best_prediction_nnet.add_fully_connected_layer(leonardo_util::get_prediction_output_format(), sigmoid_fn);
+	best_prediction_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
+	best_prediction_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	best_prediction_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_prediction_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_prediction_nnet.add_fully_connected_layer(leonardo_util::get_prediction_output_format(), leaky_relu_fn);
 	best_prediction_nnet.set_all_parameters(0.0f);
 	best_prediction_nnet.apply_noise(1);
 

@@ -227,8 +227,13 @@
     <ClInclude Include="..\LeonardoAi\leonardo_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\LeonardoAi\NeuroFox\assert_throw.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="..\LeonardoAi\NeuroFox\gpu_math.cu" />
+    <CudaCompile Include="..\LeonardoAi\NeuroFox\gpu_math.cu">
+      <Filter>Header Files</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>
