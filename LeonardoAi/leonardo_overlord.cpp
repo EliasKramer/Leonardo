@@ -258,7 +258,7 @@ void leonardo_overlord::upgrade()
 		&neural_network::learn_on_ds,
 		&new_policy_nnet,
 		std::ref(policy_training_ds),
-		2,
+		10,
 		20,
 		0.1f,
 		true
@@ -267,7 +267,7 @@ void leonardo_overlord::upgrade()
 		&neural_network::learn_on_ds,
 		&new_prediction_nnet,
 		std::ref(prediction_training_ds),
-		2,
+		10,
 		20,
 		0.1f,
 		true
@@ -378,8 +378,6 @@ void leonardo_overlord::train()
 		else
 		{
 			std::cout << "new network is worse" << std::endl;
-			//new_policy_nnet.set_parameters(best_policy_nnet);
-			//new_prediction_nnet.set_parameters(new_prediction_nnet);
 		}
 
 		if (i % 20 == 0)
