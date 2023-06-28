@@ -20,7 +20,7 @@ vector3 leonardo_util::get_prediction_output_format()
 
 void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& m)
 {
-	if (matrix::nn_equal_format(m.get_format(), leonardo_util::get_input_format()) == false)
+	if (matrix::equal_format(m.get_format(), leonardo_util::get_input_format()) == false)
 	{
 		throw std::exception("input_board has wrong format");
 	}
@@ -81,7 +81,7 @@ int leonardo_util::square_to_flat_idx(Square s, ChessColor color_to_move)
 float leonardo_util::get_move_value(const Move& move, const matrix& policy_output, ChessColor color)
 {
 	//remove statements for more speed
-	if (matrix::nn_equal_format(policy_output.get_format(), get_policy_output_format()) == false)
+	if (matrix::equal_format(policy_output.get_format(), get_policy_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
@@ -103,7 +103,7 @@ float leonardo_util::get_move_value(const Move& move, const matrix& policy_outpu
 
 void leonardo_util::set_move_value(const Move& move, matrix& output, float value, const ChessColor color_to_move)
 {
-	if (matrix::nn_equal_format(output.get_format(), get_policy_output_format()) == false)
+	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
@@ -128,7 +128,7 @@ int leonardo_util::get_best_move(
 	const UniqueMoveList& allowed_moves,
 	ChessColor curr_turn_col)
 {
-	if (matrix::nn_equal_format(output.get_format(), get_policy_output_format()) == false)
+	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
@@ -158,7 +158,7 @@ int leonardo_util::get_random_best_move(
 	const UniqueMoveList& allowed_moves,
 	ChessColor curr_turn_col)
 {
-	if (matrix::nn_equal_format(output.get_format(), get_policy_output_format()) == false)
+	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
@@ -228,7 +228,7 @@ int leonardo_util::get_random_best_move(
 
 void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game)
 {
-	if (matrix::nn_equal_format(output.get_format(), get_prediction_output_format()) == false)
+	if (matrix::equal_format(output.get_format(), get_prediction_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
@@ -244,7 +244,7 @@ void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game
 
 float leonardo_util::get_prediction_output(matrix& output)
 {
-	if (matrix::nn_equal_format(output.get_format(), get_prediction_output_format()) == false)
+	if (matrix::equal_format(output.get_format(), get_prediction_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}
@@ -268,7 +268,7 @@ matrix& leonardo_util::matrix_map_get(
 	//find it
 	matrix& m = map[game];
 	//format has to be correct
-	if (matrix::nn_equal_format(m.get_format(), get_policy_output_format()) == false)
+	if (matrix::equal_format(m.get_format(), get_policy_output_format()) == false)
 	{
 		throw std::exception("output has wrong format");
 	}

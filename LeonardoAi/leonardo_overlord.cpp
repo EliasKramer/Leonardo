@@ -25,7 +25,6 @@ float leonardo_overlord::search(
 	//current game state has not been visited
 	if (visited.find(game) == visited.end())
 	{
-		//now we visted the game
 		visited.insert(game);
 
 		//feed the input matrix into the policy network
@@ -55,7 +54,6 @@ float leonardo_overlord::search(
 	for (int i = 0; i < legal_moves.size(); i++)
 	{
 		const Move& move = *legal_moves[i].get();
-		std::string s = move.getString();
 
 		//if c is high - lots of exploration
 		//if c is low - lots of exploitation
@@ -85,7 +83,7 @@ float leonardo_overlord::search(
 
 	//calculate the new average evaulation for the current move
 	leonardo_util::matrix_map_set_float(q, game, best_move,
-		(leonardo_util::matrix_map_get_float(n, game, best_move) * leonardo_util::matrix_map_get_float(q, game, best_move) + evaluation) 
+		(leonardo_util::matrix_map_get_float(n, game, best_move) * leonardo_util::matrix_map_get_float(q, game, best_move) + evaluation)
 		/
 		(leonardo_util::matrix_map_get_float(n, game, best_move) + 1)
 	);
@@ -120,6 +118,79 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	}
 }
 
+int leonardo_overlord::self_play(
+	int game_idx,
+	size_t number_of_moves_per_game,
+	data_space& policy_training_ds,
+	data_space& prediction_training_ds)
+{
+	ChessBoard game(STARTING_FEN);
+
+	size_t move_count = 0;
+	size_t data_space_game_start_idx = prediction_training_ds.get_iterator_idx();
+
+	while (true)
+	{
+		move_count++;
+		std::cout << "move count: " << move_count << std::endl;
+
+		smart_assert(prediction_training_ds.get_iterator_idx() == policy_training_ds.get_iterator_idx());
+
+		matrix output_matrix(leonardo_util::get_policy_output_format());
+		matrix input_matrix(leonardo_util::get_input_format());
+		leonardo_util::set_matrix_from_chessboard(game, input_matrix); //all on cpu
+
+		policy(output_matrix, game);
+
+		if (move_count <= number_of_moves_per_game)
+		{
+			if (gpu_mode)
+			{
+				input_matrix.enable_gpu_mode();
+				output_matrix.enable_gpu_mode();
+			}
+			//TODO - promotion is not working rn
+			policy_training_ds.set_current_data(input_matrix);
+			policy_training_ds.set_current_label(output_matrix);
+			prediction_training_ds.set_current_data(input_matrix);
+		}
+
+		//make move
+		std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
+		int move_idx = leonardo_util::get_random_best_move(output_matrix, legal_moves, game.getCurrentTurnColor());
+		game.makeMove(*legal_moves[move_idx].get());
+
+		if (game.getGameState() != GameState::Ongoing)
+		{
+			//get current index of data space
+			size_t end_idx = prediction_training_ds.get_iterator_idx();
+
+			//set the win matrix - 0 0 if draw - 1 0 for white winning and 0 1 for black winning
+			matrix final_game_state(leonardo_util::get_prediction_output_format());
+			leonardo_util::set_prediction_output(final_game_state, game);
+			if (gpu_mode)
+			{
+				final_game_state.enable_gpu_mode();
+			}
+
+			//the whole game was saved, but we do not know the outcome, so we add that now
+			for (size_t prediction_idx = data_space_game_start_idx; prediction_idx <= end_idx; prediction_idx++)
+			{
+				prediction_training_ds.set_iterator_idx(prediction_idx);
+				prediction_training_ds.set_current_label(final_game_state);
+			}
+
+			policy_training_ds.iterator_next();
+			prediction_training_ds.iterator_next();
+
+			return move_count;
+		}
+
+		policy_training_ds.iterator_next();
+		prediction_training_ds.iterator_next();
+	}
+}
+
 void leonardo_overlord::get_training_data(
 	size_t number_of_selfplay_games,
 	size_t number_of_moves_per_game,
@@ -131,88 +202,22 @@ void leonardo_overlord::get_training_data(
 
 	for (int i = 0; i < number_of_selfplay_games; i++)
 	{
-		ChessBoard game(STARTING_FEN); // replace with starting pos TODO
-
-		size_t move_count = 0;
-		while (true)
-		{
-			//std::cout << "move count: " << move_count << std::endl;
-			move_count++;
-
-			//quick check if the iterators are valid
-			if (prediction_training_ds.get_iterator_idx() != policy_training_ds.get_iterator_idx())
-			{
-				throw std::exception("something went wrong");
-			}
-
-			//chess_data_space.new_game()  # remember index, to add outcome later
-			size_t start_idx = prediction_training_ds.get_iterator_idx();
-
-			//# get move of policy network
-			//output_matrix = policy(game, policy_network, prediction_network)
-			matrix output_matrix(leonardo_util::get_policy_output_format());
-			matrix input_matrix(leonardo_util::get_input_format());
-			leonardo_util::set_matrix_from_chessboard(game, input_matrix); //all on cpu
-
-			policy(output_matrix, game);
-
-			if (move_count <= number_of_moves_per_game)
-			{
-				if (gpu_mode)
-				{
-					input_matrix.enable_gpu_mode();
-					output_matrix.enable_gpu_mode();
-				}
-				//TODO - promotion is not working rn
-				policy_training_ds.set_current_data(input_matrix);
-				policy_training_ds.set_current_label(output_matrix);
-				prediction_training_ds.set_current_data(input_matrix);
-			}
-
-			//make move
-			std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
-			int move_idx = leonardo_util::get_random_best_move(output_matrix, legal_moves, game.getCurrentTurnColor());
-			game.makeMove(*legal_moves[move_idx].get());
-
-			if (game.getGameState() != GameState::Ongoing)
-			{
-				//get current index of data space
-				size_t end_idx = prediction_training_ds.get_iterator_idx();
-
-				//set the win matrix - 0 0 if draw - 1 0 for white winning and 0 1 for black winning
-				matrix final_game_state(leonardo_util::get_prediction_output_format());
-				leonardo_util::set_prediction_output(final_game_state, game);
-				if (gpu_mode)
-				{
-					final_game_state.enable_gpu_mode();
-				}
-
-				//the whole game was saved, but we do not know the outcome, so we add that now
-				for (size_t prediction_idx = start_idx; prediction_idx <= end_idx; prediction_idx++)
-				{
-					prediction_training_ds.set_iterator_idx(prediction_idx);
-					prediction_training_ds.set_current_label(final_game_state);
-				}
-
-				policy_training_ds.iterator_next();
-				prediction_training_ds.iterator_next();
-				std::cout
-					<< (i + 1) << "/" << number_of_selfplay_games
-					<< " game ended. move count: " << move_count
-					<< " game_state: " << GAME_STATE_STRING[game.getGameState()]
-					<< std::endl;
-				break;
-			}
-
-			policy_training_ds.iterator_next();
-			prediction_training_ds.iterator_next();
-		}
+		int move_count = self_play(
+			i,
+			number_of_moves_per_game,
+			policy_training_ds,
+			prediction_training_ds
+		);
+		std::cout
+			<< "game " << (i + 1)
+			<< "/" << number_of_selfplay_games
+			<< " finished (" << move_count << ")" << std::endl;
 	}
 }
 
 void leonardo_overlord::upgrade()
 {
-	size_t number_of_selfplay_games = 10;
+	size_t number_of_selfplay_games = 1;
 	size_t number_of_moves_per_game = 200;
 
 	std::cout << "initalizing data space\n";
@@ -336,11 +341,12 @@ void leonardo_overlord::train()
 	);
 
 	//start timer
-	std::chrono::steady_clock::time_point start = 
+	std::chrono::steady_clock::time_point start =
 		std::chrono::high_resolution_clock::now();
 
 	//training 25000 apparently
-	int iterations = 21;
+	int iterations = 100;
+	int iterations_per_file_save = 20;
 	for (int i = 0; i < iterations; i++)
 	{
 		std::cout << "upgrade time. iteration: " << i << std::endl;
@@ -358,19 +364,14 @@ void leonardo_overlord::train()
 		auto arena_start = std::chrono::high_resolution_clock::now();
 		arena_result arena_result = arena.play(50);
 		auto arena_stop = std::chrono::high_resolution_clock::now();
-		auto arena_duration = 
+		auto arena_duration =
 			std::chrono::duration_cast<std::chrono::milliseconds>(arena_stop - arena_start);
 		std::cout << "arena done. took: " << ms_to_str(arena_duration.count()) << std::endl;
-		
+
 		int win_score = arena_result.player_2_won - arena_result.player_1_won;
 
-		//	# best input for next iteration
-		//	threshold = 0.55  # hyperparameter - how much better the new net has to be
-		//	if win_ratio > threshold:
 		if (win_score > 0)
 		{
-			//policy_nn = new_policy_nn
-			//syncing host and device gets done inside ?
 			std::cout << "new network is better" << std::endl;
 			best_policy_nnet.set_parameters(new_policy_nnet);
 			best_prediction_nnet.set_parameters(new_prediction_nnet);
@@ -380,20 +381,18 @@ void leonardo_overlord::train()
 			std::cout << "new network is worse" << std::endl;
 		}
 
-		if (i % 20 == 0)
+		if ((i + 1) % iterations_per_file_save == 0 || i == iterations - 1)
 		{
 			//start save_best_to_file in save_in_file_thread 
 			file_save_thread = std::thread(&leonardo_overlord::save_best_to_file, this, i);
 		}
 
-		std::chrono::steady_clock::time_point stop = 
+		std::chrono::steady_clock::time_point stop =
 			std::chrono::high_resolution_clock::now();
 
-		//elapsed seconds since start
 		long long elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
 
 		std::cout << "elapsed: " << ms_to_str(elapsed_ms) << std::endl;
-		//remaining - TODO check if this is correct
 		long long remaining_seconds = (elapsed_ms / (i + 1)) * (iterations - i - 1);
 		std::cout << "remaining: " << ms_to_str(remaining_seconds) << std::endl;
 	}
