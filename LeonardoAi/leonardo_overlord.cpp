@@ -103,7 +103,7 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		search(game, n, p, q, visited);
 	}
@@ -132,7 +132,7 @@ int leonardo_overlord::self_play(
 	while (true)
 	{
 		move_count++;
-		std::cout << "move count: " << move_count << std::endl;
+		std::cout << ".";
 
 		smart_assert(prediction_training_ds.get_iterator_idx() == policy_training_ds.get_iterator_idx());
 
@@ -209,15 +209,18 @@ void leonardo_overlord::get_training_data(
 			prediction_training_ds
 		);
 		std::cout
+			<< "\n"
 			<< "game " << (i + 1)
 			<< "/" << number_of_selfplay_games
-			<< " finished (" << move_count << ")" << std::endl;
+			<< " finished (" << move_count << ")" 
+			<< "\n";
 	}
 }
 
 void leonardo_overlord::upgrade()
 {
-	size_t number_of_selfplay_games = 1;
+	//az has 25000
+	size_t number_of_selfplay_games = 100;
 	size_t number_of_moves_per_game = 200;
 
 	std::cout << "initalizing data space\n";
@@ -251,7 +254,6 @@ void leonardo_overlord::upgrade()
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 	std::cout << "selfplay done. took: " << ms_to_str(duration.count()) << std::endl;
-
 
 	std::cout << "start training\n";
 	start = std::chrono::high_resolution_clock::now();
@@ -344,9 +346,8 @@ void leonardo_overlord::train()
 	std::chrono::steady_clock::time_point start =
 		std::chrono::high_resolution_clock::now();
 
-	//training 25000 apparently
-	int iterations = 100;
-	int iterations_per_file_save = 20;
+	int iterations = 1000000;
+	int iterations_per_file_save = 1;
 	for (int i = 0; i < iterations; i++)
 	{
 		std::cout << "upgrade time. iteration: " << i << std::endl;

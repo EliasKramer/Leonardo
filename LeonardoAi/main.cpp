@@ -3,6 +3,6 @@
 #include "../MockChessEngine/RandomPlayer.h"
 int main()
 {
-	leonardo_overlord overlord("debuglesseses");
+	leonardo_overlord overlord("run_p100_g100_mpg200");
 	overlord.train();
 }
