@@ -123,6 +123,9 @@
     <ClCompile Include="move_value.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="value_net_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\MockChessEngine\AlphaBetaPruningBot.h">

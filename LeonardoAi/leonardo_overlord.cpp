@@ -118,104 +118,145 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	}
 }
 
-int leonardo_overlord::self_play(
-	int game_idx,
+void leonardo_overlord::self_play(
+	int first_game_idx,
+	int last_game_idx,
 	size_t number_of_moves_per_game,
 	data_space& policy_training_ds,
 	data_space& prediction_training_ds)
 {
-	ChessBoard game(STARTING_FEN);
-
-	size_t move_idx = 0;
-	size_t data_space_game_start_idx = game_idx * number_of_moves_per_game;
-
-	while (true)
+	for (int game_idx = first_game_idx; game_idx < last_game_idx; game_idx++)
 	{
-		std::cout << ".";
+		ChessBoard game(STARTING_FEN);
 
-		matrix output_matrix(leonardo_util::get_policy_output_format());
-		matrix input_matrix(leonardo_util::get_input_format());
-		leonardo_util::set_matrix_from_chessboard(game, input_matrix); //all on cpu
+		size_t move_idx = 0;
+		size_t data_space_game_start_idx = game_idx * number_of_moves_per_game;
 
-		policy(output_matrix, game);
-
-		if (move_idx < number_of_moves_per_game)
+		while (true)
 		{
-			if (gpu_mode)
+			std::string move_s = "(" + std::to_string(game_idx) + ")";
+			std::cout << move_s;
+
+			matrix output_matrix(leonardo_util::get_policy_output_format());
+			matrix input_matrix(leonardo_util::get_input_format());
+			leonardo_util::set_matrix_from_chessboard(game, input_matrix); //all on cpu
+
+			policy(output_matrix, game);
+
+			if (move_idx < number_of_moves_per_game)
 			{
-				input_matrix.enable_gpu_mode();
-				output_matrix.enable_gpu_mode();
+				if (gpu_mode)
+				{
+					input_matrix.enable_gpu_mode();
+					output_matrix.enable_gpu_mode();
+				}
+				//TODO - promotion is not working rn
+				size_t ds_idx = data_space_game_start_idx + move_idx;
+				policy_training_ds.set_data(input_matrix, ds_idx);
+				policy_training_ds.set_label(output_matrix, ds_idx);
+				prediction_training_ds.set_data(input_matrix, ds_idx);
 			}
-			//TODO - promotion is not working rn
-			size_t ds_idx = data_space_game_start_idx + move_idx;
-			policy_training_ds.set_data(input_matrix, ds_idx);
-			policy_training_ds.set_label(output_matrix, ds_idx);
-			prediction_training_ds.set_data(input_matrix, ds_idx);
+
+			//make move
+			std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
+			int chosen_move_idx = leonardo_util::get_random_best_move(output_matrix, legal_moves, game.getCurrentTurnColor());
+			game.makeMove(*legal_moves[chosen_move_idx].get());
+
+			if (game.getGameState() != GameState::Ongoing)
+			{
+				//get current index of data space
+				size_t end_idx = data_space_game_start_idx + move_idx;
+
+				//set the win matrix - 0 0 if draw - 1 0 for white winning and 0 1 for black winning
+				matrix final_game_state_w(leonardo_util::get_prediction_output_format());
+				leonardo_util::set_prediction_output(final_game_state_w, game, White);
+				matrix final_game_state_b(leonardo_util::get_prediction_output_format());
+				leonardo_util::set_prediction_output(final_game_state_b, game, Black);
+				if (gpu_mode)
+				{
+					final_game_state_w.enable_gpu_mode();
+					final_game_state_b.enable_gpu_mode();
+				}
+
+				bool white_turn = true;
+				//the whole game was saved, but we do not know the outcome, so we add that now
+				for (size_t prediction_idx = data_space_game_start_idx; prediction_idx <= end_idx; prediction_idx++)
+				{
+					//invalid argument throw in cuda here - TODO FIX
+					prediction_training_ds.set_label(white_turn ? final_game_state_w : final_game_state_b, prediction_idx);
+					white_turn = !white_turn;
+				}
+
+				std::cout
+					<<
+					"\ngame " + std::to_string(game_idx) +
+					" finished (" + std::to_string(move_idx + 1) + ")" +
+					"\n";
+
+				break;
+			}
+
+			move_idx++;
 		}
-
-		//make move
-		std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
-		int chosen_move_idx = leonardo_util::get_random_best_move(output_matrix, legal_moves, game.getCurrentTurnColor());
-		game.makeMove(*legal_moves[chosen_move_idx].get());
-
-		if (game.getGameState() != GameState::Ongoing)
-		{
-			//get current index of data space
-			size_t end_idx = data_space_game_start_idx + move_idx;
-
-			//set the win matrix - 0 0 if draw - 1 0 for white winning and 0 1 for black winning
-			matrix final_game_state_w(leonardo_util::get_prediction_output_format());
-			leonardo_util::set_prediction_output(final_game_state_w, game, White);
-			matrix final_game_state_b(leonardo_util::get_prediction_output_format());
-			leonardo_util::set_prediction_output(final_game_state_b, game, Black);
-			if (gpu_mode)
-			{
-				final_game_state_w.enable_gpu_mode();
-				final_game_state_b.enable_gpu_mode();
-			}
-
-			bool white_turn = true;
-			//the whole game was saved, but we do not know the outcome, so we add that now
-			for (size_t prediction_idx = data_space_game_start_idx; prediction_idx <= end_idx; prediction_idx++)
-			{
-				prediction_training_ds.set_label(white_turn ? final_game_state_w : final_game_state_b , prediction_idx);
-				white_turn = !white_turn;
-			}
-
-			return move_idx;
-		}
-
-		move_idx++;
 	}
 }
 
 void leonardo_overlord::get_training_data(
-	size_t number_of_selfplay_games,
+	size_t thread_count,
+	size_t games_per_thread,
 	size_t number_of_moves_per_game,
 	data_space& policy_training_ds,
 	data_space& prediction_training_ds)
 {
-	for (int i = 0; i < number_of_selfplay_games; i++)
+	std::cout << "starting " << std::to_string(games_per_thread * thread_count) << " games\n";
+	bool threaded = true;
+	if (threaded)
 	{
-		int move_count = self_play(
-			i,
-			number_of_moves_per_game,
-			policy_training_ds,
-			prediction_training_ds);
-		std::cout
-			<< "\n"
-			<< "game " << (i + 1)
-			<< "/" << number_of_selfplay_games
-			<< " finished (" << move_count << ")" 
-			<< "\n";
+		std::vector<std::thread> threads;
+
+		for (int i = 0; i < thread_count; i++)
+		{
+			std::thread t(
+				&leonardo_overlord::self_play, this,
+				i * games_per_thread,
+				i * games_per_thread + games_per_thread,
+				number_of_moves_per_game,
+				std::ref(policy_training_ds),
+				std::ref(prediction_training_ds));
+
+			threads.push_back(std::move(t));
+		}
+
+		for (auto& t : threads)
+		{
+			if (t.joinable())
+			{
+				t.join();
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < thread_count; i++)
+		{
+			self_play(
+				i * games_per_thread,
+				i * games_per_thread + games_per_thread,
+				number_of_moves_per_game,
+				policy_training_ds,
+				prediction_training_ds
+			);
+		}
 	}
 }
 
 void leonardo_overlord::upgrade()
 {
 	//az has 25000
-	size_t number_of_selfplay_games = 3;
-	size_t number_of_moves_per_game = 200;
+	size_t selfplay_thread_count = 10;
+	size_t number_of_games_per_thread = 20;
+	size_t number_of_selfplay_games = number_of_games_per_thread * selfplay_thread_count;
+	size_t number_of_moves_per_game = 100;
 
 	std::cout << "initalizing data space\n";
 	//CREATE DATA SPACE
@@ -241,13 +282,12 @@ void leonardo_overlord::upgrade()
 	auto start = std::chrono::high_resolution_clock::now();
 	//get training data through selfplay
 	get_training_data(
-		number_of_selfplay_games,
+		selfplay_thread_count,
+		number_of_games_per_thread,
 		number_of_moves_per_game,
 		policy_training_ds,
 		prediction_training_ds);
 
-	std::string v_s = prediction_training_ds.to_string();
-	std::cout << v_s << std::endl;
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 	std::cout << "selfplay done. took: " << ms_to_str(duration.count()) << std::endl;

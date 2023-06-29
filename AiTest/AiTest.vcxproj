@@ -195,6 +195,7 @@
     <ClCompile Include="board_flipper_test.cpp" />
     <ClCompile Include="move_flipper.cpp" />
     <ClCompile Include="move_value.cpp" />
+    <ClCompile Include="value_net_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LeonardoAi\LeonardoAi.vcxproj">

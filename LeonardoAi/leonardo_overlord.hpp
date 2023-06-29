@@ -37,15 +37,17 @@ private:
 
 	void policy(matrix& output_matrix, const ChessBoard& game);
 
-	int self_play(
-		int game_idx,
+	void self_play(
+		int first_game_idx,
+		int last_game_idx,
 		size_t number_of_moves_per_game,
 		data_space& policy_training_ds,
 		data_space& prediction_training_ds
 	);
 
 	void get_training_data(
-		size_t number_of_selfplay_games,
+		size_t thread_count,
+		size_t games_per_thread,
 		size_t number_of_moves_per_game,
 		data_space& policy_training_ds,
 		data_space& prediction_training_ds
