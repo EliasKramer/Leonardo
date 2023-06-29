@@ -226,7 +226,7 @@ int leonardo_util::get_random_best_move(
 	}
 }
 
-void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game)
+void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game, ChessColor color)
 {
 	if (matrix::equal_format(output.get_format(), get_prediction_output_format()) == false)
 	{
@@ -236,9 +236,23 @@ void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game
 	{
 		throw std::exception("game is not over");
 	}
+
+	//high if color wins high -> low if  color loses - low
+
+	//color wins
+	// 1 | 0
+	//color loses
+	// 0 | 1
+
 	output.sync_device_and_host();
-	output.set_at_flat_host(0, game.getGameState() == GameState::WhiteWon ? 1.0f : 0.0f);
-	output.set_at_flat_host(1, game.getGameState() == GameState::BlackWon ? 1.0f : 0.0f);
+	output.set_at_flat_host(0, 
+		(game.getGameState() == GameState::WhiteWon && color == White) ||
+		(game.getGameState() == GameState::BlackWon && color == Black) 
+		? 1.0f : 0.0f);
+	output.set_at_flat_host(1, 
+		game.getGameState() == GameState::BlackWon && color == White ||
+		game.getGameState() == GameState::WhiteWon && color == Black
+		? 1.0f : 0.0f);
 	output.sync_device_and_host();
 }
 
@@ -250,10 +264,11 @@ float leonardo_util::get_prediction_output(matrix& output)
 	}
 
 	output.sync_device_and_host();
-	float white_score = output.get_at_flat_host(0);
-	float black_score = output.get_at_flat_host(1);
 
-	return white_score - black_score;
+	float own_score = output.get_at_flat_host(0);
+	float enemy_score = output.get_at_flat_host(1);
+
+	return own_score - enemy_score;
 }
 
 matrix& leonardo_util::matrix_map_get(

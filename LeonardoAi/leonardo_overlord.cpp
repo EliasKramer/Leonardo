@@ -103,7 +103,7 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		search(game, n, p, q, visited);
 	}
@@ -126,15 +126,12 @@ int leonardo_overlord::self_play(
 {
 	ChessBoard game(STARTING_FEN);
 
-	size_t move_count = 0;
-	size_t data_space_game_start_idx = prediction_training_ds.get_iterator_idx();
+	size_t move_idx = 0;
+	size_t data_space_game_start_idx = game_idx * number_of_moves_per_game;
 
 	while (true)
 	{
-		move_count++;
 		std::cout << ".";
-
-		smart_assert(prediction_training_ds.get_iterator_idx() == policy_training_ds.get_iterator_idx());
 
 		matrix output_matrix(leonardo_util::get_policy_output_format());
 		matrix input_matrix(leonardo_util::get_input_format());
@@ -142,7 +139,7 @@ int leonardo_overlord::self_play(
 
 		policy(output_matrix, game);
 
-		if (move_count <= number_of_moves_per_game)
+		if (move_idx < number_of_moves_per_game)
 		{
 			if (gpu_mode)
 			{
@@ -150,44 +147,45 @@ int leonardo_overlord::self_play(
 				output_matrix.enable_gpu_mode();
 			}
 			//TODO - promotion is not working rn
-			policy_training_ds.set_current_data(input_matrix);
-			policy_training_ds.set_current_label(output_matrix);
-			prediction_training_ds.set_current_data(input_matrix);
+			size_t ds_idx = data_space_game_start_idx + move_idx;
+			policy_training_ds.set_data(input_matrix, ds_idx);
+			policy_training_ds.set_label(output_matrix, ds_idx);
+			prediction_training_ds.set_data(input_matrix, ds_idx);
 		}
 
 		//make move
 		std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
-		int move_idx = leonardo_util::get_random_best_move(output_matrix, legal_moves, game.getCurrentTurnColor());
-		game.makeMove(*legal_moves[move_idx].get());
+		int chosen_move_idx = leonardo_util::get_random_best_move(output_matrix, legal_moves, game.getCurrentTurnColor());
+		game.makeMove(*legal_moves[chosen_move_idx].get());
 
 		if (game.getGameState() != GameState::Ongoing)
 		{
 			//get current index of data space
-			size_t end_idx = prediction_training_ds.get_iterator_idx();
+			size_t end_idx = data_space_game_start_idx + move_idx;
 
 			//set the win matrix - 0 0 if draw - 1 0 for white winning and 0 1 for black winning
-			matrix final_game_state(leonardo_util::get_prediction_output_format());
-			leonardo_util::set_prediction_output(final_game_state, game);
+			matrix final_game_state_w(leonardo_util::get_prediction_output_format());
+			leonardo_util::set_prediction_output(final_game_state_w, game, White);
+			matrix final_game_state_b(leonardo_util::get_prediction_output_format());
+			leonardo_util::set_prediction_output(final_game_state_b, game, Black);
 			if (gpu_mode)
 			{
-				final_game_state.enable_gpu_mode();
+				final_game_state_w.enable_gpu_mode();
+				final_game_state_b.enable_gpu_mode();
 			}
 
+			bool white_turn = true;
 			//the whole game was saved, but we do not know the outcome, so we add that now
 			for (size_t prediction_idx = data_space_game_start_idx; prediction_idx <= end_idx; prediction_idx++)
 			{
-				prediction_training_ds.set_iterator_idx(prediction_idx);
-				prediction_training_ds.set_current_label(final_game_state);
+				prediction_training_ds.set_label(white_turn ? final_game_state_w : final_game_state_b , prediction_idx);
+				white_turn = !white_turn;
 			}
 
-			policy_training_ds.iterator_next();
-			prediction_training_ds.iterator_next();
-
-			return move_count;
+			return move_idx;
 		}
 
-		policy_training_ds.iterator_next();
-		prediction_training_ds.iterator_next();
+		move_idx++;
 	}
 }
 
@@ -197,17 +195,13 @@ void leonardo_overlord::get_training_data(
 	data_space& policy_training_ds,
 	data_space& prediction_training_ds)
 {
-	policy_training_ds.iterator_reset();
-	prediction_training_ds.iterator_reset();
-
 	for (int i = 0; i < number_of_selfplay_games; i++)
 	{
 		int move_count = self_play(
 			i,
 			number_of_moves_per_game,
 			policy_training_ds,
-			prediction_training_ds
-		);
+			prediction_training_ds);
 		std::cout
 			<< "\n"
 			<< "game " << (i + 1)
@@ -220,7 +214,7 @@ void leonardo_overlord::get_training_data(
 void leonardo_overlord::upgrade()
 {
 	//az has 25000
-	size_t number_of_selfplay_games = 100;
+	size_t number_of_selfplay_games = 3;
 	size_t number_of_moves_per_game = 200;
 
 	std::cout << "initalizing data space\n";
@@ -236,6 +230,7 @@ void leonardo_overlord::upgrade()
 		leonardo_util::get_input_format(),
 		leonardo_util::get_prediction_output_format()
 	);
+
 	if (gpu_mode)
 	{
 		policy_training_ds.copy_to_gpu();
@@ -251,14 +246,15 @@ void leonardo_overlord::upgrade()
 		policy_training_ds,
 		prediction_training_ds);
 
+	std::string v_s = prediction_training_ds.to_string();
+	std::cout << v_s << std::endl;
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 	std::cout << "selfplay done. took: " << ms_to_str(duration.count()) << std::endl;
 
 	std::cout << "start training\n";
 	start = std::chrono::high_resolution_clock::now();
-	policy_training_ds.iterator_reset();
-	prediction_training_ds.iterator_reset();
+
 	//train policy and prediction in parallel
 	//if a game has less than number_of_moves_per_game moves, the rest of the data is not used - it will train on 0 data
 	std::thread policy_thread = std::thread(

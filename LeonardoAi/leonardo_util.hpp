@@ -22,8 +22,8 @@ namespace leonardo_util
 	//has a matrix and picks the best move at random, but moves with higher value get picked more often
 	int get_random_best_move(const matrix& output, const UniqueMoveList& allowed_moves, ChessColor curr_turn_col);
 
-	void set_prediction_output(matrix& output, const ChessBoard& game);
-	//returns between -1 and 1 (1 means white won, -1 means black won)
+	void set_prediction_output(matrix& output, const ChessBoard& game, ChessColor color);
+
 	float get_prediction_output(matrix& output);
 
 	matrix& matrix_map_get(

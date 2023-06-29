@@ -10,7 +10,6 @@
 #include "leonardo_bot.hpp"
 #include <memory>
 #include "NeuroFox/data_space.hpp"
-#include <mutex>
 
 class leonardo_overlord
 {
@@ -42,7 +41,8 @@ private:
 		int game_idx,
 		size_t number_of_moves_per_game,
 		data_space& policy_training_ds,
-		data_space& prediction_training_ds);
+		data_space& prediction_training_ds
+	);
 
 	void get_training_data(
 		size_t number_of_selfplay_games,
