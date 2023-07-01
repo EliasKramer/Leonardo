@@ -155,6 +155,15 @@ void leonardo_overlord::self_play(
 				policy_training_ds.set_data(input_matrix, ds_idx);
 				policy_training_ds.set_label(output_matrix, ds_idx);
 				prediction_training_ds.set_data(input_matrix, ds_idx);
+
+
+				// REMOVE LATER DEBUG
+				matrix tmp(leonardo_util::get_input_format());
+				if(gpu_mode)
+					tmp.enable_gpu_mode();
+				prediction_training_ds.observe_data_at_idx(tmp, ds_idx);
+				std::string ds_s = prediction_training_ds.to_string();
+				// REMOVE LATER DEBUG				s
 			}
 
 			//make move
@@ -165,7 +174,7 @@ void leonardo_overlord::self_play(
 			if (game.getGameState() != GameState::Ongoing)
 			{
 				//get current index of data space
-				size_t end_idx = data_space_game_start_idx + move_idx;
+				size_t end_idx = data_space_game_start_idx + std::min(move_idx, number_of_moves_per_game);
 
 				//set the win matrix - 0 0 if draw - 1 0 for white winning and 0 1 for black winning
 				matrix final_game_state_w(leonardo_util::get_prediction_output_format());
@@ -180,10 +189,38 @@ void leonardo_overlord::self_play(
 
 				bool white_turn = true;
 				//the whole game was saved, but we do not know the outcome, so we add that now
-				for (size_t prediction_idx = data_space_game_start_idx; prediction_idx <= end_idx; prediction_idx++)
+				for (size_t prediction_idx = data_space_game_start_idx; prediction_idx < end_idx; prediction_idx++)
 				{
+
+					//DEBUG REMOVE LATER
+					if (prediction_idx + 1 == end_idx)
+					{
+						int x = 0;
+					}
+					if (prediction_idx + 2 == end_idx)
+					{
+						int x = 0;
+					}
+
+					matrix input(leonardo_util::get_input_format());
+					if (gpu_mode) { input.enable_gpu_mode(); }
+					prediction_training_ds.observe_data_at_idx(input, prediction_idx);
+					
+					if (!input.contains_non_zero_items())
+					{
+						std::cout << "empty input matrix at idx " << prediction_idx << std::endl;
+					}
+
+					input.device_data_is_updated();
+					input.sync_device_and_host();
+
+					//DEBUG REMOVE LATER
+					
+
 					//invalid argument throw in cuda here - TODO FIX
-					prediction_training_ds.set_label(white_turn ? final_game_state_w : final_game_state_b, prediction_idx);
+					prediction_training_ds.set_label(
+						white_turn ? final_game_state_w : final_game_state_b,
+						prediction_idx);
 					white_turn = !white_turn;
 				}
 
@@ -253,10 +290,10 @@ void leonardo_overlord::get_training_data(
 void leonardo_overlord::upgrade()
 {
 	//az has 25000
-	size_t selfplay_thread_count = 10;
-	size_t number_of_games_per_thread = 20;
+	size_t selfplay_thread_count = 2;
+	size_t number_of_games_per_thread = 2;
 	size_t number_of_selfplay_games = number_of_games_per_thread * selfplay_thread_count;
-	size_t number_of_moves_per_game = 100;
+	size_t number_of_moves_per_game = 200;
 
 	std::cout << "initalizing data space\n";
 	//CREATE DATA SPACE
