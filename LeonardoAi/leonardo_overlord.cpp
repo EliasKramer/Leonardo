@@ -110,7 +110,7 @@ void leonardo_overlord::policy(
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		search(game, given_policy_nnet, given_prediction_nnet, n, p, q, visited);
 	}
@@ -145,7 +145,7 @@ void leonardo_overlord::self_play(
 
 		while (true)
 		{
-			//std::cout << "(" + std::to_string(game_idx) + ")";
+			std::cout << "(" + std::to_string(game_idx) + ")";
 
 			matrix output_matrix(leonardo_util::get_policy_output_format());
 			matrix input_matrix(leonardo_util::get_input_format());
@@ -264,14 +264,13 @@ void leonardo_overlord::get_training_data(
 
 void leonardo_overlord::upgrade()
 {
-	//az has 25000
+	//az has 25000 games
 	size_t selfplay_thread_count = 16;
-	size_t number_of_games_per_thread = 10;
+	size_t number_of_games_per_thread = 100;
 	size_t number_of_selfplay_games = number_of_games_per_thread * selfplay_thread_count;
 	size_t number_of_moves_per_game = 200;
 
 	std::cout << "initalizing data space\n";
-	//CREATE DATA SPACE
 	data_space policy_training_ds(
 		number_of_selfplay_games * number_of_moves_per_game,
 		leonardo_util::get_input_format(),
@@ -345,19 +344,19 @@ leonardo_overlord::leonardo_overlord(
 	//best_network = neural_network("models\\learner_epoch_500.parameters");
 
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
-	//best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	//best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	//best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	//best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
 	best_policy_nnet.set_all_parameters(0.0f);
 	best_policy_nnet.apply_noise(.1);
 
 	best_prediction_nnet.set_input_format(leonardo_util::get_input_format());
-	//best_prediction_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	//best_prediction_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	//best_prediction_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	//best_prediction_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_prediction_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
+	best_prediction_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	best_prediction_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_prediction_nnet.add_fully_connected_layer(256, leaky_relu_fn);
 	best_prediction_nnet.add_fully_connected_layer(leonardo_util::get_prediction_output_format(), leaky_relu_fn);
 	best_prediction_nnet.set_all_parameters(0.0f);
 	best_prediction_nnet.apply_noise(.1);
@@ -390,14 +389,13 @@ void leonardo_overlord::train()
 		std::make_unique<leonardo_bot>(new_policy_nnet, distributed_random)
 	);
 
-	//start timer
-	std::chrono::steady_clock::time_point start =
-		std::chrono::high_resolution_clock::now();
-
-	int iterations = 1000000;
 	int iterations_per_file_save = 1;
-	for (int i = 0; i < iterations; i++)
+	long long sum_elapsed_ms = 0;
+	for (long long i = 0; ; i++)
 	{
+		std::chrono::steady_clock::time_point start =
+			std::chrono::high_resolution_clock::now();
+	
 		std::cout << "upgrade time. iteration: " << i << std::endl;
 		upgrade();
 
@@ -432,7 +430,7 @@ void leonardo_overlord::train()
 			std::cout << "new network is worse" << std::endl;
 		}
 
-		if ((i + 1) % iterations_per_file_save == 0 || i == iterations - 1)
+		if ((i + 1) % iterations_per_file_save == 0)
 		{
 			//start save_best_to_file in save_in_file_thread 
 			file_save_thread = std::thread(&leonardo_overlord::save_best_to_file, this, i);
@@ -442,10 +440,9 @@ void leonardo_overlord::train()
 			std::chrono::high_resolution_clock::now();
 
 		long long elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
-
-		std::cout << "elapsed: " << ms_to_str(elapsed_ms) << std::endl;
-		long long remaining_seconds = (elapsed_ms / (i + 1)) * (iterations - i - 1);
-		std::cout << "remaining: " << ms_to_str(remaining_seconds) << std::endl;
+		sum_elapsed_ms += elapsed_ms;
+		std::cout << "cycle took: " << ms_to_str(elapsed_ms) << " ";
+		std::cout << "average: " << ms_to_str(sum_elapsed_ms / (i + 1)) << "\n";
 	}
 }
 
