@@ -103,7 +103,7 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		search(game, n, p, q, visited);
 	}
@@ -134,8 +134,7 @@ void leonardo_overlord::self_play(
 
 		while (true)
 		{
-			std::string move_s = "(" + std::to_string(game_idx) + ")";
-			std::cout << move_s;
+			std::cout << "(" + std::to_string(game_idx) + ")";
 
 			matrix output_matrix(leonardo_util::get_policy_output_format());
 			matrix input_matrix(leonardo_util::get_input_format());
@@ -155,15 +154,6 @@ void leonardo_overlord::self_play(
 				policy_training_ds.set_data(input_matrix, ds_idx);
 				policy_training_ds.set_label(output_matrix, ds_idx);
 				prediction_training_ds.set_data(input_matrix, ds_idx);
-
-
-				// REMOVE LATER DEBUG
-				matrix tmp(leonardo_util::get_input_format());
-				if(gpu_mode)
-					tmp.enable_gpu_mode();
-				prediction_training_ds.observe_data_at_idx(tmp, ds_idx);
-				std::string ds_s = prediction_training_ds.to_string();
-				// REMOVE LATER DEBUG				s
 			}
 
 			//make move
@@ -174,7 +164,7 @@ void leonardo_overlord::self_play(
 			if (game.getGameState() != GameState::Ongoing)
 			{
 				//get current index of data space
-				size_t end_idx = data_space_game_start_idx + std::min(move_idx, number_of_moves_per_game);
+				size_t end_idx = data_space_game_start_idx + std::min(move_idx, number_of_moves_per_game - 1);
 
 				//set the win matrix - 0 0 if draw - 1 0 for white winning and 0 1 for black winning
 				matrix final_game_state_w(leonardo_util::get_prediction_output_format());
@@ -189,34 +179,8 @@ void leonardo_overlord::self_play(
 
 				bool white_turn = true;
 				//the whole game was saved, but we do not know the outcome, so we add that now
-				for (size_t prediction_idx = data_space_game_start_idx; prediction_idx < end_idx; prediction_idx++)
+				for (size_t prediction_idx = data_space_game_start_idx; prediction_idx <= end_idx; prediction_idx++)
 				{
-
-					//DEBUG REMOVE LATER
-					if (prediction_idx + 1 == end_idx)
-					{
-						int x = 0;
-					}
-					if (prediction_idx + 2 == end_idx)
-					{
-						int x = 0;
-					}
-
-					matrix input(leonardo_util::get_input_format());
-					if (gpu_mode) { input.enable_gpu_mode(); }
-					prediction_training_ds.observe_data_at_idx(input, prediction_idx);
-					
-					if (!input.contains_non_zero_items())
-					{
-						std::cout << "empty input matrix at idx " << prediction_idx << std::endl;
-					}
-
-					input.device_data_is_updated();
-					input.sync_device_and_host();
-
-					//DEBUG REMOVE LATER
-					
-
 					//invalid argument throw in cuda here - TODO FIX
 					prediction_training_ds.set_label(
 						white_turn ? final_game_state_w : final_game_state_b,
@@ -246,7 +210,7 @@ void leonardo_overlord::get_training_data(
 	data_space& prediction_training_ds)
 {
 	std::cout << "starting " << std::to_string(games_per_thread * thread_count) << " games\n";
-	bool threaded = true;
+	bool threaded = false;
 	if (threaded)
 	{
 		std::vector<std::thread> threads;
@@ -290,8 +254,8 @@ void leonardo_overlord::get_training_data(
 void leonardo_overlord::upgrade()
 {
 	//az has 25000
-	size_t selfplay_thread_count = 2;
-	size_t number_of_games_per_thread = 2;
+	size_t selfplay_thread_count = 1;
+	size_t number_of_games_per_thread = 1;
 	size_t number_of_selfplay_games = number_of_games_per_thread * selfplay_thread_count;
 	size_t number_of_moves_per_game = 200;
 
@@ -370,22 +334,22 @@ leonardo_overlord::leonardo_overlord(
 	//best_network = neural_network("models\\learner_epoch_500.parameters");
 
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
-	best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	//best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
+	//best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	//best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	//best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
 	best_policy_nnet.set_all_parameters(0.0f);
-	best_policy_nnet.apply_noise(1);
+	best_policy_nnet.apply_noise(.1);
 
 	best_prediction_nnet.set_input_format(leonardo_util::get_input_format());
-	best_prediction_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	best_prediction_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	best_prediction_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_prediction_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	//best_prediction_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
+	//best_prediction_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	//best_prediction_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	//best_prediction_nnet.add_fully_connected_layer(256, leaky_relu_fn);
 	best_prediction_nnet.add_fully_connected_layer(leonardo_util::get_prediction_output_format(), leaky_relu_fn);
 	best_prediction_nnet.set_all_parameters(0.0f);
-	best_prediction_nnet.apply_noise(1);
+	best_prediction_nnet.apply_noise(.1);
 
 	new_policy_nnet = neural_network(best_policy_nnet);
 	new_prediction_nnet = neural_network(best_prediction_nnet);
@@ -434,9 +398,11 @@ void leonardo_overlord::train()
 			file_save_thread.join();
 		}
 
-		std::cout << "throwing new and best nnet into a arena" << std::endl;
+		std::cout << "putting new and best nnet into an arena" << std::endl;
 		auto arena_start = std::chrono::high_resolution_clock::now();
+
 		arena_result arena_result = arena.play(50);
+
 		auto arena_stop = std::chrono::high_resolution_clock::now();
 		auto arena_duration =
 			std::chrono::duration_cast<std::chrono::milliseconds>(arena_stop - arena_start);

@@ -20,14 +20,9 @@ vector3 leonardo_util::get_prediction_output_format()
 
 void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& m)
 {
-	if (matrix::equal_format(m.get_format(), leonardo_util::get_input_format()) == false)
-	{
-		throw std::exception("input_board has wrong format");
-	}
-	if (m.item_count() != 64)
-	{
-		throw std::exception("input format not supported");
-	}
+	smart_assert(m.host_data_is_updated());
+	smart_assert(matrix::equal_format(m.get_format(), leonardo_util::get_input_format()));
+	smart_assert(m.item_count() == 64);
 
 	BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
 
@@ -45,12 +40,12 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 				ChessPiece piece = board.getBoardRepresentation().getPieceAt(square);
 
 				//the own pieces are 1 the others are -1
-				int multiplier = piece.getColor() == board.getCurrentTurnColor() ? 1 : -1;
+				float color_multiplier = piece.getColor() == board.getCurrentTurnColor() ? 1.0f : -1.0f;
 
-				float value = piece.getType() == PieceType::King ? 1000 : PIECETYPE_VALUE[piece.getType()];
+				float value = piece.getType() == PieceType::King ? 1000.0f : (float)PIECETYPE_VALUE[piece.getType()];
 				m.set_at_host(
 					coord,
-					value * multiplier
+					(value * color_multiplier) / 1000.0f
 				);
 			}
 			else
@@ -63,8 +58,8 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 
 int leonardo_util::square_to_flat_idx(Square s, ChessColor color_to_move)
 {
-	static const vector3 board_dimensions(8, 8, 1);
-	static vector3 coord(0, 0, 0);
+	const vector3 board_dimensions(8, 8, 1);
+	vector3 coord(0, 0, 0);
 
 	int x = s % 8;
 	int y = s / 8;
@@ -80,17 +75,10 @@ int leonardo_util::square_to_flat_idx(Square s, ChessColor color_to_move)
 
 float leonardo_util::get_move_value(const Move& move, const matrix& policy_output, ChessColor color)
 {
-	//remove statements for more speed
-	if (matrix::equal_format(policy_output.get_format(), get_policy_output_format()) == false)
-	{
-		throw std::exception("output has wrong format");
-	}
-	if (policy_output.host_data_is_updated() == false)
-	{
-		throw std::exception("output is not updated");
-	}
+	smart_assert(vector3::are_equal(policy_output.get_format(), get_policy_output_format()));
+	smart_assert(policy_output.host_data_is_updated());
 
-	static vector3 coord(0, 0, 0);
+	vector3 coord(0, 0, 0);
 
 	int flat_start_idx = square_to_flat_idx(move.getStart(), color);
 	int flat_dest_idx = square_to_flat_idx(move.getDestination(), color);
@@ -103,16 +91,10 @@ float leonardo_util::get_move_value(const Move& move, const matrix& policy_outpu
 
 void leonardo_util::set_move_value(const Move& move, matrix& output, float value, const ChessColor color_to_move)
 {
-	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
-	{
-		throw std::exception("output has wrong format");
-	}
-	if (!output.host_data_is_updated())
-	{
-		throw std::exception("output is not synced");
-	}
+	smart_assert(vector3::are_equal(output.get_format(), get_policy_output_format()));
+	smart_assert(output.host_data_is_updated());
 
-	static vector3 coord(0, 0, 0);
+	vector3 coord(0, 0, 0);
 
 	int flat_start_idx = square_to_flat_idx(move.getStart(), color_to_move);
 	int flat_dest_idx = square_to_flat_idx(move.getDestination(), color_to_move);
@@ -128,10 +110,7 @@ int leonardo_util::get_best_move(
 	const UniqueMoveList& allowed_moves,
 	ChessColor curr_turn_col)
 {
-	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
-	{
-		throw std::exception("output has wrong format");
-	}
+	smart_assert(vector3::are_equal(output.get_format(), get_policy_output_format()));
 
 	int max_idx = 0;
 	float max_value = FLT_MIN;
@@ -158,86 +137,63 @@ int leonardo_util::get_random_best_move(
 	const UniqueMoveList& allowed_moves,
 	ChessColor curr_turn_col)
 {
-	if (matrix::equal_format(output.get_format(), get_policy_output_format()) == false)
-	{
-		throw std::exception("output has wrong format");
-	}
-	//the implementation has negative values in mind
-	float sum_positive = 0;
-	float sum_negative = 0;
+	smart_assert(matrix::equal_format(output.get_format(), get_policy_output_format()));
 
+	//we are implementing softmax here instead of the nnet, in order to save some time.
+	//a layer that does softmax would be cleaner
+
+	float max_abs = 0;
+	//get highest value in order to normalize all values
+	for (const std::unique_ptr<Move>& move : allowed_moves)
+	{
+		float value = abs(get_move_value(*move, output, curr_turn_col));
+		
+		smart_assert(!std::isnan(value), "value is nan");
+	
+		if (value > max_abs)
+		{
+			max_abs = value;
+		}
+	}
+
+	float e_sum = 0;
 	for (const std::unique_ptr<Move>& move : allowed_moves)
 	{
 		float value = get_move_value(*move, output, curr_turn_col);
-		value > 0 ? sum_positive += value : sum_negative += value;
+		float e = exp(value / max_abs);
+		e_sum += e;
 	}
-	
-	if (sum_positive > 0)
-	{
-		float random = random_float_excl(0, sum_positive);
 
-		float current_sum = 0;
-		int move_idx = 0;
-		for (const std::unique_ptr<Move>& move : allowed_moves)
-		{
-			float value = get_move_value(*move, output, curr_turn_col);
-			if (value > 0)
-			{
-				current_sum += value;
-				if (current_sum >= random)
-				{
-					return move_idx;
-				}
-				move_idx++;
-			}
-		}
-	}
-	else if (sum_negative < 0)
-	{
-		float random = random_float_excl(sum_negative, 0);
-		
-		float current_sum = 0;
-		int move_idx = 0;
+	float random = random_float_excl(0, 1);
 
-		for (const std::unique_ptr<Move>& move : allowed_moves)
+	float current_sum = 0;
+	int move_idx = 0;
+	for (const std::unique_ptr<Move>& move : allowed_moves)
+	{
+		float value = get_move_value(*move, output, curr_turn_col);
+		float e = exp(value / max_abs);
+
+		float prob = e / e_sum;
+
+		current_sum += prob;
+		if (current_sum >= random)
 		{
-			float value = get_move_value(*move, output, curr_turn_col);
-			if (value < 0)
-			{
-				current_sum += value;
-				if (current_sum <= random)
-				{
-					return move_idx;
-				}
-				move_idx++;
-			}
+			return move_idx;
 		}
+		move_idx++;
 	}
-	else if (sum_positive == 0 && sum_negative == 0)
-	{
-		std::cout
-			<< "all move values are 0 -> moves.size() = "
-			<< allowed_moves.size() << std::endl;
-		return random_idx(allowed_moves.size());
-	}
-	else
-	{
-		throw std::exception("something went wrong\n");
-	}
+
+	//this could occur due to rounding errors
+	//in very few cases
+	std::cout << "no move found";
+	return 0;
 }
 
 void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game, ChessColor color)
 {
-	if (matrix::equal_format(output.get_format(), get_prediction_output_format()) == false)
-	{
-		throw std::exception("output has wrong format");
-	}
-	if (game.getGameState() == GameState::Ongoing)
-	{
-		throw std::exception("game is not over");
-	}
-
-	//high if color wins high -> low if  color loses - low
+	smart_assert(vector3::are_equal(output.get_format(), get_prediction_output_format()));
+	smart_assert(output.host_data_is_updated());
+	smart_assert(game.getGameState() != GameState::Ongoing);
 
 	//color wins
 	// 1 | 0
@@ -258,12 +214,11 @@ void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game
 
 float leonardo_util::get_prediction_output(matrix& output)
 {
-	if (matrix::equal_format(output.get_format(), get_prediction_output_format()) == false)
-	{
-		throw std::exception("output has wrong format");
-	}
+	smart_assert(output.host_data_is_updated());
+	smart_assert(vector3::are_equal(output.get_format(), get_prediction_output_format()));
 
-	output.sync_device_and_host();
+	//not necessary?
+	//output.sync_device_and_host();
 
 	float own_score = output.get_at_flat_host(0);
 	float enemy_score = output.get_at_flat_host(1);
@@ -280,13 +235,10 @@ matrix& leonardo_util::matrix_map_get(
 	{
 		map.insert(std::make_pair(game, matrix(get_policy_output_format())));
 	}
-	//find it
+
 	matrix& m = map[game];
-	//format has to be correct
-	if (matrix::equal_format(m.get_format(), get_policy_output_format()) == false)
-	{
-		throw std::exception("output has wrong format");
-	}
+
+	smart_assert(vector3::are_equal(m.get_format(), get_policy_output_format()));
 
 	return m;
 }
