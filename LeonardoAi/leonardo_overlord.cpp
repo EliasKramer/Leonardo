@@ -12,6 +12,8 @@ void leonardo_overlord::save_best_to_file(size_t epoch)
 }
 float leonardo_overlord::search(
 	const ChessBoard& game,
+	neural_network& given_policy_nnet,
+	neural_network& given_prediction_nnet,
 	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& n,
 	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& p,
 	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& q,
@@ -34,17 +36,17 @@ float leonardo_overlord::search(
 		{
 			input_matrix.enable_gpu_mode();
 		}
-		new_policy_nnet.forward_propagation(input_matrix);
+		given_policy_nnet.forward_propagation(input_matrix);
 
 		//see how "promising" the current position is for every move
-		new_policy_nnet.get_output().sync_device_and_host();
-		p[game] = new_policy_nnet.get_output(); //cpu
+		given_policy_nnet.get_output().sync_device_and_host();
+		p[game] = given_policy_nnet.get_output(); //cpu
 
 
 		//predict the position value by the prediction nnet and return the value (between -1 and 1) 
-		new_prediction_nnet.forward_propagation(input_matrix);
-		new_prediction_nnet.get_output().sync_device_and_host();
-		return -1 * leonardo_util::get_prediction_output(new_prediction_nnet.get_output()); //cpu
+		given_prediction_nnet.forward_propagation(input_matrix);
+		given_prediction_nnet.get_output().sync_device_and_host();
+		return -1 * leonardo_util::get_prediction_output(given_prediction_nnet.get_output()); //cpu
 	}
 
 	std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
@@ -79,7 +81,7 @@ float leonardo_overlord::search(
 	ChessBoard new_game = game.getCopyByValue();
 	new_game.makeMove(best_move);
 
-	float evaluation = search(new_game, n, p, q, visited);
+	float evaluation = search(new_game, given_policy_nnet, given_prediction_nnet, n, p, q, visited);
 
 	//calculate the new average evaulation for the current move
 	leonardo_util::matrix_map_set_float(q, game, best_move,
@@ -95,7 +97,12 @@ float leonardo_overlord::search(
 	return -evaluation;
 }
 
-void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
+void leonardo_overlord::policy(
+	matrix& output_matrix,
+	neural_network& given_policy_nnet,
+	neural_network& given_prediction_nnet,
+	const ChessBoard& game
+)
 {
 	std::unordered_map<ChessBoard, matrix, chess_board_hasher> n;
 	std::unordered_map<ChessBoard, matrix, chess_board_hasher> p;
@@ -105,7 +112,7 @@ void leonardo_overlord::policy(matrix& output_matrix, const ChessBoard& game)
 	//1600 in openai
 	for (int i = 0; i < 3; i++)
 	{
-		search(game, n, p, q, visited);
+		search(game, given_policy_nnet, given_prediction_nnet, n, p, q, visited);
 	}
 
 	std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
@@ -125,6 +132,10 @@ void leonardo_overlord::self_play(
 	data_space& policy_training_ds,
 	data_space& prediction_training_ds)
 {
+	//we make a copy of the networks, because this makes it absolutely threadsafe
+	neural_network policy_nnet_copy = neural_network(new_policy_nnet);
+	neural_network prediction_nnet_copy = neural_network(new_prediction_nnet);
+
 	for (int game_idx = first_game_idx; game_idx < last_game_idx; game_idx++)
 	{
 		ChessBoard game(STARTING_FEN);
@@ -134,13 +145,13 @@ void leonardo_overlord::self_play(
 
 		while (true)
 		{
-			std::cout << "(" + std::to_string(game_idx) + ")";
+			//std::cout << "(" + std::to_string(game_idx) + ")";
 
 			matrix output_matrix(leonardo_util::get_policy_output_format());
 			matrix input_matrix(leonardo_util::get_input_format());
 			leonardo_util::set_matrix_from_chessboard(game, input_matrix); //all on cpu
 
-			policy(output_matrix, game);
+			policy(output_matrix, policy_nnet_copy, prediction_nnet_copy, game);
 
 			if (move_idx < number_of_moves_per_game)
 			{
@@ -210,7 +221,7 @@ void leonardo_overlord::get_training_data(
 	data_space& prediction_training_ds)
 {
 	std::cout << "starting " << std::to_string(games_per_thread * thread_count) << " games\n";
-	bool threaded = false;
+	bool threaded = true;
 	if (threaded)
 	{
 		std::vector<std::thread> threads;
@@ -254,8 +265,8 @@ void leonardo_overlord::get_training_data(
 void leonardo_overlord::upgrade()
 {
 	//az has 25000
-	size_t selfplay_thread_count = 1;
-	size_t number_of_games_per_thread = 1;
+	size_t selfplay_thread_count = 16;
+	size_t number_of_games_per_thread = 10;
 	size_t number_of_selfplay_games = number_of_games_per_thread * selfplay_thread_count;
 	size_t number_of_moves_per_game = 200;
 

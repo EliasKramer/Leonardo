@@ -200,7 +200,8 @@ void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game
 	//color loses
 	// 0 | 1
 
-	output.sync_device_and_host();
+	//output.sync_device_and_host(); // we check for that in the smart_assert
+
 	output.set_at_flat_host(0, 
 		(game.getGameState() == GameState::WhiteWon && color == White) ||
 		(game.getGameState() == GameState::BlackWon && color == Black) 
@@ -214,6 +215,10 @@ void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game
 
 float leonardo_util::get_prediction_output(matrix& output)
 {
+	if (!output.host_data_is_updated())
+	{
+		int x = 0;
+	}
 	smart_assert(output.host_data_is_updated());
 	smart_assert(vector3::are_equal(output.get_format(), get_prediction_output_format()));
 

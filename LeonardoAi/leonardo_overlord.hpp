@@ -29,13 +29,19 @@ private:
 
 	float search(
 		const ChessBoard& game,
+		neural_network& given_policy_nnet,
+		neural_network& given_prediction_nnet,
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& n,
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& p,
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& q,
 		std::unordered_set<ChessBoard, chess_board_hasher>& visited
 	);
 
-	void policy(matrix& output_matrix, const ChessBoard& game);
+	void policy(
+		matrix& output_matrix, 
+		neural_network& given_policy_nnet,
+		neural_network& given_prediction_nnet,
+		const ChessBoard& game);
 
 	void self_play(
 		int first_game_idx,
