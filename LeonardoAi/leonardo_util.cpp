@@ -147,9 +147,9 @@ int leonardo_util::get_random_best_move(
 	for (const std::unique_ptr<Move>& move : allowed_moves)
 	{
 		float value = abs(get_move_value(*move, output, curr_turn_col));
-		
+
 		smart_assert(!std::isnan(value), "value is nan");
-	
+
 		if (value > max_abs)
 		{
 			max_abs = value;
@@ -202,11 +202,11 @@ void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game
 
 	//output.sync_device_and_host(); // we check for that in the smart_assert
 
-	output.set_at_flat_host(0, 
+	output.set_at_flat_host(0,
 		(game.getGameState() == GameState::WhiteWon && color == White) ||
-		(game.getGameState() == GameState::BlackWon && color == Black) 
+		(game.getGameState() == GameState::BlackWon && color == Black)
 		? 1.0f : 0.0f);
-	output.set_at_flat_host(1, 
+	output.set_at_flat_host(1,
 		game.getGameState() == GameState::BlackWon && color == White ||
 		game.getGameState() == GameState::WhiteWon && color == Black
 		? 1.0f : 0.0f);
@@ -279,4 +279,34 @@ float leonardo_util::matrix_map_sum(
 		sum += get_move_value(*move, m, game.getCurrentTurnColor());
 	}
 	return sum;
+}
+
+void leonardo_util::update_thread(
+	const size_t& progression,
+	size_t total,
+	size_t tick_in_ms)
+{
+	long long start = std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::system_clock::now().time_since_epoch()).count();
+
+	while (true)
+	{
+		long long now = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::system_clock::now().time_since_epoch()).count();
+		long long passed_ms = now - start;
+
+		std::cout
+			<< "progress: " << progression << "/" << total
+			<< " (" << (float)progression / (float)total * 100.0f << "%)"
+			<< " passed: " << ms_to_str(passed_ms)
+			<< " remaining: " << ms_to_str((long long)((float)passed_ms / (float)progression * (float)(total - progression)))
+			<< std::endl;
+
+		if (progression >= total)
+		{
+			break;
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(tick_in_ms));
+	}
 }

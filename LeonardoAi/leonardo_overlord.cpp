@@ -98,6 +98,7 @@ float leonardo_overlord::search(
 }
 
 void leonardo_overlord::policy(
+	long long epoch,
 	matrix& output_matrix,
 	neural_network& given_policy_nnet,
 	neural_network& given_prediction_nnet,
@@ -110,7 +111,7 @@ void leonardo_overlord::policy(
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < (3 + (epoch * 0.5)); i++)
 	{
 		search(game, given_policy_nnet, given_prediction_nnet, n, p, q, visited);
 	}
@@ -126,6 +127,9 @@ void leonardo_overlord::policy(
 }
 
 void leonardo_overlord::self_play(
+	long long epoch,
+	size_t& progression,
+	std::mutex& progression_mutex,
 	int first_game_idx,
 	int last_game_idx,
 	size_t number_of_moves_per_game,
@@ -145,13 +149,13 @@ void leonardo_overlord::self_play(
 
 		while (true)
 		{
-			std::cout << "(" + std::to_string(game_idx) + ")";
+			//std::cout << "(" + std::to_string(game_idx) + ")";
 
 			matrix output_matrix(leonardo_util::get_policy_output_format());
 			matrix input_matrix(leonardo_util::get_input_format());
 			leonardo_util::set_matrix_from_chessboard(game, input_matrix); //all on cpu
 
-			policy(output_matrix, policy_nnet_copy, prediction_nnet_copy, game);
+			policy(epoch, output_matrix, policy_nnet_copy, prediction_nnet_copy, game);
 
 			if (move_idx < number_of_moves_per_game)
 			{
@@ -199,11 +203,15 @@ void leonardo_overlord::self_play(
 					white_turn = !white_turn;
 				}
 
+				/*
 				std::cout
 					<<
 					"\ngame " + std::to_string(game_idx) +
 					" finished (" + std::to_string(move_idx + 1) + ")" +
 					"\n";
+				*/
+				std::lock_guard<std::mutex> lock(progression_mutex);
+				progression++;
 
 				break;
 			}
@@ -214,6 +222,7 @@ void leonardo_overlord::self_play(
 }
 
 void leonardo_overlord::get_training_data(
+	long long iteration,
 	size_t thread_count,
 	size_t games_per_thread,
 	size_t number_of_moves_per_game,
@@ -221,52 +230,55 @@ void leonardo_overlord::get_training_data(
 	data_space& prediction_training_ds)
 {
 	std::cout << "starting " << std::to_string(games_per_thread * thread_count) << " games\n";
-	bool threaded = true;
-	if (threaded)
+
+	std::vector<std::thread> threads;
+
+	size_t progression = 0;
+	std::mutex progression_mutex;
+
+	std::thread timer_thread = std::thread(
+		&leonardo_util::update_thread,
+		std::ref(progression),
+		thread_count * games_per_thread,
+		5000);
+
+	for (int i = 0; i < thread_count; i++)
 	{
-		std::vector<std::thread> threads;
+		std::thread t(
+			&leonardo_overlord::self_play, this,
+			iteration,
+			std::ref(progression),
+			std::ref(progression_mutex),
+			i * games_per_thread,
+			i * games_per_thread + games_per_thread,
+			number_of_moves_per_game,
+			std::ref(policy_training_ds),
+			std::ref(prediction_training_ds));
 
-		for (int i = 0; i < thread_count; i++)
+		threads.push_back(std::move(t));
+	}
+
+	for (auto& t : threads)
+	{
+		if (t.joinable())
 		{
-			std::thread t(
-				&leonardo_overlord::self_play, this,
-				i * games_per_thread,
-				i * games_per_thread + games_per_thread,
-				number_of_moves_per_game,
-				std::ref(policy_training_ds),
-				std::ref(prediction_training_ds));
-
-			threads.push_back(std::move(t));
-		}
-
-		for (auto& t : threads)
-		{
-			if (t.joinable())
-			{
-				t.join();
-			}
+			t.join();
 		}
 	}
-	else
+
+	if (timer_thread.joinable())
 	{
-		for (int i = 0; i < thread_count; i++)
-		{
-			self_play(
-				i * games_per_thread,
-				i * games_per_thread + games_per_thread,
-				number_of_moves_per_game,
-				policy_training_ds,
-				prediction_training_ds
-			);
-		}
+		timer_thread.join();
 	}
 }
 
-void leonardo_overlord::upgrade()
+void leonardo_overlord::upgrade(
+	long long epoch
+)
 {
 	//az has 25000 games
 	size_t selfplay_thread_count = 16;
-	size_t number_of_games_per_thread = 100;
+	size_t number_of_games_per_thread = 20;
 	size_t number_of_selfplay_games = number_of_games_per_thread * selfplay_thread_count;
 	size_t number_of_moves_per_game = 200;
 
@@ -276,12 +288,14 @@ void leonardo_overlord::upgrade()
 		leonardo_util::get_input_format(),
 		leonardo_util::get_policy_output_format()
 	);
+	std::cout << "policy training ds is " << byte_size_to_str(policy_training_ds.byte_size()) << "\n";
 
 	data_space prediction_training_ds(
 		number_of_selfplay_games * number_of_moves_per_game,
 		leonardo_util::get_input_format(),
 		leonardo_util::get_prediction_output_format()
 	);
+	std::cout << "prediction training ds is " << byte_size_to_str(prediction_training_ds.byte_size()) << "\n";
 
 	if (gpu_mode)
 	{
@@ -289,10 +303,21 @@ void leonardo_overlord::upgrade()
 		prediction_training_ds.copy_to_gpu();
 	}
 
+	std::cout
+		<< "policy network is " << byte_size_to_str(new_policy_nnet.get_param_byte_size())
+		<< " (" << selfplay_thread_count << " threads -> " << byte_size_to_str(new_policy_nnet.get_param_byte_size() * selfplay_thread_count) << ")"
+		<< "\n";
+	std::cout << "prediction network is " << byte_size_to_str(new_prediction_nnet.get_param_byte_size())
+		<< " (" << selfplay_thread_count << " threads -> " << byte_size_to_str(new_prediction_nnet.get_param_byte_size() * selfplay_thread_count) << ")"
+		<< "\n";
+
+
+
 	std::cout << "starting selfplay to get data \n";
 	auto start = std::chrono::high_resolution_clock::now();
 	//get training data through selfplay
 	get_training_data(
+		epoch,
 		selfplay_thread_count,
 		number_of_games_per_thread,
 		number_of_moves_per_game,
@@ -350,7 +375,7 @@ leonardo_overlord::leonardo_overlord(
 	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
 	best_policy_nnet.set_all_parameters(0.0f);
-	best_policy_nnet.apply_noise(.1);
+	best_policy_nnet.apply_noise(.1f);
 
 	best_prediction_nnet.set_input_format(leonardo_util::get_input_format());
 	best_prediction_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
@@ -359,7 +384,7 @@ leonardo_overlord::leonardo_overlord(
 	best_prediction_nnet.add_fully_connected_layer(256, leaky_relu_fn);
 	best_prediction_nnet.add_fully_connected_layer(leonardo_util::get_prediction_output_format(), leaky_relu_fn);
 	best_prediction_nnet.set_all_parameters(0.0f);
-	best_prediction_nnet.apply_noise(.1);
+	best_prediction_nnet.apply_noise(.1f);
 
 	new_policy_nnet = neural_network(best_policy_nnet);
 	new_prediction_nnet = neural_network(best_prediction_nnet);
@@ -395,9 +420,11 @@ void leonardo_overlord::train()
 	{
 		std::chrono::steady_clock::time_point start =
 			std::chrono::high_resolution_clock::now();
-	
-		std::cout << "upgrade time. iteration: " << i << std::endl;
-		upgrade();
+
+		std::cout 
+			<< "upgrade time. iteration: " << i 
+			<< "\n--------------------------------------\n";
+		upgrade(i);
 
 		//	# arena - with biased random instead of applying noise to input
 		//	win_ratio = pit(policy_nn, new_policy_nn, n = number_of_games)
@@ -410,7 +437,7 @@ void leonardo_overlord::train()
 		std::cout << "putting new and best nnet into an arena" << std::endl;
 		auto arena_start = std::chrono::high_resolution_clock::now();
 
-		arena_result arena_result = arena.play(50);
+		arena_result arena_result = arena.play(200);
 
 		auto arena_stop = std::chrono::high_resolution_clock::now();
 		auto arena_duration =
@@ -421,13 +448,19 @@ void leonardo_overlord::train()
 
 		if (win_score > 0)
 		{
-			std::cout << "new network is better" << std::endl;
+			std::cout
+				<< "---------------------\n"
+				<< "new network is better (won " << win_score << " more)\n"
+				<< "---------------------\n";
 			best_policy_nnet.set_parameters(new_policy_nnet);
 			best_prediction_nnet.set_parameters(new_prediction_nnet);
 		}
 		else
 		{
-			std::cout << "new network is worse" << std::endl;
+			std::cout
+				<< "--------------------\n"
+				<< "new network is worse (lost " -win_score << " more)\n"
+				<< "--------------------\n";
 		}
 
 		if ((i + 1) % iterations_per_file_save == 0)

@@ -46,4 +46,9 @@ namespace leonardo_util
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
 		const ChessBoard& game,
 		std::vector<std::unique_ptr<Move>>& legal_moves);
+
+	void update_thread(
+		const size_t& progression,
+		size_t total,
+		size_t tick_in_ms);
 }
