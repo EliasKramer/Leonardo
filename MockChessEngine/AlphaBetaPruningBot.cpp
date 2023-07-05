@@ -1,5 +1,13 @@
 #include "AlphaBetaPruningBot.h"
 
+AlphaBetaPruningBot::AlphaBetaPruningBot()
+: Medicrius()
+{}
+
+AlphaBetaPruningBot::AlphaBetaPruningBot(int depth)
+: Medicrius(depth)
+{}
+
 int AlphaBetaPruningBot::getMove(const ChessBoard& board, const UniqueMoveList& moves)
 {
 	auto begin = std::chrono::high_resolution_clock::now();
@@ -11,7 +19,7 @@ int AlphaBetaPruningBot::getMove(const ChessBoard& board, const UniqueMoveList& 
 	int nodesSearched = 0;
 	int branchesPruned = 0;
 
-	int depth = 3;
+	int depth = _depth;
 
 	int bestMoveScore = INT_MIN;
 	int bestMoveIdx = 0;

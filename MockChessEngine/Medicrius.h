@@ -10,9 +10,12 @@
 
 class Medicrius : public Player
 {
+protected:
+	int _depth = 3;
 public:
 	Medicrius();
 	Medicrius(std::string name);
+	Medicrius(int depth);
 
 	int getMove(const ChessBoard& board, const UniqueMoveList& moves) override;
 

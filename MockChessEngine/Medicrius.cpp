@@ -8,6 +8,11 @@ Medicrius::Medicrius(std::string name)
 	:Player(name)
 {}
 
+Medicrius::Medicrius(int depth)
+	:Player("Medicrus"), 
+	_depth(depth)
+{}
+
 int Medicrius::getMove(const ChessBoard& board, const UniqueMoveList& moves)
 {
 	//multithreading would also be useful here

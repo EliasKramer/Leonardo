@@ -3,6 +3,8 @@
 #include <memory>
 #include <thread>
 #include "../MockChessEngine/ChessBoard.h"
+#include "../MockChessEngine/AlphaBetaPruningBot.h"
+#include "../MockChessEngine/RandomPlayer.h"
 #include "leonardo_util.hpp"
 #include <unordered_map>
 #include <unordered_set>
@@ -10,6 +12,7 @@
 #include "leonardo_bot.hpp"
 #include <memory>
 #include "NeuroFox/data_space.hpp"
+#include <filesystem>
 
 class leonardo_overlord
 {
@@ -25,7 +28,7 @@ private:
 	bool gpu_mode = true;
 
 	std::thread file_save_thread;
-	void save_best_to_file(size_t epoch);
+	void save_best_to_file(size_t epoch, bool prediction, bool policy);
 
 	float search(
 		const ChessBoard& game,
@@ -69,6 +72,13 @@ public:
 	~leonardo_overlord();
 
 	void train();
+	void train_policy();
+	void get_data_for_prediction(
+		size_t id,
+		size_t& epoch,
+		std::mutex& trainings_mutex
+	);
+	void train_prediction();
 
 	const neural_network& get_best_network() const;
 };

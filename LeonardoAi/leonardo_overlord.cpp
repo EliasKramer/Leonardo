@@ -1,13 +1,29 @@
 #include "leonardo_overlord.hpp"
 
-void leonardo_overlord::save_best_to_file(size_t epoch)
+void leonardo_overlord::save_best_to_file(size_t epoch, bool prediction, bool policy)
 {
 	//best_network.save_to_file(name);
-	std::cout << "\nsaving best network to file\n";
-	std::string policy_path = "models\\" + name + "_policy_epoch_" + std::to_string(epoch) + ".parameters";
-	std::string prediction_path = "models\\" + name + "_prediction_epoch_" + std::to_string(epoch) + ".parameters";
-	best_policy_nnet.save_to_file(policy_path);
-	best_prediction_nnet.save_to_file(prediction_path);
+	std::cout << "\nsaving best network to file";
+	//check if folder exists
+	if (!std::filesystem::exists("models"))
+	{
+		std::filesystem::create_directory("models");
+	}
+	std::string folder_name = "models\\" + name + "_epoch_" + std::to_string(epoch);
+	if (!std::filesystem::exists(folder_name))
+	{
+		std::filesystem::create_directory(folder_name);
+	}
+	if (policy)
+	{
+		std::string policy_path = folder_name + "\\policy.parameters";
+		best_policy_nnet.save_to_file(policy_path);
+	}
+	if (prediction)
+	{
+		std::string prediction_path = folder_name + "\\prediction.parameters";
+		best_prediction_nnet.save_to_file(prediction_path);
+	}
 	std::cout << "\nsaved best network to file\n";
 }
 float leonardo_overlord::search(
@@ -240,7 +256,7 @@ void leonardo_overlord::get_training_data(
 		&leonardo_util::update_thread,
 		std::ref(progression),
 		thread_count * games_per_thread,
-		5000);
+		30000);
 
 	for (int i = 0; i < thread_count; i++)
 	{
@@ -406,6 +422,11 @@ leonardo_overlord::~leonardo_overlord()
 	}
 }
 
+void leonardo_overlord::train_policy()
+{
+	//train on grandmaster games
+}
+
 void leonardo_overlord::train()
 {
 	chess_arena arena(
@@ -421,8 +442,8 @@ void leonardo_overlord::train()
 		std::chrono::steady_clock::time_point start =
 			std::chrono::high_resolution_clock::now();
 
-		std::cout 
-			<< "upgrade time. iteration: " << i 
+		std::cout
+			<< "upgrade time. iteration: " << i
 			<< "\n--------------------------------------\n";
 		upgrade(i);
 
@@ -459,14 +480,14 @@ void leonardo_overlord::train()
 		{
 			std::cout
 				<< "--------------------\n"
-				<< "new network is worse (lost " -win_score << " more)\n"
+				<< "new network is worse (lost " - win_score << " more)\n"
 				<< "--------------------\n";
 		}
 
 		if ((i + 1) % iterations_per_file_save == 0)
 		{
 			//start save_best_to_file in save_in_file_thread 
-			file_save_thread = std::thread(&leonardo_overlord::save_best_to_file, this, i);
+			file_save_thread = std::thread(&leonardo_overlord::save_best_to_file, this, i, true, true);
 		}
 
 		std::chrono::steady_clock::time_point stop =
@@ -476,6 +497,123 @@ void leonardo_overlord::train()
 		sum_elapsed_ms += elapsed_ms;
 		std::cout << "cycle took: " << ms_to_str(elapsed_ms) << " ";
 		std::cout << "average: " << ms_to_str(sum_elapsed_ms / (i + 1)) << "\n";
+	}
+}
+
+void leonardo_overlord::get_data_for_prediction(
+	size_t id,
+	size_t& epoch,
+	std::mutex& trainings_mutex
+)
+{
+	size_t number_of_games = 300;
+	size_t moves_per_game = 100;
+
+	AlphaBetaPruningBot player1(2);
+	RandomPlayer player2;
+	bool player1_turn = true;
+	bool flip_player = false;
+
+	for (int i = 0;; i++)
+	{
+		std::cout << "thread" + std::to_string(id) + " game " + std::to_string(i) + "\n";
+		data_space ds(
+			number_of_games * moves_per_game,
+			leonardo_util::get_input_format(),
+			leonardo_util::get_prediction_output_format()
+		);
+
+		for (size_t game_idx = 0; game_idx < number_of_games; game_idx++)
+		{
+			size_t start_idx = game_idx * moves_per_game;
+			size_t end_idx = (game_idx + 1) * moves_per_game;
+			ChessBoard game(STARTING_FEN);
+			for (size_t move_idx = 0; ; move_idx++)
+			{
+				std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
+
+				int chosen_move_idx =
+					player1_turn ?
+					player1.getMove(game, legal_moves) :
+					player2.getMove(game, legal_moves);
+				player1_turn = !player1_turn;
+
+				if (start_idx + move_idx < end_idx)
+				{
+					matrix input_matrix(leonardo_util::get_input_format());
+					leonardo_util::set_matrix_from_chessboard(game, input_matrix); //all on cpu
+
+					ds.set_data(input_matrix, move_idx);
+				}
+
+				game.makeMove(*legal_moves[chosen_move_idx].get());
+
+				if (game.getGameState() != Ongoing)
+				{
+					size_t game_end_idx = start_idx + std::min(move_idx, moves_per_game - 1);
+
+					matrix final_game_state_w(leonardo_util::get_prediction_output_format());
+					leonardo_util::set_prediction_output(final_game_state_w, game, White);
+					matrix final_game_state_b(leonardo_util::get_prediction_output_format());
+					leonardo_util::set_prediction_output(final_game_state_b, game, Black);
+					bool white_turn = true;
+					for (size_t back_track_idx = start_idx; back_track_idx <= game_end_idx; back_track_idx++)
+					{
+						ds.set_label(
+							white_turn ? final_game_state_w : final_game_state_b,
+							back_track_idx);
+						white_turn = !white_turn;
+					}
+					flip_player = !flip_player;
+					player1_turn = flip_player;
+					break;
+				}
+			}
+		}
+		if (gpu_mode)
+		{
+			ds.copy_to_gpu();
+		}
+		std::lock_guard<std::mutex> lock(trainings_mutex);
+		std::cout << "learn on data " << i << "\n";
+		best_prediction_nnet.learn_on_ds(
+			ds,
+			20,
+			20,
+			0.1,
+			true
+		);
+		save_best_to_file(epoch, true, false);
+		std::cout << "epoch " << epoch << " done \n";
+		epoch++;
+	}
+}
+
+void leonardo_overlord::train_prediction()
+{
+	size_t thread_count = 8;
+
+	std::mutex trainings_mutex;
+
+	std::vector<std::thread> threads;
+
+	size_t epoch = 0;
+
+	for (size_t i = 0; i < thread_count; i++)
+	{
+		threads.emplace_back(
+			&leonardo_overlord::get_data_for_prediction,
+			this,
+			i,
+			std::ref(epoch),
+			std::ref(trainings_mutex)
+		);
+	}
+
+	//willl never happen. just to block the thread
+	for (auto& thread : threads)
+	{
+		thread.join();
 	}
 }
 
