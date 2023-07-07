@@ -506,7 +506,7 @@ void leonardo_overlord::get_data_for_prediction(
 	std::mutex& trainings_mutex
 )
 {
-	size_t number_of_games = 300;
+	size_t number_of_games = 100;
 	size_t moves_per_game = 100;
 
 	AlphaBetaPruningBot player1(2);
@@ -583,7 +583,11 @@ void leonardo_overlord::get_data_for_prediction(
 			0.1,
 			true
 		);
-		save_best_to_file(epoch, true, false);
+
+		if (epoch % 100 == 0)
+		{
+			save_best_to_file(epoch, true, false);
+		}
 		std::cout << "epoch " << epoch << " done \n";
 		epoch++;
 	}
@@ -591,7 +595,7 @@ void leonardo_overlord::get_data_for_prediction(
 
 void leonardo_overlord::train_prediction()
 {
-	size_t thread_count = 8;
+	size_t thread_count = 10;
 
 	std::mutex trainings_mutex;
 

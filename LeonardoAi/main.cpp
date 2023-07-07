@@ -21,7 +21,7 @@ int main()
 	//signal(SIGABRT, &my_function_to_handle_aborts);
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
-	leonardo_overlord overlord("test");
+	leonardo_overlord overlord("only_prediction");
 	overlord.train_prediction();
 	
 	matrix m(vector3(1, 1, 1));
