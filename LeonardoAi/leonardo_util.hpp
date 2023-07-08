@@ -10,7 +10,7 @@ namespace leonardo_util
 {
 	vector3 get_input_format();
 	vector3 get_policy_output_format();
-	vector3 get_prediction_output_format();
+	vector3 get_value_nnet_output();
 
 	void set_matrix_from_chessboard(const ChessBoard& board, matrix& input);
 	int square_to_flat_idx(Square s, ChessColor color_to_move);
@@ -22,9 +22,9 @@ namespace leonardo_util
 	//has a matrix and picks the best move at random, but moves with higher value get picked more often
 	int get_random_best_move(const matrix& output, const UniqueMoveList& allowed_moves, ChessColor curr_turn_col);
 
-	void set_prediction_output(matrix& output, const ChessBoard& game, ChessColor color);
+	void set_value_nnet_output(matrix& output, const ChessBoard& game, ChessColor color);
 
-	float get_prediction_output(matrix& output);
+	float get_value_nnet_output(matrix& output);
 
 	matrix& matrix_map_get(
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,

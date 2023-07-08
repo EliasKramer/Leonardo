@@ -13,7 +13,7 @@ vector3 leonardo_util::get_policy_output_format()
 	return vector3(64, 64, 1);
 }
 
-vector3 leonardo_util::get_prediction_output_format()
+vector3 leonardo_util::get_value_nnet_output()
 {
 	return vector3(2, 1, 1);
 }
@@ -59,18 +59,16 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 int leonardo_util::square_to_flat_idx(Square s, ChessColor color_to_move)
 {
 	const vector3 board_dimensions(8, 8, 1);
-	vector3 coord(0, 0, 0);
-
+	
 	int x = s % 8;
 	int y = s / 8;
+	
 	if (color_to_move == Black)
 	{
 		y = 7 - y;
 	}
-	coord.x = x;
-	coord.y = y;
 
-	return coord.get_index(board_dimensions);
+	return vector3(x,y,0).get_index(board_dimensions);
 }
 
 float leonardo_util::get_move_value(const Move& move, const matrix& policy_output, ChessColor color)
@@ -189,9 +187,9 @@ int leonardo_util::get_random_best_move(
 	return 0;
 }
 
-void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game, ChessColor color)
+void leonardo_util::set_value_nnet_output(matrix& output, const ChessBoard& game, ChessColor color)
 {
-	smart_assert(vector3::are_equal(output.get_format(), get_prediction_output_format()));
+	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output()));
 	smart_assert(output.host_data_is_updated());
 	smart_assert(game.getGameState() != GameState::Ongoing);
 
@@ -213,14 +211,14 @@ void leonardo_util::set_prediction_output(matrix& output, const ChessBoard& game
 	output.sync_device_and_host();
 }
 
-float leonardo_util::get_prediction_output(matrix& output)
+float leonardo_util::get_value_nnet_output(matrix& output)
 {
 	if (!output.host_data_is_updated())
 	{
 		int x = 0;
 	}
 	smart_assert(output.host_data_is_updated());
-	smart_assert(vector3::are_equal(output.get_format(), get_prediction_output_format()));
+	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output()));
 
 	//not necessary?
 	//output.sync_device_and_host();

@@ -20,20 +20,20 @@ private:
 	std::string name;
 
 	neural_network best_policy_nnet;
-	neural_network best_prediction_nnet;
+	neural_network best_value_nnet;
 	
 	neural_network new_policy_nnet;
-	neural_network new_prediction_nnet;
+	neural_network new_value_nnet;
 
 	bool gpu_mode = true;
 
 	std::thread file_save_thread;
-	void save_best_to_file(size_t epoch, bool prediction, bool policy);
+	void save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet);
 
 	float search(
 		const ChessBoard& game,
 		neural_network& given_policy_nnet,
-		neural_network& given_prediction_nnet,
+		neural_network& given_value_nnet,
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& n,
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& p,
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& q,
@@ -44,7 +44,7 @@ private:
 		long long epoch,
 		matrix& output_matrix, 
 		neural_network& given_policy_nnet,
-		neural_network& given_prediction_nnet,
+		neural_network& given_value_nnet,
 		const ChessBoard& game);
 
 	void self_play(
@@ -55,7 +55,7 @@ private:
 		int last_game_idx,
 		size_t number_of_moves_per_game,
 		data_space& policy_training_ds,
-		data_space& prediction_training_ds
+		data_space& given_value_nnet
 	);
 
 	void get_training_data(
@@ -64,7 +64,7 @@ private:
 		size_t games_per_thread,
 		size_t number_of_moves_per_game,
 		data_space& policy_training_ds,
-		data_space& prediction_training_ds
+		data_space& value_training_ds
 	);
 	void upgrade(long long epoch);
 public:
@@ -73,12 +73,12 @@ public:
 
 	void train();
 	void train_policy();
-	void get_data_for_prediction(
+	void get_data_for_value_nnet(
 		size_t id,
 		size_t& epoch,
 		std::mutex& trainings_mutex
 	);
-	void train_prediction();
+	void train_value_nnet();
 
 	const neural_network& get_best_network() const;
 };
