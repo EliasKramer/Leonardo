@@ -393,7 +393,7 @@ leonardo_overlord::leonardo_overlord(
 	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
 	best_policy_nnet.xavier_initialization();
-	
+
 
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
 	best_value_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
@@ -501,27 +501,33 @@ void leonardo_overlord::train()
 	}
 }
 
-void leonardo_overlord::get_data_for_value_nnet(
+void leonardo_overlord::train_value_nnet_thread_fn(
 	size_t id,
+	std::chrono::high_resolution_clock::time_point training_start,
 	size_t& epoch,
+	size_t& total_moves_made,
+	size_t& total_games_played,
 	std::mutex& trainings_mutex
 )
 {
-	size_t number_of_games = 3;
 	size_t moves_per_game = 50;
+	size_t number_of_games = 10;
 
-	AlphaBetaPruningBot player1(2);
+	AlphaBetaPruningBot player1(2); //the argument is the depth
 	RandomPlayer player2;
 	bool player1_plays_white = true;
 
+	std::cout << "thread " + std::to_string(id) + " started\n";
+
 	for (int i = 0;; i++)
 	{
-		std::cout << "thread" + std::to_string(id) + " game " + std::to_string(i) + "\n";
 		data_space ds(
 			number_of_games * moves_per_game,
 			leonardo_util::get_input_format(),
 			leonardo_util::get_value_nnet_output()
 		);
+
+		size_t move_sum = 0;
 
 		for (size_t game_idx = 0; game_idx < number_of_games; game_idx++)
 		{
@@ -534,13 +540,13 @@ void leonardo_overlord::get_data_for_value_nnet(
 			{
 				std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
 
-				int chosen_move_idx =
+				size_t chosen_move_idx =
 					whites_turn == player1_plays_white ?
 					player1.getMove(game, legal_moves) :
 					player2.getMove(game, legal_moves);
 				whites_turn = !whites_turn;
 
-				int ds_idx = start_idx + move_idx;
+				size_t ds_idx = start_idx + move_idx;
 
 				if (ds_idx < end_idx)
 				{
@@ -569,10 +575,13 @@ void leonardo_overlord::get_data_for_value_nnet(
 						back_track_white_turn = !back_track_white_turn;
 					}
 
+					/*
 					std::cout << "\nt-id: " << id << " game " << game_idx << " done move idx: " << move_idx << "\n" << GAME_STATE_STRING[game.getGameState()] << "\n";
 					std::cout << "p1 is white " << player1_plays_white << "\n";
 					std::cout << game.getFen() << "\n";
+					*/
 					player1_plays_white = !player1_plays_white;
+					move_sum += (move_idx + 1);
 					break;
 				}
 			}
@@ -581,42 +590,75 @@ void leonardo_overlord::get_data_for_value_nnet(
 		{
 			ds.copy_to_gpu();
 		}
+
+		auto start = std::chrono::high_resolution_clock::now();
 		std::lock_guard<std::mutex> lock(trainings_mutex);
-		std::cout << "learn on data " << i << "\n";
+		auto stop = std::chrono::high_resolution_clock::now();
+		long long mutex_waiting_time = 
+			std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
+		
 		best_value_nnet.learn_on_ds(
 			ds,
 			20,
 			20,
-			0.1,
+			0.1f,
 			true
 		);
+
+		total_games_played += number_of_games;
+		total_moves_made += move_sum;
+
+		//update moves per game, that get saved to a bit more than the average
+		moves_per_game = (total_moves_made / total_games_played) * 1.1f;
+		smart_assert(moves_per_game > 0);
 
 		if (epoch % 100 == 0)
 		{
 			save_best_to_file(epoch, true, false);
 		}
-		std::cout << "epoch " << epoch << " done \n";
+
+		long long total_time_elapsed = 
+			std::chrono::duration_cast<std::chrono::milliseconds>
+			(std::chrono::high_resolution_clock::now() - training_start).count();
+
+		std::cout <<
+			"# " << (epoch + 1) << " " <<
+			get_current_time_str() <<
+			" | " << ms_to_str(total_time_elapsed) <<
+			" (total moves " << total_moves_made <<
+			" | total games " << total_games_played <<
+			" | m/g " << total_moves_made / total_games_played <<
+			" | moves saved/g " << moves_per_game <<
+			" | mutex wait " << ms_to_str(mutex_waiting_time) <<
+			")\n";
 		epoch++;
 	}
 }
 
 void leonardo_overlord::train_value_nnet()
 {
-	size_t thread_count = 1;
+	size_t thread_count = 9;
 
 	std::mutex trainings_mutex;
 
 	std::vector<std::thread> threads;
 
 	size_t epoch = 0;
+	size_t total_moves_made = 0;
+	size_t total_games_played = 0;
+
+	std::chrono::time_point start_time = std::chrono::high_resolution_clock::now();
 
 	for (size_t i = 0; i < thread_count; i++)
 	{
 		threads.emplace_back(
-			&leonardo_overlord::get_data_for_value_nnet,
+			&leonardo_overlord::train_value_nnet_thread_fn,
 			this,
 			i,
+			start_time,
 			std::ref(epoch),
+			std::ref(total_moves_made),
+			std::ref(total_games_played),
 			std::ref(trainings_mutex)
 		);
 	}

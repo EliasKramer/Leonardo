@@ -73,11 +73,16 @@ public:
 
 	void train();
 	void train_policy();
-	void get_data_for_value_nnet(
+
+private:
+	void train_value_nnet_thread_fn(
 		size_t id,
+		std::chrono::high_resolution_clock::time_point training_start,
 		size_t& epoch,
-		std::mutex& trainings_mutex
-	);
+		size_t& total_moves_made,
+		size_t& total_games_played,
+		std::mutex& trainings_mutex);
+public: 
 	void train_value_nnet();
 
 	const neural_network& get_best_network() const;
