@@ -2,7 +2,7 @@
 
 vector3 leonardo_util::get_input_format()
 {
-	return vector3(8, 8, 1);
+	return vector3(8, 8, NUMBER_OF_DIFFERENT_PIECE_TYPES);
 }
 
 vector3 leonardo_util::get_policy_output_format()
@@ -20,8 +20,6 @@ vector3 leonardo_util::get_value_nnet_output()
 
 void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& m)
 {
-	throw std::runtime_error("fix this shit. 0 and -1 in multiple dimensions");
-
 	smart_assert(m.host_data_is_updated());
 	smart_assert(matrix::equal_format(m.get_format(), leonardo_util::get_input_format()));
 	smart_assert(m.item_count() == 64);
@@ -30,29 +28,27 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 
 	bool flipped = board.getCurrentTurnColor() == Black;
 
+	m.set_all(0);
+
 	for (int y = 0; y < 8; y++)
 	{
 		for (int x = 0; x < 8; x++)
 		{
-			vector3 coord(x, flipped ? y : 7 - y);
 			Square square = (Square)vector3(x, y).get_index(vector3(8, 8, 1));
 
 			if (bitboardsOverlap(all_pieces, BB_SQUARE[square]))
 			{
 				ChessPiece piece = board.getBoardRepresentation().getPieceAt(square);
-
+				
+				vector3 coord(x, flipped ? y : 7 - y, piece.getType());
+				
 				//the own pieces are 1 the others are -1
-				float color_multiplier = piece.getColor() == board.getCurrentTurnColor() ? 1.0f : -1.0f;
+				float color_value = piece.getColor() == board.getCurrentTurnColor() ? 1.0f : -1.0f;
 
-				float value = piece.getType() == PieceType::King ? 1000.0f : (float)PIECETYPE_VALUE[piece.getType()];
 				m.set_at_host(
 					coord,
-					(value * color_multiplier) / 1000.0f
+					color_value
 				);
-			}
-			else
-			{
-				m.set_at_host(coord, 0.0f);
 			}
 		}
 	}

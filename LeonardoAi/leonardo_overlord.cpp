@@ -596,7 +596,7 @@ void leonardo_overlord::train_value_nnet_thread_fn(
 		auto stop = std::chrono::high_resolution_clock::now();
 		long long mutex_waiting_time = 
 			std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
-		
+
 		best_value_nnet.learn_on_ds(
 			ds,
 			20,
