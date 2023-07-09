@@ -609,7 +609,7 @@ void leonardo_overlord::train_value_nnet_thread_fn(
 		total_moves_made += move_sum;
 
 		//update moves per game, that get saved to a bit more than the average
-		moves_per_game = (total_moves_made / total_games_played) * 1.1f;
+		moves_per_game = (size_t)((float)(total_moves_made / total_games_played) * 1.1f);
 		smart_assert(moves_per_game > 0);
 
 		if (epoch % 100 == 0)

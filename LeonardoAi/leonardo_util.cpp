@@ -148,7 +148,7 @@ int leonardo_util::get_random_best_move(
 	{
 		float value = abs(get_move_value(*move, output, curr_turn_col));
 
-		smart_assert(!std::isnan(value), "value is nan");
+		smart_assert(!std::isnan(value));
 
 		if (value > max_abs)
 		{
