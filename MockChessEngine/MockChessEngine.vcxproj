@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\util.cpp" />
     <ClCompile Include="AlphaBetaPruningBot.cpp" />
     <ClCompile Include="BitBoard.cpp" />
     <ClCompile Include="BoardRepresentation.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="RandomPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\LeonardoAi\NeuroFox\util.hpp" />
     <ClInclude Include="AlphaBetaPruningBot.h" />
     <ClInclude Include="BitBoard.h" />
     <ClInclude Include="BoardRepresentation.h" />

@@ -81,9 +81,12 @@ private:
 		size_t& epoch,
 		size_t& total_moves_made,
 		size_t& total_games_played,
+		size_t& black_won,
+		size_t& white_won,
+		size_t& draw,
 		std::mutex& trainings_mutex);
 public: 
 	void train_value_nnet();
-
+	void test_value_nnet();
 	const neural_network& get_best_network() const;
 };

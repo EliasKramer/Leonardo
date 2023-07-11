@@ -44,7 +44,8 @@ int AlphaBetaPruningBot::getMove(const ChessBoard& board, const UniqueMoveList& 
 				branchesPruned
 			);
 
-		int currScore = colorMult * moveScore;
+		float small_rand = random_float_excl(1.00, 1.15);
+		int currScore = colorMult * moveScore * small_rand;
 
 		/*
 		std::cout

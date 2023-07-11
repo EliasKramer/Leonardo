@@ -78,6 +78,9 @@
     <ClCompile Include="Medicrius.cpp">
       <Filter>Source Files\chess</Filter>
     </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\util.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BitBoard.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="Medicrius.h">
       <Filter>Header Files\chess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LeonardoAi\NeuroFox\util.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
