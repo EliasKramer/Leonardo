@@ -1,6 +1,6 @@
 #pragma once
 #include "Medicrius.h"
-
+#include "../LeonardoAi/NeuroFox/util.hpp"
 class AlphaBetaPruningBot : public Medicrius
 {
 public:

@@ -22,7 +22,6 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 {
 	smart_assert(m.host_data_is_updated());
 	smart_assert(matrix::equal_format(m.get_format(), leonardo_util::get_input_format()));
-	smart_assert(m.item_count() == 64);
 
 	BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
 
@@ -187,25 +186,33 @@ int leonardo_util::get_random_best_move(
 
 void leonardo_util::set_value_nnet_output(matrix& output, const ChessBoard& game, ChessColor color)
 {
+	GameState state = game.getGameState();
 	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output()));
 	smart_assert(output.host_data_is_updated());
-	smart_assert(game.getGameState() != GameState::Ongoing);
+	smart_assert(state != GameState::Ongoing);
 
 	//color wins
 	// 1 | 0
 	//color loses
 	// 0 | 1
-
-	//output.sync_device_and_host(); // we check for that in the smart_assert
+	//draw or stalemate
+	// 0.5 | 0.5
 
 	output.set_at_flat_host(0,
-		(game.getGameState() == GameState::WhiteWon && color == White) ||
-		(game.getGameState() == GameState::BlackWon && color == Black)
+		(state == GameState::WhiteWon && color == White) ||
+		(state == GameState::BlackWon && color == Black)
 		? 1.0f : 0.0f);
 	output.set_at_flat_host(1,
-		game.getGameState() == GameState::BlackWon && color == White ||
-		game.getGameState() == GameState::WhiteWon && color == Black
+		state == GameState::BlackWon && color == White ||
+		state == GameState::WhiteWon && color == Black
 		? 1.0f : 0.0f);
+
+	if (state == GameState::Draw || state == GameState::Stalemate)
+	{
+		output.set_at_flat_host(0, 0.5f);
+		output.set_at_flat_host(1, 0.5f);
+	}
+
 	output.sync_device_and_host();
 }
 
