@@ -21,7 +21,7 @@ int main()
 	//signal(SIGABRT, &my_function_to_handle_aborts);
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
-	leonardo_overlord overlord("test_run");
+	leonardo_overlord overlord("xavier_and_momentum_iteration");
 	overlord.train_value_nnet();
 	return 0;
 

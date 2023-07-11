@@ -511,7 +511,7 @@ void leonardo_overlord::train_value_nnet_thread_fn(
 )
 {
 	size_t moves_per_game = 50;
-	size_t number_of_games = 10;
+	size_t number_of_games = 20;
 
 	AlphaBetaPruningBot player1(2); //the argument is the depth
 	RandomPlayer player2;
@@ -599,11 +599,10 @@ void leonardo_overlord::train_value_nnet_thread_fn(
 
 		best_value_nnet.learn_on_ds(
 			ds,
-			20,
-			20,
+			32,
+			64,
 			0.1f,
-			true
-		);
+			true);
 
 		total_games_played += number_of_games;
 		total_moves_made += move_sum;

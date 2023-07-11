@@ -22,7 +22,6 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 {
 	smart_assert(m.host_data_is_updated());
 	smart_assert(matrix::equal_format(m.get_format(), leonardo_util::get_input_format()));
-	smart_assert(m.item_count() == 64);
 
 	BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
 
