@@ -393,7 +393,7 @@ leonardo_overlord::leonardo_overlord(
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
 	best_policy_nnet.xavier_initialization();
 	
-	best_value_nnet = neural_network("C:\\Users\\krame\\Desktop\\all\\_coding\\Leonardo\\LeonardoAi\\models\\xavier_momentum_1100\\value.parameters");
+	best_value_nnet = neural_network("C:\\Users\\krame\\Desktop\\all\\_coding\\Leonardo\\LeonardoAi\\models\\double_alpha_400\\value.parameters");
 	/*
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
 	best_value_nnet.add_fully_connected_layer(1024, leaky_relu_fn);

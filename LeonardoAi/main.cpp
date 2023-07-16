@@ -26,7 +26,7 @@ int main()
 	
 	//board.getFen();
 	ChessBoard board("r2q1rk1/pppb1ppp/3b1n2/3P4/3QP3/3P4/PP1B1PPP/RN2KB1R b KQ - 1 12");
-	neural_network nnet("C:\\Users\\krame\\Desktop\\all\\_coding\\Leonardo\\LeonardoAi\\models\\xavier_momentum_2300\\value.parameters");
+	neural_network nnet("C:\\Users\\krame\\Desktop\\all\\_coding\\Leonardo\\LeonardoAi\\models\\double_alpha_400\\value.parameters");
 	
 	matrix in(leonardo_util::get_input_format());
 	leonardo_util::set_matrix_from_chessboard(board, in);
