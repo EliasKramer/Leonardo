@@ -9,8 +9,9 @@ int main()
 {
 	//SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
-	leonardo_overlord overlord("cmake test");
-	overlord.train_value_nnet();
+	leonardo_overlord overlord("azure");
+	overlord.train();
+	/*
 	return 0;
 
 	data_space mock;
@@ -33,4 +34,5 @@ int main()
 	return 0;
 	matrix m(vector3(1, 1, 1));
 	m.get_string();
+	*/
 }

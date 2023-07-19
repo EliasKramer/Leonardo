@@ -129,7 +129,7 @@ void leonardo_overlord::policy(
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < (3 + (epoch * 0.5)); i++)
+	for (int i = 0; i < (100); i++)
 	{
 		search(game, given_policy_nnet, given_value_nnet, n, p, q, visited);
 	}
@@ -393,15 +393,18 @@ leonardo_overlord::leonardo_overlord(
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
 	best_policy_nnet.xavier_initialization();
 	
-//	best_value_nnet = neural_network("C:\\Users\\krame\\Desktop\\all\\_coding\\Leonardo\\LeonardoAi\\models\\xavier_momentum_1100\\value.parameters");
+	//print current directory with std
+	std::cout << "searching for value nnet: " << std::filesystem::current_path() << "\n";
+
+	best_value_nnet = neural_network("value.parameters");
 	
-	best_value_nnet.set_input_format(leonardo_util::get_input_format());
+	//best_value_nnet.set_input_format(leonardo_util::get_input_format());
 	//best_value_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
 	//best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
 	//best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
 	//best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output(), leaky_relu_fn);
-	best_value_nnet.xavier_initialization();
+	//best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output(), leaky_relu_fn);
+	//best_value_nnet.xavier_initialization();
 	
 	new_policy_nnet = neural_network(best_policy_nnet);
 	new_value_nnet = neural_network(best_value_nnet);
