@@ -9,16 +9,16 @@ int main()
 {
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
-	leonardo_overlord overlord("xavier_and_momentum_iteration");
-	overlord.train_value_nnet();
-	return 0;
+	//leonardo_overlord overlord("test_better_player");
+	//overlord.test_value_nnet();
+	//return 0;
 
-	data_space mock;
-	mock.to_string(); //remove - used to not get optimized away
+	//data_space mock;
+	//mock.to_string(); //remove - used to not get optimized away
 	
 	//board.getFen();
-	ChessBoard board("r2q1rk1/pppb1ppp/3b1n2/3P4/3QP3/3P4/PP1B1PPP/RN2KB1R b KQ - 1 12");
-	neural_network nnet("C:\\Users\\krame\\Desktop\\all\\_coding\\Leonardo\\LeonardoAi\\models\\xavier_momentum_2300\\value.parameters");
+	ChessBoard board("rnbqk1nr/pppp1ppp/8/4p3/4P3/3P4/PPPB1PPP/RN2KBNR w KQkq - 0 4");
+	neural_network nnet("C:\\Users\\krame\\Desktop\\all\\_coding\\Leonardo\\LeonardoAi\\models\\better_player_700\\value.parameters");
 	
 	matrix in(leonardo_util::get_input_format());
 	leonardo_util::set_matrix_from_chessboard(board, in);

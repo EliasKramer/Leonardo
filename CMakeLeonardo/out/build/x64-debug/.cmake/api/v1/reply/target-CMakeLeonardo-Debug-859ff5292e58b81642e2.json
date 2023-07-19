@@ -52,7 +52,10 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-D_WINDOWS -Xcompiler=\"/W3 /GR /EHsc\" -Xcompiler=\"-MDd  -Ob0 -Od /RTC1\" -std=c++17 --generate-code=arch=compute_61,code=[compute_61,sm_61] -Xcompiler=-ZI"
+					"fragment" : "-D_WINDOWS -Xcompiler=\"/W3 /GR /EHsc\" -Xcompiler=\"-MDd -Zi -Ob0 -Od /RTC1\" --generate-code=arch=compute_61,code=[compute_61,sm_61]"
+				},
+				{
+					"fragment" : "-std=c++17"
 				}
 			],
 			"includes" : 
@@ -80,7 +83,10 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++20 -ZI"
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1"
+				},
+				{
+					"fragment" : "-std:c++20"
 				}
 			],
 			"includes" : 
@@ -144,7 +150,7 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -ZI",
+				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1",
 				"role" : "flags"
 			},
 			{

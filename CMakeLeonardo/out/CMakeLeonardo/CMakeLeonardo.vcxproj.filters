@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\AlphaBetaPruningBot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\BitBoard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\BoardRepresentation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\ChessBoard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\ChessPiece.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\Constants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\DataAndTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\HelpMethods.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\HumanPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\Medicrius.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\Move.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\MoveCastle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\MoveDoublePawn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\MoveEnPassant.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\MovePromote.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\RandomPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\chess_arena.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\leonardo_bot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\leonardo_overlord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\leonardo_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\convolutional_layer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\data_space.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\fully_connected_layer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\layer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\math_functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\matrix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\neural_network.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\pooling_layer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\test_result.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\vector3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\AlphaBetaPruningBot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\BitBoard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\BoardRepresentation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\ChessBoard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\ChessPiece.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\DataAndTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\HelpMethods.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\HumanPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\Medicrius.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\Move.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\MoveCastle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\MoveDoublePawn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\MoveEnPassant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\MovePromote.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\MockChessEngine\RandomPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="..\..\CMakeLeonardo\LeonardoAi\NeuroFox\gpu_math.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\krame\Desktop\all\_coding\Leonardo\CMakeLeonardo\CMakeLeonardo\LeonardoAi\NeuroFox\gpu_math.cuh" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{35780637-F46C-3189-A12F-5A6538310361}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{66E7A4BC-10F5-3526-A65C-8A2102F9E786}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

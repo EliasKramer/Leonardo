@@ -393,8 +393,8 @@ leonardo_overlord::leonardo_overlord(
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
 	best_policy_nnet.xavier_initialization();
 	
-//	best_value_nnet = neural_network("C:\\Users\\krame\\Desktop\\all\\_coding\\Leonardo\\LeonardoAi\\models\\xavier_momentum_1100\\value.parameters");
-	
+	best_value_nnet = neural_network("C:\\Users\\krame\\Desktop\\all\\_coding\\Leonardo\\LeonardoAi\\models\\better_player_700\\value.parameters");
+	/*
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
 	//best_value_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
 	//best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
@@ -402,7 +402,7 @@ leonardo_overlord::leonardo_overlord(
 	//best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output(), leaky_relu_fn);
 	best_value_nnet.xavier_initialization();
-	
+	*/
 	new_policy_nnet = neural_network(best_policy_nnet);
 	new_value_nnet = neural_network(best_value_nnet);
 
@@ -697,7 +697,7 @@ void leonardo_overlord::test_value_nnet()
 	size_t number_of_games = 10;
 
 	AlphaBetaPruningBot player1(3); //the argument is the depth
-	AlphaBetaPruningBot player2(3);
+	RandomPlayer player2;
 	bool player1_plays_white = true;
 
 	for (int i = 0;; i++)
