@@ -31,7 +31,7 @@ void chess_arena::play_game(arena_result& result)
 		//throws an error if the returned value is not a valid index
 		if (choosenMoveIdx < 0 || choosenMoveIdx >= legalMoves.size())
 		{
-			throw std::exception("move cannot be executed. returned index is invalid!");
+			throw std::runtime_error("move cannot be executed. returned index is invalid!");
 		}
 
 		//get the move from the list
