@@ -50,22 +50,6 @@ ChessPiece BoardRepresentation::getPieceAt(Square square) const
 		}
 	}
 
-	if (!foundColor || !foundType)
-	{
-		std::cout << "exception. no piece found at square: " << std::to_string(square) << "\n"
-			<< "PiecesOfColor[White]: " << PiecesOfColor[White] << "\n"
-			<< "PiecesOfColor[Black]: " << PiecesOfColor[Black] << "\n"
-			<< "PiecesOfType[King]: " << PiecesOfType[King] << "\n"
-			<< "PiecesOfType[Queen]: " << PiecesOfType[Queen] << "\n"
-			<< "PiecesOfType[Rook]: " << PiecesOfType[Rook] << "\n"
-			<< "PiecesOfType[Bishop]: " << PiecesOfType[Bishop] << "\n"
-			<< "PiecesOfType[Knight]: " << PiecesOfType[Knight] << "\n"
-			<< "PiecesOfType[Pawn]: " << PiecesOfType[Pawn] << "\n"
-			<< "squareBB: " << squareBB << "\n"
-			<< "AllPieces: " << AllPieces << "\n";
-		throw std::exception("There was no piece found at the given square");
-	}
-
 	return ChessPiece(colFound, typeFound);
 }
 
@@ -110,9 +94,6 @@ void BoardRepresentation::copySquareToPos(Square copyField, Square pasteField)
 
 void BoardRepresentation::setAtPosition(ChessPiece piece, Square position)
 {
-	if (AllPieces != (PiecesOfColor[White] | PiecesOfColor[Black]))
-		throw std::exception("AllPieces is not equal to the sum of PiecesOfColor[White] and PiecesOfColor[Black]");
-
 	BitBoard piecePos = BB_SQUARE[position];
 
 	setPieceBitBoard(piece, piecePos);
