@@ -3,6 +3,8 @@
 #include <string>
 #include "ChessBoard.h"
 #include <iostream>
+#include <exception>
+
 class Player
 {
 protected:
