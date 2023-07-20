@@ -12,4 +12,5 @@ std::string Player::getName()
 int Player::getMove(const ChessBoard& board, const UniqueMoveList& moves)
 {
     throw std::exception("Cannot call Player Base method");
+    return -1;
 }
