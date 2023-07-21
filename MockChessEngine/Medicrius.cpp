@@ -90,12 +90,26 @@ int Medicrius::evaluateBoard(const ChessBoard& board)
 	// - if white wins return highest possible number
 	// - if black wins return lowest possible number
 	// - stalemate and draw is 0
-	int gameStatePoints = GAME_STATE_EVALUATION[board.getGameState()];
+	GameState state = board.getGameState();
+	int gameStatePoints = GAME_STATE_EVALUATION[state];
 	//if the game is still ongoing the value will be -1 and thus should be continued evaluating
 	if (gameStatePoints != -1)
 	{
-		//if the game is already over return the evaluation
-		return gameStatePoints;
+		if (state == Draw || state == Stalemate)
+		{
+			if (board.getCurrentTurnColor() == White)
+			{
+				return -1000; //disencourages stalemates
+			}
+			else
+			{
+				return 1000;
+			}
+		}
+		else
+		{
+			return gameStatePoints;
+		}
 	}
 
 	//now calculate the score

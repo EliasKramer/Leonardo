@@ -9,7 +9,7 @@ int main()
 {
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
-	leonardo_overlord overlord("xavier_and_momentum_iteration");
+	leonardo_overlord overlord("better_player");
 	overlord.train_value_nnet();
 	return 0;
 
