@@ -240,13 +240,13 @@ void convolutional_layer::forward_propagation(const matrix& input)
 
 void convolutional_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
-	throw std::exception("not implemented");
+	throw std::runtime_error("not implemented");
 	layer::back_propagation(input, passing_error);
 }
 
 void convolutional_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
-	throw std::exception("not implemented");
+	throw std::runtime_error("not implemented");
 }
 
 void convolutional_layer::enable_gpu_mode()

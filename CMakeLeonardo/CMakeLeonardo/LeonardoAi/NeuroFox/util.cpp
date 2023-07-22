@@ -1,5 +1,6 @@
 #include "util.hpp"
 #include <iomanip>
+#include <time.h>
 
 int random_idx(int size)
 {
@@ -184,10 +185,11 @@ std::string ms_to_str(size_t given_ms, size_t max_unit_count)
 //quick and dirty
 std::string get_current_time_str()
 {
+	return "TODO: time implementation";
 	// Get the current time
 	std::time_t currentTime = std::time(nullptr);
 	std::tm localTime;
-	localtime_s(&localTime, &currentTime);
+	//localtime_s(&localTime, &currentTime);
 
 	// Format the current time
 	char timeBuffer[6]; // Format: hh:mm

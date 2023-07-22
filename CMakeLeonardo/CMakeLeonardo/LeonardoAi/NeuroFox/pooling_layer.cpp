@@ -122,7 +122,7 @@ void pooling_layer::forward_propagation(const matrix& input)
 void pooling_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
 	layer::back_propagation(input, passing_error);
-	throw std::exception("not implemented");
+	throw std::runtime_error("not implemented");
 }
 
 void pooling_layer::apply_deltas(size_t training_data_count, float learning_rate)

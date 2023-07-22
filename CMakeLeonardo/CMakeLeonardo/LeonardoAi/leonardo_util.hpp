@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 #include <cassert>
+#include <thread>
 namespace leonardo_util 
 {
 	vector3 get_input_format();

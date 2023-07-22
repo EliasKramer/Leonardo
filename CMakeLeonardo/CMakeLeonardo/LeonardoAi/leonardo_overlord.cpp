@@ -443,7 +443,7 @@ void leonardo_overlord::train()
 	long long sum_elapsed_ms = 0;
 	for (long long i = 0; ; i++)
 	{
-		std::chrono::steady_clock::time_point start =
+		auto start =
 			std::chrono::high_resolution_clock::now();
 
 		std::cout
@@ -494,7 +494,7 @@ void leonardo_overlord::train()
 			file_save_thread = std::thread(&leonardo_overlord::save_best_to_file, this, i, true, true);
 		}
 
-		std::chrono::steady_clock::time_point stop =
+		auto stop =
 			std::chrono::high_resolution_clock::now();
 
 		long long elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();

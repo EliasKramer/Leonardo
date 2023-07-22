@@ -1,6 +1,7 @@
 #pragma once
 #include "matrix.hpp"
 #include <mutex>
+#include <algorithm>
 
 class data_space
 {

@@ -512,7 +512,7 @@ float matrix::percentile(float percentage) const
 	smart_assert(percentage >= 0.0f && percentage <= 1.0f);
 	
 	float* sorted = new float[item_count()];
-	memcpy(sorted, host_data, sizeof(float) * item_count());
+	std::memcpy(sorted, host_data, sizeof(float) * item_count());
 	std::sort(sorted, sorted + item_count());
 
 	float idx_f = percentage * item_count();

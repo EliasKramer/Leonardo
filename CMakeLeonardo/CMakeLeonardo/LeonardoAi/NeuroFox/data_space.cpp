@@ -82,7 +82,7 @@ data_space::data_space(
 {
 	if (given_data.size() != given_label.size())
 	{
-		throw std::exception("data and label size mismatch");
+		throw std::runtime_error("data and label size mismatch");
 	}
 
 	for (size_t i = 0; i < given_data.size(); i++)

@@ -8,6 +8,8 @@
 #include "gpu_math.cuh"
 #include "enum_space.hpp"
 #include "assert_throw.hpp"
+#include <cstring>
+#include <algorithm>
 
 class matrix {
 private:

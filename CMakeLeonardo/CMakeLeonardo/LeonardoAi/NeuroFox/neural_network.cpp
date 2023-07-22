@@ -245,7 +245,7 @@ void neural_network::add_convolutional_layer(
 void neural_network::add_pooling_layer(size_t kernel_size, size_t stride, e_pooling_type_t pooling_type)
 {
 	//TODO
-	throw std::exception("not implemented");
+	throw std::runtime_error("not implemented");
 }
 
 void neural_network::set_all_parameters(float value)
