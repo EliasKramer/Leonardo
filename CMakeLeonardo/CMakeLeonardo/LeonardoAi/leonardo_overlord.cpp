@@ -1,5 +1,5 @@
 #include "leonardo_overlord.hpp"
-#include <float.h>
+
 void leonardo_overlord::save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet)
 {
 	//best_network.save_to_file(name);
@@ -384,7 +384,7 @@ leonardo_overlord::leonardo_overlord(
 	std::string name
 ) : name(name)
 {
-	
+	/*	
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
 	//best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
 	//best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
@@ -392,11 +392,13 @@ leonardo_overlord::leonardo_overlord(
 	//best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
 	best_policy_nnet.xavier_initialization();
-	
+	*/
+
 	//print current directory with std
-	std::cout << "searching for value nnet: " << std::filesystem::current_path() << "\n";
+	std::cout << "searching for nnets: " << std::filesystem::current_path() << "\n";
 
 	best_value_nnet = neural_network("value.parameters");
+	best_policy_nnet = neural_network("policy.parameters");
 	
 	//best_value_nnet.set_input_format(leonardo_util::get_input_format());
 	//best_value_nnet.add_fully_connected_layer(1024, leaky_relu_fn);

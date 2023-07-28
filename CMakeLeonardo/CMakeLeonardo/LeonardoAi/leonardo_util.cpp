@@ -142,7 +142,7 @@ int leonardo_util::get_random_best_move(
 	//get highest value in order to normalize all values
 	for (const std::unique_ptr<Move>& move : allowed_moves)
 	{
-		float value = abs(get_move_value(*move, output, curr_turn_col));
+		float value = std::abs(get_move_value(*move, output, curr_turn_col));
 
 		smart_assert(!std::isnan(value));
 
