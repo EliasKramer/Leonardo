@@ -11,7 +11,7 @@
 #include "chess_arena.hpp"
 #include "leonardo_bot.hpp"
 #include <memory>
-#include "NeuroFox/data_space.hpp"
+#include "./NeuroFox/data_space.hpp"
 #include <filesystem>
 
 class leonardo_overlord

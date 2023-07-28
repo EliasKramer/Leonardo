@@ -9,10 +9,10 @@ int main()
 {
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
-	leonardo_overlord overlord("better_player");
-	overlord.train_value_nnet();
+	leonardo_overlord overlord("actual_overlord");
+	overlord.train();
 	return 0;
-
+	/*
 	data_space mock;
 	mock.to_string(); //remove - used to not get optimized away
 	
@@ -32,5 +32,5 @@ int main()
 	
 	return 0;
 	matrix m(vector3(1, 1, 1));
-	m.get_string();
+	m.get_string();*/
 }
