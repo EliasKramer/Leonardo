@@ -1,5 +1,5 @@
 #include "leonardo_overlord.hpp"
-
+#include <float.h>
 void leonardo_overlord::save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet)
 {
 	//best_network.save_to_file(name);

@@ -10,7 +10,9 @@
 #include "assert_throw.hpp"
 #include <cstring>
 #include <algorithm>
-
+#include <cuda_runtime.h>
+#include <device_launch_parameters.h>
+#include <float.h>
 class matrix {
 private:
 	vector3 format;

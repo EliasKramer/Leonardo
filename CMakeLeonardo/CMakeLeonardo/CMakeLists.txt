@@ -1,6 +1,10 @@
 ﻿# CMakeList.txt : CMake project for CMakeLeonardo, include source and define
 # project specific logic here.
 #
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+set(CMAKE_C_COMPILER "/usr/bin/clang")
+set(CMAKE_CUDA_COMPILER "/usr/local/cuda/bin/nvcc")
+
 enable_language(CUDA)
 # Check if the CMake version is greater than or equal to 3.12
 if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.12)

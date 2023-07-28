@@ -1,4 +1,5 @@
 #include "leonardo_util.hpp"
+#include <float.h>
 
 vector3 leonardo_util::get_input_format()
 {
