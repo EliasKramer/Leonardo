@@ -1,1 +1,0 @@
--D__CUDA_ARCH__=520 -D__CUDA_ARCH_LIST__=520 -nologo -c -TP  -DCUDA_DOUBLE_MATH_FUNCTIONS -EHsc "-IC:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8/bin/../include"   "C:\Users\Elias\Desktop\all\coding\c_c++\Leonardo\CMakeLeonardo\out\build\x64-debug\CMakeFiles\3.26.0-msvc3\CompilerIdCUDA\tmp\CMakeCUDACompilerId.cudafe1.cpp" 
