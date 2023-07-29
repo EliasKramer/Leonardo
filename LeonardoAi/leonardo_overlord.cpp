@@ -129,7 +129,7 @@ void leonardo_overlord::policy(
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 500; i++)
 	{
 		search(game, given_policy_nnet, given_value_nnet, n, p, q, visited);
 	}
@@ -295,7 +295,7 @@ void leonardo_overlord::upgrade(
 )
 {
 	//az has 25000 games
-	size_t selfplay_thread_count = 8;
+	size_t selfplay_thread_count = 4;
 	size_t number_of_games_per_thread = 10;
 	size_t number_of_selfplay_games = number_of_games_per_thread * selfplay_thread_count;
 	size_t number_of_moves_per_game = 200;
@@ -382,20 +382,12 @@ leonardo_overlord::leonardo_overlord(
 	std::string name
 ) : name(name)
 {
-	
-	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
-	best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
-	best_policy_nnet.xavier_initialization();
-	
 	//print curret directory
 	std::filesystem::path p = std::filesystem::current_path();
-	std::cout << "looking for value nnet in " << p << '\n';
+	std::cout << "looking for nnets in " << p << '\n';
 
 	best_value_nnet = neural_network("value.parameters");
+	best_policy_nnet = neural_network("policy.parameters");
 	/*
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
 	best_value_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
