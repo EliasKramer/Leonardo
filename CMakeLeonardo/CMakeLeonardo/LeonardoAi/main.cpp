@@ -4,10 +4,27 @@
 //#include <windows.h>
 #include <signal.h>
 #include "../MockChessEngine/Game.h"
-
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <iostream>
+#include <sched.h>
+#include <unistd.h>
 int main()
 {
 	//SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+pid_t pid = getpid();
+
+    // Create a scheduling parameter structure
+    struct sched_param params;
+
+    // Set the scheduling policy to SCHED_FIFO (First-In-First-Out)
+    params.sched_priority = sched_get_priority_max(SCHED_FIFO);
+
+    // Set the process to the high priority
+    if (sched_setscheduler(pid, SCHED_FIFO, &params) == -1) {
+        std::cerr << "Failed to set high priority. Ensure you have sufficient privileges." << std::endl;
+        return 1;
+    }
 
 	leonardo_overlord overlord("azure");
 	overlord.train();

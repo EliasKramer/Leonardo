@@ -1,5 +1,6 @@
 #include "leonardo_util.hpp"
 #include <float.h>
+#include <algorithm>
 
 vector3 leonardo_util::get_input_format()
 {
@@ -128,6 +129,29 @@ int leonardo_util::get_best_move(
 	return max_idx;
 }
 
+static double output_to_exponent(float value)
+{
+	//would be a nice implementation, if the compiler would support it
+	//std::clamp((double)value / 10,-7097,7097);
+
+	//these values got found by writing a little test script.
+	//exp((double)x/10) is invalid if x is smaller than -7097 or larger than 7097
+	if (value < -7097)
+	{
+		std::cout << "WARNING: value too small for exponentiation. Clamping to -7097.\n";
+		return -7097;
+	}
+	else if (value > 7097)
+	{
+		std::cout << "WARNING: value too large for exponentiation. Clamping to 7097.\n";
+		return 7097;
+	}
+	else
+	{
+		return (double)value / 10;
+	}
+}
+
 int leonardo_util::get_random_best_move(
 	const matrix& output,
 	const UniqueMoveList& allowed_moves,
@@ -137,43 +161,33 @@ int leonardo_util::get_random_best_move(
 
 	//we are implementing softmax here instead of the nnet, in order to save some time.
 	//a layer that does softmax would be cleaner
-
-	float max_abs = 0;
-	//get highest value in order to normalize all values
-	for (const std::unique_ptr<Move>& move : allowed_moves)
-	{
-		float value = std::abs(get_move_value(*move, output, curr_turn_col));
-
-		smart_assert(!std::isnan(value));
-
-		if (value > max_abs)
-		{
-			max_abs = value;
-		}
-	}
-
-	float e_sum = 0;
+	
+	double e_sum = 0;
 	for (const std::unique_ptr<Move>& move : allowed_moves)
 	{
 		float value = get_move_value(*move, output, curr_turn_col);
-		float e = exp(value / max_abs);
+		double e = exp(output_to_exponent(value));
 		e_sum += e;
 	}
 
 	float random = random_float_excl(0, 1);
+	//std::cout << "random: " << random << std::endl;
 
-	float current_sum = 0;
+	double current_sum = 0;
 	int move_idx = 0;
 	for (const std::unique_ptr<Move>& move : allowed_moves)
 	{
 		float value = get_move_value(*move, output, curr_turn_col);
-		float e = exp(value / max_abs);
+		double e = exp((output_to_exponent(value)));
 
-		float prob = e / e_sum;
+		double prob = e / e_sum;
+
+		//std::cout << "m_idx " << move_idx<< " curr sum: "<< current_sum << " value " << value << " prob: " << prob << " e " << e << " esum " << e_sum << std::endl;
 
 		current_sum += prob;
 		if (current_sum >= random)
 		{
+			//std::cout << "move found: " << move_idx << std::endl;
 			return move_idx;
 		}
 		move_idx++;
@@ -181,7 +195,7 @@ int leonardo_util::get_random_best_move(
 
 	//this could occur due to rounding errors
 	//in very few cases
-	std::cout << "no move found";
+	std::cout << "no move found\n";
 	return 0;
 }
 

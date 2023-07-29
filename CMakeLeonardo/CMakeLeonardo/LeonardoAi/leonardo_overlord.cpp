@@ -77,7 +77,7 @@ float leonardo_overlord::search(
 
 		//if c is high - lots of exploration
 		//if c is low - lots of exploitation
-		float c = 1;
+		float c = 1.5f;
 
 		float n_sum = leonardo_util::matrix_map_sum(n, game, legal_moves);
 		float n_at_move = leonardo_util::matrix_map_get_float(n, game, move);
@@ -129,7 +129,7 @@ void leonardo_overlord::policy(
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < (100); i++)
+	for (int i = 0; i < 500; i++)
 	{
 		search(game, given_policy_nnet, given_value_nnet, n, p, q, visited);
 	}
@@ -295,8 +295,8 @@ void leonardo_overlord::upgrade(
 )
 {
 	//az has 25000 games
-	size_t selfplay_thread_count = 16;
-	size_t number_of_games_per_thread = 20;
+	size_t selfplay_thread_count = 4;
+	size_t number_of_games_per_thread = 10;
 	size_t number_of_selfplay_games = number_of_games_per_thread * selfplay_thread_count;
 	size_t number_of_moves_per_game = 200;
 
@@ -449,6 +449,7 @@ void leonardo_overlord::train()
 			std::chrono::high_resolution_clock::now();
 
 		std::cout
+			<< "\n--------------------------------------\n"
 			<< "upgrade time. iteration: " << i
 			<< "\n--------------------------------------\n";
 		upgrade(i);
