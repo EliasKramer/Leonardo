@@ -27,7 +27,6 @@ private:
 
 	bool gpu_mode = true;
 
-	std::thread file_save_thread;
 	void save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet);
 
 	float search(
@@ -69,7 +68,6 @@ private:
 	void upgrade(long long epoch);
 public:
 	leonardo_overlord(std::string name);
-	~leonardo_overlord();
 
 	void train();
 	void train_policy();

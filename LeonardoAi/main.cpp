@@ -8,9 +8,19 @@
 int main()
 {
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+	/*
+	neural_network other = neural_network("C:\\Users\\Elias\\Desktop\\i5_overlord\\actual_overlord_epoch_0\\policy.parameters");
+	neural_network local = neural_network("C:\\Users\\Elias\\Desktop\\i5_overlord\\actual_overlord_epoch_5\\policy.parameters");
 
-	leonardo_overlord overlord("actual_overlord");
-	overlord.train();
+
+	std::cout << "other: " << other.parameter_analysis() << std::endl;
+	std::cout << "local: " << local.parameter_analysis() << std::endl;
+	std::cout << "same format: " << local.nn_equal_format(other) << std::endl;
+	std::cout << "same format: " << local.equal_parameter(other) << std::endl;
+	*/
+	leonardo_overlord overlord("test");
+	//overlord.test_value_nnet();
+	overlord.train_policy();
 	return 0;
 	/*
 	data_space mock;

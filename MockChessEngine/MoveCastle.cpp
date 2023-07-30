@@ -31,6 +31,8 @@ void MoveCastle::execute(BoardRepresentation& board) const
 }
 std::string MoveCastle::getString() const
 {
+	return Move::getString();
+	/*
 	if (_destination == G1 || _destination == G8)
 	{
 		return "O-O";
@@ -39,6 +41,7 @@ std::string MoveCastle::getString() const
 	{
 		return "O-O-O";
 	}
+	*/
 }
 BitBoard MoveCastle::getBBWithMoveDone()
 {

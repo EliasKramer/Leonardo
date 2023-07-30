@@ -1,27 +1,26 @@
 #include "leonardo_overlord.hpp"
-
+#include <cmath>
 void leonardo_overlord::save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet)
 {
-	//best_network.save_to_file(name);
 	std::cout << "\nsaving best network to file";
 	//check if folder exists
 	if (!std::filesystem::exists("models"))
 	{
 		std::filesystem::create_directory("models");
 	}
-	std::string folder_name = "models\\" + name + "_epoch_" + std::to_string(epoch);
+	std::string folder_name = "models/" + name + "_epoch_" + std::to_string(epoch);
 	if (!std::filesystem::exists(folder_name))
 	{
 		std::filesystem::create_directory(folder_name);
 	}
 	if (policy_nnet)
 	{
-		std::string policy_path = folder_name + "\\policy.parameters";
+		std::string policy_path = folder_name + "/policy.parameters";
 		best_policy_nnet.save_to_file(policy_path);
 	}
 	if (value_nnet)
 	{
-		std::string value_nnet_path = folder_name + "\\value.parameters";
+		std::string value_nnet_path = folder_name + "/value.parameters";
 		best_value_nnet.save_to_file(value_nnet_path);
 	}
 	std::cout << "\nsaved best network to file\n";
@@ -77,7 +76,7 @@ float leonardo_overlord::search(
 
 		//if c is high - lots of exploration
 		//if c is low - lots of exploitation
-		float c = 1;
+		float c = 2;
 
 		float n_sum = leonardo_util::matrix_map_sum(n, game, legal_moves);
 		float n_at_move = leonardo_util::matrix_map_get_float(n, game, move);
@@ -129,7 +128,7 @@ void leonardo_overlord::policy(
 	std::unordered_set<ChessBoard, chess_board_hasher> visited;
 
 	//1600 in openai
-	for (int i = 0; i < 500; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		search(game, given_policy_nnet, given_value_nnet, n, p, q, visited);
 	}
@@ -164,7 +163,7 @@ void leonardo_overlord::self_play(
 
 		size_t move_idx = 0;
 		size_t data_space_game_start_idx = game_idx * number_of_moves_per_game;
-
+		std::string moves_str = "";
 		while (true)
 		{
 			//std::cout << "(" + std::to_string(game_idx) + ")";
@@ -193,6 +192,7 @@ void leonardo_overlord::self_play(
 			std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
 			int chosen_move_idx = leonardo_util::get_random_best_move(output_matrix, legal_moves, game.getCurrentTurnColor());
 			game.makeMove(*legal_moves[chosen_move_idx].get());
+			moves_str += legal_moves[chosen_move_idx]->getString() + " ";
 
 			if (game.getGameState() != GameState::Ongoing)
 			{
@@ -221,13 +221,15 @@ void leonardo_overlord::self_play(
 					white_turn = !white_turn;
 				}
 
-				/*
+
 				std::cout
 					<<
 					"\ngame " + std::to_string(game_idx) +
-					" finished (" + std::to_string(move_idx + 1) + ")" +
+					" finished (" + std::to_string(move_idx + 1) + ") " +
+					(game.getGameState() == GameState::Draw ? "draw" : game.getGameState() == GameState::WhiteWon ? "white won" : "black won") +
+					" " + moves_str +
 					"\n";
-				*/
+
 				std::lock_guard<std::mutex> lock(progression_mutex);
 				progression++;
 
@@ -295,7 +297,7 @@ void leonardo_overlord::upgrade(
 )
 {
 	//az has 25000 games
-	size_t selfplay_thread_count = 4;
+	size_t selfplay_thread_count = 8;
 	size_t number_of_games_per_thread = 10;
 	size_t number_of_selfplay_games = number_of_games_per_thread * selfplay_thread_count;
 	size_t number_of_moves_per_game = 200;
@@ -347,31 +349,24 @@ void leonardo_overlord::upgrade(
 	std::cout << "start training\n";
 	start = std::chrono::high_resolution_clock::now();
 
-	//train policy and value nnet in parallel
-	//if a game has less than number_of_moves_per_game moves, the rest of the data is not used - it will train on 0 data
-	std::thread policy_thread = std::thread(
-		&neural_network::learn_on_ds,
-		&new_policy_nnet,
-		std::ref(policy_training_ds),
-		32,
-		64,
-		0.1f,
-		true
-	);
-	std::thread value_nnet_thread = std::thread(
-		&neural_network::learn_on_ds,
-		&new_value_nnet,
-		std::ref(value_nnet_training_ds),
+	std::string s1 = policy_training_ds.to_string();
+	std::string s2 = value_nnet_training_ds.to_string();
+
+	new_policy_nnet.learn_on_ds(
+		policy_training_ds,
 		32,
 		64,
 		0.1f,
 		true
 	);
 
-	if (policy_thread.joinable())
-		policy_thread.join();
-	if (value_nnet_thread.joinable())
-		value_nnet_thread.join();
+	new_value_nnet.learn_on_ds(
+		value_nnet_training_ds,
+		32,
+		64,
+		0.1f,
+		true
+	);
 
 	stop = std::chrono::high_resolution_clock::now();
 	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -386,17 +381,30 @@ leonardo_overlord::leonardo_overlord(
 	std::filesystem::path p = std::filesystem::current_path();
 	std::cout << "looking for nnets in " << p << '\n';
 
+	//best_value_nnet = neural_network("value.parameters");
+	//best_policy_nnet = neural_network("policy.parameters");
+
 	best_value_nnet = neural_network("value.parameters");
-	best_policy_nnet = neural_network("policy.parameters");
+	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
 	/*
-	best_value_nnet.set_input_format(leonardo_util::get_input_format());
-	best_value_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output(), leaky_relu_fn);
-	best_value_nnet.xavier_initialization();
+	best_policy_nnet.add_fully_connected_layer(2048, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(2048, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(128, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	*/
+	best_policy_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	/*
+	*/
+	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
+	best_policy_nnet.xavier_initialization();
+
 	new_policy_nnet = neural_network(best_policy_nnet);
 	new_value_nnet = neural_network(best_value_nnet);
 
@@ -409,17 +417,166 @@ leonardo_overlord::leonardo_overlord(
 	}
 }
 
-leonardo_overlord::~leonardo_overlord()
-{
-	if (file_save_thread.joinable())
-	{
-		file_save_thread.join();
+static std::vector<std::string> read_file_lines(const std::string& filename) {
+	std::vector<std::string> lines;
+	std::ifstream file(filename);
+
+	if (!file.is_open()) {
+		std::cerr << "Error: Could not open file '" << filename << "'" << std::endl;
+		return lines;
 	}
+
+	std::string line;
+	while (std::getline(file, line)) {
+		lines.push_back(line);
+	}
+
+	file.close();
+	return lines;
+}
+
+static std::vector<std::string> split_string(const std::string& input, char separator) {
+	std::vector<std::string> result;
+	std::string current;
+
+	for (char c : input) {
+		if (c == separator) {
+			if (!current.empty()) {
+				result.push_back(current);
+				current.clear();
+			}
+		}
+		else {
+			current += c;
+		}
+	}
+
+	if (!current.empty()) {
+		result.push_back(current);
+	}
+
+	return result;
+}
+
+static void train_new_on_move(neural_network& policy_nnet, const ChessBoard& board, const std::unique_ptr<Move>& move)
+{
+	matrix input(leonardo_util::get_input_format());
+	leonardo_util::set_matrix_from_chessboard(board, input);
+	input.enable_gpu_mode();
+	matrix label(leonardo_util::get_policy_output_format());
+	leonardo_util::set_move_value(*move.get(), label, 1.0f, board.getCurrentTurnColor());
+	label.enable_gpu_mode();
+	policy_nnet.back_propagation(input, label);
 }
 
 void leonardo_overlord::train_policy()
 {
-	//train on grandmaster games
+	chess_arena arena(
+		"pit",
+		std::make_unique<leonardo_bot>(best_policy_nnet, distributed_random),
+		std::make_unique<leonardo_bot>(new_policy_nnet, distributed_random)
+	);
+	chess_arena arena_random(
+		"pit",
+		std::make_unique<RandomPlayer>(),
+		std::make_unique<leonardo_bot>(new_policy_nnet, max)
+	);
+
+	std::cout << "reading games file\n";
+	std::vector<std::string> games = read_file_lines("games.txt");
+	std::cout << "done. " << games.size() << " games loaded\n";
+	matrix input(leonardo_util::get_input_format());
+	matrix label(leonardo_util::get_policy_output_format());
+
+	int batch_size = 100;
+	int ds_idx = 0;
+	std::unique_ptr<data_space> ds;
+	for (int g = 0; g < games.size(); g++)
+	{
+		if (g % batch_size == 0)
+		{
+			if (g != 0)
+			{
+				std::cout << "learning on " << ds->get_item_count() << " positions \n";
+				ds->copy_to_gpu();
+				new_policy_nnet.learn_on_ds(*ds.get(), 2, 1024, 0.1f, true);
+				
+				std::cout << "testing\n";
+
+				new_policy_nnet.sync_device_and_host();
+				best_policy_nnet.sync_device_and_host();
+
+				arena_result arena_result = arena.play(1000);
+
+				int win_score = arena_result.player_2_won - arena_result.player_1_won;
+				if (win_score > 0)
+				{
+					std::cout
+						<< "---------------------\n"
+						<< "new network is better (won " << win_score << " more)\n"
+						<< "---------------------\n";
+					best_policy_nnet.set_parameters(new_policy_nnet);
+					save_best_to_file(g, false, true);
+				}
+				else
+				{
+					std::cout
+						<< "--------------------\n"
+						<< "new network is worse (lost " << (-win_score) << " more)\n"
+						<< "--------------------\n";
+				}
+
+				arena_result = arena_random.play(1000);
+				win_score = arena_result.player_2_won - arena_result.player_1_won;
+				std::cout << "against random: " << (win_score > 0 ? "better" : "worse") << "(" << win_score << ")" << "\n";
+			}
+
+			ds_idx = 0;
+			int batch_item_size = 0;
+			for (int i = g; i < std::min((int)games.size(), g + batch_size); i++)
+			{
+				batch_item_size += split_string(games[i], ' ').size();
+			}
+			ds.reset();
+			ds = std::make_unique<data_space>(
+				batch_item_size,
+				leonardo_util::get_input_format(),
+				leonardo_util::get_policy_output_format());
+		}
+		std::vector<std::string> master_moves = split_string(games[g], ' ');	
+
+		ChessBoard board(STARTING_FEN);
+
+		for (int m = 0; m < master_moves.size(); m++)
+		{
+			std::vector<std::unique_ptr<Move>> moves = board.getAllLegalMoves();
+			bool found_move = false;
+			for (int i = 0; i < moves.size(); i++)
+			{
+				if (moves[i]->getString() == master_moves[m])
+				{
+					//add to ds
+					leonardo_util::set_matrix_from_chessboard(board, input);
+					leonardo_util::set_move_value(*moves[i].get(), label, 1.0f, board.getCurrentTurnColor());
+					smart_assert(label.contains_non_zero_items());
+					ds->set_data(input, ds_idx);
+					ds->set_label(label, ds_idx);
+					leonardo_util::set_move_value(*moves[i].get(), label, 0.0f, board.getCurrentTurnColor());
+					smart_assert(!label.contains_non_zero_items());
+					
+					board.makeMove(*moves[i].get());
+					found_move = true;
+					ds_idx++;
+					break;
+				}
+			}
+			if (!found_move)
+			{
+				std::cout << "no move found: " + std::to_string(g) + " " + master_moves[m] + "\n";
+				break;
+			}
+		}
+	}
 }
 
 void leonardo_overlord::train()
@@ -445,15 +602,10 @@ void leonardo_overlord::train()
 		//	# arena - with biased random instead of applying noise to input
 		//	win_ratio = pit(policy_nn, new_policy_nn, n = number_of_games)
 
-		if (file_save_thread.joinable())
-		{
-			file_save_thread.join();
-		}
-
 		std::cout << "putting new and best nnet into an arena" << std::endl;
 		auto arena_start = std::chrono::high_resolution_clock::now();
 
-		arena_result arena_result = arena.play(200);
+		arena_result arena_result = arena.play(5);
 
 		auto arena_stop = std::chrono::high_resolution_clock::now();
 		auto arena_duration =
@@ -461,6 +613,16 @@ void leonardo_overlord::train()
 		std::cout << "arena done. took: " << ms_to_str(arena_duration.count()) << std::endl;
 
 		int win_score = arena_result.player_2_won - arena_result.player_1_won;
+
+		best_policy_nnet.sync_device_and_host();
+		best_value_nnet.sync_device_and_host();
+		new_value_nnet.sync_device_and_host();
+		new_policy_nnet.sync_device_and_host();
+
+		std::cout << "value nets are equal format: " << best_value_nnet.nn_equal_format(new_value_nnet) << std::endl;
+		std::cout << "policy nets are equal format: " << best_policy_nnet.nn_equal_format(new_policy_nnet) << std::endl;
+		std::cout << "value nets are equal parameters: " << best_value_nnet.equal_parameter(new_value_nnet) << std::endl;
+		std::cout << "policy nets are equal parameters: " << best_policy_nnet.equal_parameter(new_policy_nnet) << std::endl;
 
 		if (win_score > 0)
 		{
@@ -470,20 +632,25 @@ void leonardo_overlord::train()
 				<< "---------------------\n";
 			best_policy_nnet.set_parameters(new_policy_nnet);
 			best_value_nnet.set_parameters(new_value_nnet);
+
+			if ((i + 1) % iterations_per_file_save == 0)
+			{
+				//start save_best_to_file in save_in_file_thread 
+				save_best_to_file(i, true, true);
+			}
 		}
 		else
 		{
 			std::cout
 				<< "--------------------\n"
-				<< "new network is worse (lost " - win_score << " more)\n"
+				<< "new network is worse (lost " << (-win_score) << " more)\n"
 				<< "--------------------\n";
 		}
 
-		if ((i + 1) % iterations_per_file_save == 0)
-		{
-			//start save_best_to_file in save_in_file_thread 
-			file_save_thread = std::thread(&leonardo_overlord::save_best_to_file, this, i, true, true);
-		}
+		std::cout << "value nets are equal format: " << best_value_nnet.nn_equal_format(new_value_nnet) << std::endl;
+		std::cout << "policy nets are equal format: " << best_policy_nnet.nn_equal_format(new_policy_nnet) << std::endl;
+		std::cout << "value nets are equal parameters: " << best_value_nnet.equal_parameter(new_value_nnet) << std::endl;
+		std::cout << "policy nets are equal parameters: " << best_policy_nnet.equal_parameter(new_policy_nnet) << std::endl;
 
 		std::chrono::steady_clock::time_point stop =
 			std::chrono::high_resolution_clock::now();
@@ -598,7 +765,7 @@ void leonardo_overlord::train_value_nnet_thread_fn(
 		auto start = std::chrono::high_resolution_clock::now();
 		std::lock_guard<std::mutex> lock(trainings_mutex);
 		auto stop = std::chrono::high_resolution_clock::now();
-		long long mutex_waiting_time = 
+		long long mutex_waiting_time =
 			std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
 
 		best_value_nnet.learn_on_ds(
@@ -623,7 +790,7 @@ void leonardo_overlord::train_value_nnet_thread_fn(
 			save_best_to_file(epoch, true, false);
 		}
 
-		long long total_time_elapsed = 
+		long long total_time_elapsed =
 			std::chrono::duration_cast<std::chrono::milliseconds>
 			(std::chrono::high_resolution_clock::now() - training_start).count();
 
@@ -750,11 +917,11 @@ void leonardo_overlord::test_value_nnet()
 						back_track_white_turn = !back_track_white_turn;
 					}
 
-					
+
 					std::cout << " game " << game_idx << " done move idx: " << move_idx << "\n" << GAME_STATE_STRING[game.getGameState()] << "\n";
 					std::cout << "p1 is white " << player1_plays_white << "\n";
 					std::cout << game.getFen() << "\n";
-					
+
 					player1_plays_white = !player1_plays_white;
 					move_sum += (move_idx + 1);
 					break;
