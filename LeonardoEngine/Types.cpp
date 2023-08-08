@@ -1,6 +1,6 @@
 #include "Types.h"
 
-const std::map<direction, map> EDGES = {
+const std::map<direction, bitboard> EDGES = {
 	{ NORTH, RANK_8 },
 	{ NORTH_NORTH_EAST, RANK_8 | RANK_7 | FILE_H},
 	{ NORTH_EAST, RANK_8 | FILE_A },

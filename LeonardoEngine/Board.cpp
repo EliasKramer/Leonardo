@@ -1,6 +1,6 @@
 #include "Board.h"
 
-Board::Board(map pawns, map knights, map rooks, map bishops, map queens, map kings, map whitePieces, map blackPieces) 
+Board::Board(bitboard pawns, bitboard knights, bitboard rooks, bitboard bishops, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces) 
 {
 	this->pawns = pawns;
 	this->knights = knights;
@@ -20,8 +20,8 @@ Board::Board(map pawns, map knights, map rooks, map bishops, map queens, map kin
 std::vector<piece> Board::getPiecesOfColor(color color)
 {
 	std::vector<piece> pieces;
-	map piecesBB = color == WHITE ? whitePieces : blackPieces;
-	map currentPosition = 0x1;
+	bitboard piecesBB = color == WHITE ? whitePieces : blackPieces;
+	bitboard currentPosition = 0x1;
 	for (uint8_t i = 0; i < 64; i++)
 	{
 		if (piecesBB & currentPosition)
@@ -37,7 +37,7 @@ std::vector<piece> Board::getPiecesOfColor(color color)
 	return pieces;
 }
 
-pieceType Board::getType(map pieceBB) 
+pieceType Board::getType(bitboard pieceBB) 
 {
 	pieceType type = NONE;
 	if (pieceBB & pawns)
@@ -67,40 +67,40 @@ pieceType Board::getType(map pieceBB)
 	return type;
 }
 
-map Board::getPawns()
+bitboard Board::getPawns()
 {
 	return pawns;
 }
-map Board::getKnights()
+bitboard Board::getKnights()
 {
 	return knights;
 }
-map Board::getBishops()
+bitboard Board::getBishops()
 {
 	return bishops;
 }
-map Board::getRooks()
+bitboard Board::getRooks()
 {
 	return rooks;
 }
-map Board::getQueens()
+bitboard Board::getQueens()
 {
 	return queens;
 }
-map Board::getKings()
+bitboard Board::getKings()
 {
 	return kings;
 }
 
-map Board::getWhitePieces()
+bitboard Board::getWhitePieces()
 {
 	return whitePieces;
 }
-map Board::getBlackPieces()
+bitboard Board::getBlackPieces()
 {
 	return blackPieces;
 }
-map Board::getAllPieces()
+bitboard Board::getAllPieces()
 {
 	return whitePieces | blackPieces;
 }

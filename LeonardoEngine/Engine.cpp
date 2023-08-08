@@ -61,7 +61,7 @@ std::vector<Move> getMovesForPiece(Board board, piece piece)
 std::vector<Move> getMovesForPawn(Board board, piece pawn)
 {
 	std::vector<Move> moves;
-	map position = 1ULL << pawn.position;
+	bitboard position = 1ULL << pawn.position;
 	if (position & RANK_8 || position & RANK_1)
 	{
 		Move promoteN(pawn.position, KNIGHT);
@@ -77,7 +77,7 @@ std::vector<Move> getMovesForPawn(Board board, piece pawn)
 	else
 	{
 		direction dir = pawn.color == WHITE ? NORTH : SOUTH;
-		map piecesOfOtherColor = pawn.color == WHITE ? board.getBlackPieces() : board.getWhitePieces();
+		bitboard piecesOfOtherColor = pawn.color == WHITE ? board.getBlackPieces() : board.getWhitePieces();
 
 		if (!(position << dir & board.getAllPieces()))
 		{
@@ -106,7 +106,7 @@ std::vector<Move> getMovesForPawn(Board board, piece pawn)
 
 std::vector<Move> getMovesForKnight(Board board, piece knight)
 {
-	map position = 1ULL << knight.position;
+	bitboard position = 1ULL << knight.position;
 	std::vector<Move> moves;
 	return moves;
 }
@@ -153,9 +153,9 @@ std::vector<Move> getMovesForQueen(Board board, piece queen)
 
 void addSlidingMovesInDirection(std::vector<Move>& moves, Board board, piece piece, direction dir)
 {
-	map position = 1ULL << piece.position;
-	map piecesOfOtherColor = piece.color == WHITE ? board.getBlackPieces() : board.getWhitePieces();
-	map nextPosition = position;
+	bitboard position = 1ULL << piece.position;
+	bitboard piecesOfOtherColor = piece.color == WHITE ? board.getBlackPieces() : board.getWhitePieces();
+	bitboard nextPosition = position;
 	square nextSquare = piece.position;
 
 	bool isAtEdge = position & EDGES.at(dir);
@@ -185,7 +185,7 @@ void addSlidingMovesInDirection(std::vector<Move>& moves, Board board, piece pie
 
 std::vector<Move> getMovesForKing(Board board, piece king)
 {
-	map position = 1ULL << king.position;
+	bitboard position = 1ULL << king.position;
 	std::vector<Move> moves;
 	return moves;
 }

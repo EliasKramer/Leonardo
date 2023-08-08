@@ -5,34 +5,34 @@
 class Board
 {
 	private:
-		map pawns;
-		map knights;
-		map bishops;
-		map rooks;
-		map queens;
-		map kings;
+		bitboard pawns;
+		bitboard knights;
+		bitboard bishops;
+		bitboard rooks;
+		bitboard queens;
+		bitboard kings;
 
-		map whitePieces;
-		map blackPieces;
+		bitboard whitePieces;
+		bitboard blackPieces;
 
 		std::vector<piece> whitePiecesList;
 		std::vector<piece> blackPiecesList;
 
 		std::vector<piece> getPiecesOfColor(color color);
 	public:
-		Board(map pawns, map knights, map books, map rooks, map queens, map kings, map whitePieces, map blackPieces);
-		pieceType getType(map pieceBB);
+		Board(bitboard pawns, bitboard knights, bitboard books, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces);
+		pieceType getType(bitboard pieceBB);
 
-		map getPawns();
-		map getKnights();
-		map getBishops();
-		map getRooks();
-		map getQueens();
-		map getKings();
+		bitboard getPawns();
+		bitboard getKnights();
+		bitboard getBishops();
+		bitboard getRooks();
+		bitboard getQueens();
+		bitboard getKings();
 
-		map getWhitePieces();
-		map getBlackPieces();
-		map getAllPieces();
+		bitboard getWhitePieces();
+		bitboard getBlackPieces();
+		bitboard getAllPieces();
 
 		std::vector<piece> getWhitePiecesList();
 		std::vector<piece> getBlackPiecesList();

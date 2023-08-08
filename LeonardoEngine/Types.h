@@ -4,7 +4,7 @@
 #include <string>
 #include <array>
 
-using map = uint64_t;
+using bitboard = uint64_t;
 
 enum square : uint8_t 
 {
@@ -52,7 +52,7 @@ enum direction : int8_t {
 	NORTH_NORTH_WEST = NORTH + NORTH_WEST
 };
 
-enum row : map
+enum row : bitboard
 {
 	RANK_1 = 0xFF, 
 	RANK_2 = RANK_1 << NORTH, 
@@ -73,7 +73,7 @@ enum row : map
 	FILE_H = FILE_A << 7 * EAST
 };
 
-extern const std::map<direction, map> EDGES;
+extern const std::map<direction, bitboard> EDGES;
 
 struct piece 
 {
