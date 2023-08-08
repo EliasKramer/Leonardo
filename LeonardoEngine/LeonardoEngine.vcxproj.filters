@@ -41,9 +41,6 @@
     <ClCompile Include="Board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Types.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
