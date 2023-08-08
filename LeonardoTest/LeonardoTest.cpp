@@ -1,5 +1,5 @@
-#include "CppUnitTest.h"
-#include "../LeonardoEngine/engine.h"
+#include <CppUnitTest.h>
+#include <Engine.h>
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace LeonardoTest
