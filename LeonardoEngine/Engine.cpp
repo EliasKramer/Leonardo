@@ -106,8 +106,19 @@ std::vector<Move> getMovesForPawn(Board board, piece pawn)
 
 std::vector<Move> getMovesForKnight(Board board, piece knight)
 {
-	bitboard position = 1ULL << knight.position;
 	std::vector<Move> moves;
+
+	addMoveInDirection(moves, board, knight, UP_UP_RIGHT);
+	addMoveInDirection(moves, board, knight, RIGHT_RIGHT_UP);
+	addMoveInDirection(moves, board, knight, RIGHT_RIGHT_DOWN);
+	addMoveInDirection(moves, board, knight, DOWN_DOWN_RIGHT);
+	addMoveInDirection(moves, board, knight, DOWN_DOWN_LEFT);
+	addMoveInDirection(moves, board, knight, LEFT_LEFT_DOWN);
+	addMoveInDirection(moves, board, knight, LEFT_LEFT_UP);
+	addMoveInDirection(moves, board, knight, UP_UP_LEFT);
+
+	
+
 	return moves;
 }
 
@@ -151,6 +162,18 @@ std::vector<Move> getMovesForQueen(Board board, piece queen)
 	return moves;
 }
 
+std::vector<Move> getMovesForKing(Board board, piece king)
+{
+	std::vector<Move> moves;
+
+	addMoveInDirection(moves, board, king, UP);
+	addMoveInDirection(moves, board, king, RIGHT_UP);
+	addMoveInDirection(moves, board, king, RIGHT);
+	addMoveInDirection(moves, board, king, RIGHT_DOWN);
+	addMoveInDirection(moves, board, king, DOWN);
+	addMoveInDirection(moves, board, king, LEFT_DOWN);
+	addMoveInDirection(moves, board, king, LEFT);
+	addMoveInDirection(moves, board, king, LEFT_UP);
 	return moves;
 }
 
@@ -186,9 +209,16 @@ void addSlidingMovesInDirection(std::vector<Move>& moves, Board board, piece pie
 }
 
 
-std::vector<Move> getMovesForKing(Board board, piece king)
+
+void addMoveInDirection(std::vector<Move>& moves, Board board, piece piece, direction dir)
 {
-	bitboard position = 1ULL << king.position;
-	std::vector<Move> moves;
-	return moves;
+	bitboard position = 1ULL << piece.position;
+	bitboard piecesOfSameColor = piece.color == WHITE ? board.getWhitePieces() : board.getBlackPieces();
+
+	square targetSquare = (square)(piece.position + dir);
+	if (!((1ULL << piece.position) & EDGES.at(dir)) && !((1ULL << targetSquare) & piecesOfSameColor))
+	{
+		Move move(piece.position, targetSquare);
+		moves.push_back(move);
+	}
 }
