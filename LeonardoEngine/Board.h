@@ -21,10 +21,12 @@ class Board
 		color turnColor = WHITE;
 		bitboard enPassant = 0;
 		std::vector<piece> getPiecesOfColor(color color);
+		bool checkDirectionForAttack(square square, direction dir, bitboard EnemySlidingPieces);
 	public:
 		Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces);
 		pieceType getType(bitboard pieceBB);
 
+		bool squareIsAttackedBy(square square, color color);
 		bitboard getPawns();
 		bitboard getKnights();
 		bitboard getBishops();

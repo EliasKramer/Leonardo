@@ -65,6 +65,66 @@ pieceType Board::getType(bitboard pieceBB)
 	return type;
 }
 
+bool Board::squareIsAttackedBy(square square, color color)
+{
+	bitboard position = 1ULL << square;
+
+	bitboard enemyPawns = color == WHITE ? whitePieces & pawns : blackPieces & pawns;
+	bitboard enemyKnights = color == WHITE ? whitePieces & knights : blackPieces & knights;
+	bitboard enemyBishops = color == WHITE ? whitePieces & bishops : blackPieces & bishops;
+	bitboard enemyRooks = color == WHITE ? whitePieces & rooks : blackPieces & rooks;
+	bitboard enemyQueens = color == WHITE ? whitePieces & queens : blackPieces & queens;
+	bitboard enemyKing = color == WHITE ? whitePieces & kings : blackPieces & kings;
+
+	bitboard dangerousPawns = color == WHITE ? position >> 7 | position >> 9 : position << 7 | position << 9;
+	bitboard dangerousKnights = position << 17 | position << 15 | position << 10 | position << 6 | position >> 17 | position >> 15 | position >> 10 | position >> 6;
+	bitboard dangerousKings = position << 8 | position << 1 | position >> 1 | position >> 8 | position << 7 | position << 9 | position >> 7 | position >> 9;
+	
+	if ((dangerousPawns & enemyPawns) || (dangerousKnights & enemyKnights) || (dangerousKings & enemyKing))
+	{
+		return true;
+	}
+
+	bitboard enemyRooksQueens = enemyRooks | enemyQueens;
+	bitboard enemyBishopsQueens = enemyBishops | enemyQueens;
+	bitboard file = 0x101010101010101ULL << (square % 8);
+	bitboard rank = 0xFFULL << (square - (square % 8));
+	//checking each direction for attack, but for the file and rank we only check if there is a rook or queen
+	if (((enemyRooksQueens & rank) && (checkDirectionForAttack(square, LEFT, enemyRooksQueens) || checkDirectionForAttack(square, RIGHT, enemyRooksQueens))) ||
+		((enemyRooksQueens & file) && (checkDirectionForAttack(square, UP, enemyRooksQueens) || checkDirectionForAttack(square, DOWN, enemyRooksQueens))) ||
+		checkDirectionForAttack(square, LEFT_UP, enemyBishopsQueens) || checkDirectionForAttack(square, RIGHT_UP, enemyBishopsQueens) ||
+		checkDirectionForAttack(square, LEFT_DOWN, enemyBishopsQueens) || checkDirectionForAttack(square, RIGHT_DOWN, enemyBishopsQueens))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Board::checkDirectionForAttack(square position, direction dir, bitboard enemySlidingPieces)
+{
+	square nextSquare = position;
+	bitboard nextPosition = 1ULL << nextSquare;
+	bool isAtEdge = nextPosition & EDGES.at(dir);
+
+	while (!isAtEdge) 
+	{
+		nextSquare = (square)(nextSquare + dir);
+		nextPosition = 1ULL << nextSquare;
+		if (nextPosition & getAllPieces())
+		{
+			if (nextPosition & enemySlidingPieces) 
+			{
+				return true;
+			}
+			return false;
+		}
+		isAtEdge = nextPosition & EDGES.at(dir);
+	}
+	return false;
+}
+
+
 bitboard Board::getPawns()
 {
 	return pawns;
