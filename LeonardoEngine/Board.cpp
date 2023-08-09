@@ -120,3 +120,12 @@ void Board::switchTurnColor()
 {
 	turnColor = (color)!turnColor;
 }
+bitboard Board::getEnPassant()
+{
+	return enPassant;
+}
+
+void Board::setEnPassant(bitboard position)
+{
+	enPassant = position;
+}

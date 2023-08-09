@@ -6,11 +6,18 @@ Move::Move(square from, square to) :
 {
 }
 
+Move::Move(square from, square to, moveType type) :
+	from(from), 
+	to(to), 
+	type(type)
+{
+}
 
 Move::Move(square from, pieceType promotion) :
 	from(from), 
 	to(from), 
 	promotion(promotion),
+	type(PROMOTION)
 {
 }
 

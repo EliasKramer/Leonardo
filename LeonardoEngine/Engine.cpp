@@ -79,27 +79,53 @@ std::vector<Move> getMovesForPawn(Board board, piece pawn)
 		direction dir = pawn.color == WHITE ? UP : DOWN;
 		bitboard piecesOfOtherColor = pawn.color == WHITE ? board.getBlackPieces() : board.getWhitePieces();
 
-		if (!(position << dir & board.getAllPieces()))
+		square targetSquare = (square)(pawn.position + dir);
+
+		if (!((1ULL << targetSquare) & board.getAllPieces()))
 		{
-			Move move(pawn.position, (square)(pawn.position + dir));
+			Move move(pawn.position, targetSquare);
 			moves.push_back(move);
-			if (position & RANK_2 && !(position & 2 * dir))
+
+			if (position & RANK_2)
 			{
-				Move move(pawn.position, (square)(pawn.position + 2 * dir));
+				targetSquare = (square)(pawn.position + 2 * dir);
+				if (!((1ULL << targetSquare) & piecesOfOtherColor))
+				{
+					Move move(pawn.position, targetSquare);
+					moves.push_back(move);
+				}
+			}
+		}
+		if (!(position & FILE_A))
+		{
+			targetSquare = (square)(pawn.position + dir + LEFT);
+			bitboard targetPosition = 1ULL << targetSquare;
+			if (targetPosition & piecesOfOtherColor)
+			{
+				Move move(pawn.position, targetSquare);
+				moves.push_back(move);
+			}
+			if (targetPosition & board.getEnPassant())
+			{
+				Move move(pawn.position, targetSquare, EN_PASSANT);
 				moves.push_back(move);
 			}
 		}
-		if (!(position & FILE_A) && (position << (dir + WEST) & piecesOfOtherColor))
+		if (!(position & FILE_H))
 		{
-			Move move(pawn.position, (square)(pawn.position + dir + WEST));
-			moves.push_back(move);
+			targetSquare = (square)(pawn.position + dir + RIGHT);
+			bitboard targetPosition = 1ULL << targetSquare;
+			if (targetPosition & piecesOfOtherColor)
+			{
+				Move move(pawn.position, targetSquare);
+				moves.push_back(move);
+			}
+			if (targetPosition & board.getEnPassant())
+			{
+				Move move(pawn.position, targetSquare, EN_PASSANT);
+				moves.push_back(move);
+			}
 		}
-		if (!(position & FILE_H) && (position << (dir + EAST) & piecesOfOtherColor))
-		{
-			Move move(pawn.position, (square)(pawn.position + dir + EAST));
-			moves.push_back(move);
-		}
-
 	}
 	return moves;
 }
