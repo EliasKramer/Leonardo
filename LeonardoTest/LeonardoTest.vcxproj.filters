@@ -30,10 +30,8 @@
     <ClCompile Include="LeonardoTest.cpp">
       <Filter>Source Files\test_functions</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\LeonardoEngine\engine.hpp">
-      <Filter>Source Files\import</Filter>
-    </ClInclude>
+    <ClCompile Include="EngineTest.cpp">
+      <Filter>Source Files\test_functions</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

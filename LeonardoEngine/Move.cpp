@@ -28,3 +28,8 @@ pieceType Move::getPromotion()
 {
 	return promotion;
 }
+
+bool Move::operator==(const Move& other) const
+{
+	return from == other.from && to == other.to && type == other.type && promotion == other.promotion;
+}

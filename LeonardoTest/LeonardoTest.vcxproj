@@ -90,6 +90,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\LeonardoEngine\Engine.cpp" />
+    <ClCompile Include="EngineTest.cpp" />
     <ClCompile Include="LeonardoTest.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -99,9 +100,6 @@
     <ProjectReference Include="..\LeonardoEngine\LeonardoEngine.vcxproj">
       <Project>{16b21464-eaa5-4067-b870-dae866ec8f6b}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\LeonardoEngine\engine.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

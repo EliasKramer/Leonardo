@@ -13,5 +13,6 @@ class Move
 		square getFrom();
 		square getTo();
 		pieceType getPromotion();
-};
 
+		bool operator==(const Move& other) const;
+};
