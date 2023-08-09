@@ -90,6 +90,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\LeonardoEngine\Engine.cpp" />
+    <ClCompile Include="BoardTest.cpp" />
     <ClCompile Include="EngineTest.cpp" />
     <ClCompile Include="LeonardoTest.cpp" />
   </ItemGroup>

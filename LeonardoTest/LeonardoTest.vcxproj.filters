@@ -33,5 +33,8 @@
     <ClCompile Include="EngineTest.cpp">
       <Filter>Source Files\test_functions</Filter>
     </ClCompile>
+    <ClCompile Include="BoardTest.cpp">
+      <Filter>Source Files\test_functions</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
