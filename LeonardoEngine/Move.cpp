@@ -1,16 +1,17 @@
 #include "Move.h"
 
-Move::Move(square from, square to)
+Move::Move(square from, square to) :
+	from(from), 
+	to(to)
 {
-	this->from = from;
-	this->to = to;
 }
 
-Move::Move(square from, pieceType promotion)
+
+Move::Move(square from, pieceType promotion) :
+	from(from), 
+	to(from), 
+	promotion(promotion),
 {
-	this->from = from;
-	this->to = from;
-	this->promotion = promotion;
 }
 
 square Move::getFrom()

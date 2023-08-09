@@ -20,7 +20,7 @@ class Board
 
 		std::vector<piece> getPiecesOfColor(color color);
 	public:
-		Board(bitboard pawns, bitboard knights, bitboard books, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces);
+		Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces);
 		pieceType getType(bitboard pieceBB);
 
 		bitboard getPawns();

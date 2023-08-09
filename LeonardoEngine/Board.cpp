@@ -1,19 +1,17 @@
 #include "Board.h"
 
-Board::Board(bitboard pawns, bitboard knights, bitboard rooks, bitboard bishops, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces) 
+Board::Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces) : 
+	pawns(pawns), 
+	knights(knights), 
+	bishops(bishops), 
+	rooks(rooks), 
+	queens(queens), 
+	kings(kings), 
+	whitePieces(whitePieces), 
+	blackPieces(blackPieces),
+	whitePiecesList(getPiecesOfColor(WHITE)),
+	blackPiecesList(getPiecesOfColor(BLACK))
 {
-	this->pawns = pawns;
-	this->knights = knights;
-	this->rooks = rooks;
-	this->bishops = bishops;
-	this->queens = queens;
-	this->kings = kings;
-
-	this->whitePieces = whitePieces;
-	this->blackPieces = blackPieces;
-
-	this->whitePiecesList = getPiecesOfColor(WHITE);
-	this->blackPiecesList = getPiecesOfColor(BLACK);
 }
 
 
