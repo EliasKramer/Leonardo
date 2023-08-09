@@ -18,6 +18,7 @@ class Board
 		std::vector<piece> whitePiecesList;
 		std::vector<piece> blackPiecesList;
 
+		color turnColor = WHITE;
 		std::vector<piece> getPiecesOfColor(color color);
 	public:
 		Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces);
@@ -36,5 +37,7 @@ class Board
 
 		std::vector<piece> getWhitePiecesList();
 		std::vector<piece> getBlackPiecesList();
+		color getTurnColor();
+		void switchTurnColor();
 };
 

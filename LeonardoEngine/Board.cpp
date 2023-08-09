@@ -111,3 +111,12 @@ std::vector<piece> Board::getBlackPiecesList()
 {
 	return blackPiecesList;
 }
+color Board::getTurnColor()
+{
+	return turnColor;
+}
+
+void Board::switchTurnColor()
+{
+	turnColor = (color)!turnColor;
+}
