@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include <map>
 #include <string>
 #include <array>
@@ -31,46 +30,46 @@ enum color : uint8_t
 };
 
 enum direction : int8_t {
-	NORTH = 8,
-	EAST = 1,
-	SOUTH = -NORTH,
-	WEST = -EAST,
+	UP = 8,
+	RIGHT = 1,
+	DOWN = -UP,
+	LEFT = -RIGHT,
 
-	NORTH_EAST = NORTH + EAST,
-	SOUTH_EAST = SOUTH + EAST,
-	SOUTH_WEST = SOUTH + WEST,
-	NORTH_WEST = NORTH + WEST,
+	RIGHT_UP = UP + RIGHT,
+	RIGHT_DOWN = DOWN + RIGHT,
+	LEFT_DOWN = DOWN + LEFT,
+	LEFT_UP = UP + LEFT,
 
-	NORTH_NORTH_EAST = NORTH + NORTH_EAST,
-	EAST_NORTH_EAST = EAST + NORTH_EAST,
-	EAST_SOUTH_EAST = EAST + SOUTH_EAST,
-	SOUTH_SOUTH_EAST = SOUTH + SOUTH_EAST,
+	UP_UP_RIGHT = UP + RIGHT_UP,
+	RIGHT_RIGHT_UP = RIGHT + RIGHT_UP,
+	RIGHT_RIGHT_DOWN = RIGHT + RIGHT_DOWN,
+	DOWN_DOWN_RIGHT = DOWN + RIGHT_DOWN,
 
-	SOUTH_SOUTH_WEST = SOUTH + SOUTH_WEST,
-	WEST_SOUTH_WEST = WEST + SOUTH_WEST,
-	WEST_NORTH_WEST = WEST + NORTH_WEST,
-	NORTH_NORTH_WEST = NORTH + NORTH_WEST
+	DOWN_DOWN_LEFT = DOWN + LEFT_DOWN,
+	LEFT_LEFT_DOWN = LEFT + LEFT_DOWN,
+	LEFT_LEFT_UP = LEFT + LEFT_UP,
+	UP_UP_LEFT = UP + LEFT_UP
 };
 
 enum row : bitboard
 {
 	RANK_1 = 0xFF, 
-	RANK_2 = RANK_1 << NORTH, 
-	RANK_3 = RANK_1 << 2 * NORTH,
-	RANK_4 = RANK_1 << 3 * NORTH,
-	RANK_5 = RANK_1 << 4 * NORTH,
-	RANK_6 = RANK_1 << 5 * NORTH,
-	RANK_7 = RANK_1 << 6 * NORTH,
-	RANK_8 = RANK_1 << 7 * NORTH,
+	RANK_2 = RANK_1 << UP, 
+	RANK_3 = RANK_1 << 2 * UP,
+	RANK_4 = RANK_1 << 3 * UP,
+	RANK_5 = RANK_1 << 4 * UP,
+	RANK_6 = RANK_1 << 5 * UP,
+	RANK_7 = RANK_1 << 6 * UP,
+	RANK_8 = RANK_1 << 7 * UP,
 
 	FILE_A = 0x0101010101010101,
-	FILE_B = FILE_A << EAST,
-	FILE_C = FILE_A << 2 * EAST,
-	FILE_D = FILE_A << 3 * EAST,
-	FILE_E = FILE_A << 4 * EAST,
-	FILE_F = FILE_A << 5 * EAST,
-	FILE_G = FILE_A << 6 * EAST,
-	FILE_H = FILE_A << 7 * EAST
+	FILE_B = FILE_A << RIGHT,
+	FILE_C = FILE_A << 2 * RIGHT,
+	FILE_D = FILE_A << 3 * RIGHT,
+	FILE_E = FILE_A << 4 * RIGHT,
+	FILE_F = FILE_A << 5 * RIGHT,
+	FILE_G = FILE_A << 6 * RIGHT,
+	FILE_H = FILE_A << 7 * RIGHT
 };
 
 extern const std::map<direction, bitboard> EDGES;

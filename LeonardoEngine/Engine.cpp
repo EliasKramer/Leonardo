@@ -76,7 +76,7 @@ std::vector<Move> getMovesForPawn(Board board, piece pawn)
 	}
 	else
 	{
-		direction dir = pawn.color == WHITE ? NORTH : SOUTH;
+		direction dir = pawn.color == WHITE ? UP : DOWN;
 		bitboard piecesOfOtherColor = pawn.color == WHITE ? board.getBlackPieces() : board.getWhitePieces();
 
 		if (!(position << dir & board.getAllPieces()))
@@ -115,10 +115,10 @@ std::vector<Move> getMovesForBishop(Board board, piece bishop)
 {
 	std::vector<Move> moves;
 
-	addSlidingMovesInDirection(moves, board, bishop, NORTH_EAST);
-	addSlidingMovesInDirection(moves, board, bishop, SOUTH_EAST);
-	addSlidingMovesInDirection(moves, board, bishop, SOUTH_WEST);
-	addSlidingMovesInDirection(moves, board, bishop, NORTH_WEST);
+	addSlidingMovesInDirection(moves, board, bishop, RIGHT_UP);
+	addSlidingMovesInDirection(moves, board, bishop, RIGHT_DOWN);
+	addSlidingMovesInDirection(moves, board, bishop, LEFT_DOWN);
+	addSlidingMovesInDirection(moves, board, bishop, LEFT_UP);
 
 	return moves;
 }
@@ -127,10 +127,10 @@ std::vector<Move> getMovesForRook(Board board, piece rook)
 {
 	std::vector<Move> moves;
 
-	addSlidingMovesInDirection(moves, board, rook, NORTH);
-	addSlidingMovesInDirection(moves, board, rook, EAST);
-	addSlidingMovesInDirection(moves, board, rook, SOUTH);
-	addSlidingMovesInDirection(moves, board, rook, WEST);
+	addSlidingMovesInDirection(moves, board, rook, UP);
+	addSlidingMovesInDirection(moves, board, rook, RIGHT);
+	addSlidingMovesInDirection(moves, board, rook, DOWN);
+	addSlidingMovesInDirection(moves, board, rook, LEFT);
 
 	return moves;
 }
@@ -139,14 +139,17 @@ std::vector<Move> getMovesForQueen(Board board, piece queen)
 {
 	std::vector<Move> moves;
 
-	addSlidingMovesInDirection(moves, board, queen, NORTH);
-	addSlidingMovesInDirection(moves, board, queen, EAST);
-	addSlidingMovesInDirection(moves, board, queen, SOUTH);
-	addSlidingMovesInDirection(moves, board, queen, WEST);
-	addSlidingMovesInDirection(moves, board, queen, NORTH_EAST);
-	addSlidingMovesInDirection(moves, board, queen, SOUTH_EAST);
-	addSlidingMovesInDirection(moves, board, queen, SOUTH_WEST);
-	addSlidingMovesInDirection(moves, board, queen, NORTH_WEST);
+	addSlidingMovesInDirection(moves, board, queen, UP);
+	addSlidingMovesInDirection(moves, board, queen, RIGHT);
+	addSlidingMovesInDirection(moves, board, queen, DOWN);
+	addSlidingMovesInDirection(moves, board, queen, LEFT);
+	addSlidingMovesInDirection(moves, board, queen, RIGHT_UP);
+	addSlidingMovesInDirection(moves, board, queen, RIGHT_DOWN);
+	addSlidingMovesInDirection(moves, board, queen, LEFT_DOWN);
+	addSlidingMovesInDirection(moves, board, queen, LEFT_UP);
+
+	return moves;
+}
 
 	return moves;
 }
