@@ -171,6 +171,7 @@ std::vector<piece> Board::getBlackPiecesList()
 {
 	return blackPiecesList;
 }
+
 color Board::getTurnColor()
 {
 	return turnColor;
@@ -180,6 +181,7 @@ void Board::switchTurnColor()
 {
 	turnColor = (color)!turnColor;
 }
+
 bitboard Board::getEnPassant()
 {
 	return enPassant;
@@ -188,4 +190,35 @@ bitboard Board::getEnPassant()
 void Board::setEnPassant(bitboard position)
 {
 	enPassant = position;
+}
+
+bool Board::getWhiteLeftCastleAvailable()
+{
+	return whiteLeftCastleAvailable;
+}
+
+bool Board::getWhiteRightCastleAvailable()
+{
+	return whiteRightCastleAvailable;
+}
+
+bool Board::getBlackLeftCastleAvailable()
+{
+	return blackLeftCastleAvailable;
+}
+
+bool Board::getBlackRightCastleAvailable()
+{
+	return blackRightCastleAvailable;
+}
+
+void Board::whiteCastle()
+{
+	whiteLeftCastleAvailable = false;
+	whiteRightCastleAvailable = false;
+}
+void Board::blackCastle()
+{
+	blackLeftCastleAvailable = false;
+	blackRightCastleAvailable = false;
 }

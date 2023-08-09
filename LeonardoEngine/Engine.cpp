@@ -200,6 +200,44 @@ std::vector<Move> getMovesForKing(Board board, piece king)
 	addMoveInDirection(moves, board, king, LEFT_DOWN);
 	addMoveInDirection(moves, board, king, LEFT);
 	addMoveInDirection(moves, board, king, LEFT_UP);
+
+	bool leftCastleAvailable = king.color == WHITE ? board.getWhiteLeftCastleAvailable() : board.getBlackLeftCastleAvailable();
+	bool rightCastleAvailable = king.color == WHITE ? board.getWhiteRightCastleAvailable() : board.getBlackRightCastleAvailable();
+	bitboard freeSpacesLeft = king.color == WHITE ? 0xe : 0xe00000000000000;
+	bitboard freeSpacesRight = king.color == WHITE ? 0x60 : 0x6000000000000000;
+
+	if (((leftCastleAvailable && !(freeSpacesLeft & board.getAllPieces())) || (rightCastleAvailable && !(freeSpacesRight & board.getAllPieces()))) && !board.squareIsAttackedBy(king.position, (color)!board.getTurnColor()))
+	{
+		square b18 = king.color == WHITE ? B1 : B8;
+		square c18 = king.color == WHITE ? C1 : C8;
+		square d18 = king.color == WHITE ? D1 : D8;
+
+		square f18 = king.color == WHITE ? F1 : F8;
+		square g18 = king.color == WHITE ? G1 : G8;
+
+		square a18 = king.color == WHITE ? A1 : A8;
+		square h18 = king.color == WHITE ? H1 : H8;
+
+		if (leftCastleAvailable && !(freeSpacesLeft & board.getAllPieces()) &&
+			!board.squareIsAttackedBy(a18, (color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(b18, (color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(c18, (color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(d18, (color)!board.getTurnColor()))
+		{
+			Move move(king.position, c18, CASTLE);
+			moves.push_back(move);
+		}
+
+		if (rightCastleAvailable && !(freeSpacesRight & board.getAllPieces()) &&
+			!board.squareIsAttackedBy(f18, (color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(g18, (color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(h18, (color)!board.getTurnColor()))
+		{
+			Move move(king.position, g18, CASTLE);
+			moves.push_back(move);
+		}
+	}
+
 	return moves;
 }
 
