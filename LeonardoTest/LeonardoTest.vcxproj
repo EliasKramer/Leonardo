@@ -95,9 +95,6 @@
     <ClCompile Include="LeonardoTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LeonardoAi\LeonardoAi.vcxproj">
-      <Project>{6065e741-45f5-4edc-8583-d513cfe48a0b}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\LeonardoEngine\LeonardoEngine.vcxproj">
       <Project>{16b21464-eaa5-4067-b870-dae866ec8f6b}</Project>
     </ProjectReference>
