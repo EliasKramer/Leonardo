@@ -1,6 +1,288 @@
-#include "engine.hpp"
+#include "engine.h"
+#include <cmath>
 
-int test()
+std::vector<Move> getMoves(Board board, color color)
 {
-	return 15;
+	std::vector<Move> moves;
+	std::vector<piece> pieces = color == WHITE ? board.getWhitePiecesList() : board.getBlackPiecesList();
+	for (piece piece : pieces)
+	{
+		std::vector<Move> pieceMoves = getMovesForPiece(board, piece);
+		moves.insert(moves.end(), pieceMoves.begin(), pieceMoves.end());
+	}
+	return moves;
+}
+
+std::vector<Move> getMoves(Board board, color color, int depth)
+{
+	std::vector<Move> moves = getMoves(board, color);
+	if (depth != 1)
+	{
+		for (Move move : moves)
+		{
+			Board newBoard(board);
+			//move.apply(newBoard);
+			std::vector<Move> nextMoves = getMoves(newBoard, color == WHITE ? BLACK : WHITE, depth - 1);
+			moves.insert(moves.end(), nextMoves.begin(), nextMoves.end());
+		}
+	}
+	return moves;
+}
+
+
+std::vector<Move> getMovesForPiece(Board board, piece piece)
+{
+	std::vector<Move> moves;
+	
+	switch (piece.type)
+	{
+		case PAWN:
+			moves = getMovesForPawn(board, piece);
+			break;
+		case KNIGHT:
+			moves = getMovesForKnight(board, piece);
+			break;
+		case BISHOP:
+			moves = getMovesForBishop(board, piece);
+			break;
+		case ROOK:
+			moves = getMovesForRook(board, piece);
+			break;
+		case QUEEN:
+			moves = getMovesForQueen(board, piece);
+			break;
+		case KING:
+			moves = getMovesForKing(board, piece);
+			break;
+	}
+	return moves;
+}
+
+std::vector<Move> getMovesForPawn(Board board, piece pawn)
+{
+	std::vector<Move> moves;
+	bitboard position = 1ULL << pawn.position;
+	if (position & RANK_8 || position & RANK_1)
+	{
+		Move promoteN(pawn.position, KNIGHT);
+		Move promoteB(pawn.position, BISHOP);
+		Move promoteR(pawn.position, ROOK);
+		Move promoteQ(pawn.position, QUEEN);
+
+		moves.push_back(promoteN);
+		moves.push_back(promoteB);
+		moves.push_back(promoteR);
+		moves.push_back(promoteQ);
+	}
+	else
+	{
+		direction dir = pawn.color == WHITE ? UP : DOWN;
+		bitboard piecesOfOtherColor = pawn.color == WHITE ? board.getBlackPieces() : board.getWhitePieces();
+
+		square targetSquare = (square)(pawn.position + dir);
+
+		if (!((1ULL << targetSquare) & board.getAllPieces()))
+		{
+			Move move(pawn.position, targetSquare);
+			moves.push_back(move);
+
+			if (position & RANK_2)
+			{
+				targetSquare = (square)(pawn.position + 2 * dir);
+				if (!((1ULL << targetSquare) & piecesOfOtherColor))
+				{
+					Move move(pawn.position, targetSquare);
+					moves.push_back(move);
+				}
+			}
+		}
+		if (!(position & FILE_A))
+		{
+			targetSquare = (square)(pawn.position + dir + LEFT);
+			bitboard targetPosition = 1ULL << targetSquare;
+			if (targetPosition & piecesOfOtherColor)
+			{
+				Move move(pawn.position, targetSquare);
+				moves.push_back(move);
+			}
+			if (targetPosition & board.getEnPassant())
+			{
+				Move move(pawn.position, targetSquare, EN_PASSANT);
+				moves.push_back(move);
+			}
+		}
+		if (!(position & FILE_H))
+		{
+			targetSquare = (square)(pawn.position + dir + RIGHT);
+			bitboard targetPosition = 1ULL << targetSquare;
+			if (targetPosition & piecesOfOtherColor)
+			{
+				Move move(pawn.position, targetSquare);
+				moves.push_back(move);
+			}
+			if (targetPosition & board.getEnPassant())
+			{
+				Move move(pawn.position, targetSquare, EN_PASSANT);
+				moves.push_back(move);
+			}
+		}
+	}
+	return moves;
+}
+
+std::vector<Move> getMovesForKnight(Board board, piece knight)
+{
+	std::vector<Move> moves;
+
+	addMoveInDirection(moves, board, knight, UP_UP_RIGHT);
+	addMoveInDirection(moves, board, knight, RIGHT_RIGHT_UP);
+	addMoveInDirection(moves, board, knight, RIGHT_RIGHT_DOWN);
+	addMoveInDirection(moves, board, knight, DOWN_DOWN_RIGHT);
+	addMoveInDirection(moves, board, knight, DOWN_DOWN_LEFT);
+	addMoveInDirection(moves, board, knight, LEFT_LEFT_DOWN);
+	addMoveInDirection(moves, board, knight, LEFT_LEFT_UP);
+	addMoveInDirection(moves, board, knight, UP_UP_LEFT);
+
+	
+
+	return moves;
+}
+
+std::vector<Move> getMovesForBishop(Board board, piece bishop)
+{
+	std::vector<Move> moves;
+
+	addSlidingMovesInDirection(moves, board, bishop, RIGHT_UP);
+	addSlidingMovesInDirection(moves, board, bishop, RIGHT_DOWN);
+	addSlidingMovesInDirection(moves, board, bishop, LEFT_DOWN);
+	addSlidingMovesInDirection(moves, board, bishop, LEFT_UP);
+
+	return moves;
+}
+
+std::vector<Move> getMovesForRook(Board board, piece rook)
+{
+	std::vector<Move> moves;
+
+	addSlidingMovesInDirection(moves, board, rook, UP);
+	addSlidingMovesInDirection(moves, board, rook, RIGHT);
+	addSlidingMovesInDirection(moves, board, rook, DOWN);
+	addSlidingMovesInDirection(moves, board, rook, LEFT);
+
+	return moves;
+}
+
+std::vector<Move> getMovesForQueen(Board board, piece queen)
+{
+	std::vector<Move> moves;
+
+	addSlidingMovesInDirection(moves, board, queen, UP);
+	addSlidingMovesInDirection(moves, board, queen, RIGHT);
+	addSlidingMovesInDirection(moves, board, queen, DOWN);
+	addSlidingMovesInDirection(moves, board, queen, LEFT);
+	addSlidingMovesInDirection(moves, board, queen, RIGHT_UP);
+	addSlidingMovesInDirection(moves, board, queen, RIGHT_DOWN);
+	addSlidingMovesInDirection(moves, board, queen, LEFT_DOWN);
+	addSlidingMovesInDirection(moves, board, queen, LEFT_UP);
+
+	return moves;
+}
+
+std::vector<Move> getMovesForKing(Board board, piece king)
+{
+	std::vector<Move> moves;
+
+	addMoveInDirection(moves, board, king, UP);
+	addMoveInDirection(moves, board, king, RIGHT_UP);
+	addMoveInDirection(moves, board, king, RIGHT);
+	addMoveInDirection(moves, board, king, RIGHT_DOWN);
+	addMoveInDirection(moves, board, king, DOWN);
+	addMoveInDirection(moves, board, king, LEFT_DOWN);
+	addMoveInDirection(moves, board, king, LEFT);
+	addMoveInDirection(moves, board, king, LEFT_UP);
+
+	bool leftCastleAvailable = king.color == WHITE ? board.getWhiteLeftCastleAvailable() : board.getBlackLeftCastleAvailable();
+	bool rightCastleAvailable = king.color == WHITE ? board.getWhiteRightCastleAvailable() : board.getBlackRightCastleAvailable();
+	bitboard freeSpacesLeft = king.color == WHITE ? 0xe : 0xe00000000000000;
+	bitboard freeSpacesRight = king.color == WHITE ? 0x60 : 0x6000000000000000;
+
+	if (((leftCastleAvailable && !(freeSpacesLeft & board.getAllPieces())) || (rightCastleAvailable && !(freeSpacesRight & board.getAllPieces()))) && !board.squareIsAttackedBy(king.position, (color)!board.getTurnColor()))
+	{
+		square b18 = king.color == WHITE ? B1 : B8;
+		square c18 = king.color == WHITE ? C1 : C8;
+		square d18 = king.color == WHITE ? D1 : D8;
+
+		square f18 = king.color == WHITE ? F1 : F8;
+		square g18 = king.color == WHITE ? G1 : G8;
+
+		square a18 = king.color == WHITE ? A1 : A8;
+		square h18 = king.color == WHITE ? H1 : H8;
+
+		if (leftCastleAvailable && !(freeSpacesLeft & board.getAllPieces()) &&
+			!board.squareIsAttackedBy(a18, (color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(b18, (color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(c18, (color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(d18, (color)!board.getTurnColor()))
+		{
+			Move move(king.position, c18, CASTLE);
+			moves.push_back(move);
+		}
+
+		if (rightCastleAvailable && !(freeSpacesRight & board.getAllPieces()) &&
+			!board.squareIsAttackedBy(f18, (color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(g18, (color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(h18, (color)!board.getTurnColor()))
+		{
+			Move move(king.position, g18, CASTLE);
+			moves.push_back(move);
+		}
+	}
+
+	return moves;
+}
+
+void addSlidingMovesInDirection(std::vector<Move>& moves, Board board, piece piece, direction dir)
+{
+	bitboard position = 1ULL << piece.position;
+	bitboard piecesOfOtherColor = piece.color == WHITE ? board.getBlackPieces() : board.getWhitePieces();
+	bitboard nextPosition = position;
+	square nextSquare = piece.position;
+
+	bool isAtEdge = position & EDGES.at(dir);
+	while (!isAtEdge)
+	{
+		nextSquare = (square)(nextSquare + dir);
+		nextPosition = 1ULL << nextSquare;
+		if (nextPosition & piecesOfOtherColor)
+		{
+			Move move(piece.position, nextSquare);
+			moves.push_back(move);
+			break;
+		}
+		else if (nextPosition & board.getAllPieces())
+		{
+			break;
+		}
+		else
+		{
+			Move move(piece.position, nextSquare);
+			moves.push_back(move);
+		}
+		isAtEdge = nextPosition & EDGES.at(dir);
+	}
+}
+
+
+
+void addMoveInDirection(std::vector<Move>& moves, Board board, piece piece, direction dir)
+{
+	bitboard position = 1ULL << piece.position;
+	bitboard piecesOfSameColor = piece.color == WHITE ? board.getWhitePieces() : board.getBlackPieces();
+
+	square targetSquare = (square)(piece.position + dir);
+	if (!((1ULL << piece.position) & EDGES.at(dir)) && !((1ULL << targetSquare) & piecesOfSameColor))
+	{
+		Move move(piece.position, targetSquare);
+		moves.push_back(move);
+	}
 }

@@ -21,10 +21,11 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="EngineTest.cpp">
+      <Filter>Source Files\test_functions</Filter>
+    </ClCompile>
+    <ClCompile Include="BoardTest.cpp">
+      <Filter>Source Files\test_functions</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
