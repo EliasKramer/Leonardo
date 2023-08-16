@@ -1,12 +1,14 @@
 #include "Move.h"
 
-Move::Move(square from, square to) :
+Move::Move(pieceType piece, square from, square to) :
+	piece(piece),
 	from(from), 
 	to(to)
 {
 }
 
-Move::Move(square from, square to, moveType type) :
+Move::Move(pieceType piece, square from, square to, moveType type) :
+	piece(piece),
 	from(from), 
 	to(to), 
 	type(type)
@@ -14,11 +16,16 @@ Move::Move(square from, square to, moveType type) :
 }
 
 Move::Move(square from, pieceType promotion) :
+	piece(promotion),
 	from(from), 
 	to(from), 
-	promotion(promotion),
 	type(PROMOTION)
 {
+}
+
+pieceType Move::getPieceType()
+{
+	return piece;
 }
 
 square Move::getFrom()
@@ -31,12 +38,12 @@ square Move::getTo()
 	return to;
 }
 
-pieceType Move::getPromotion()
+moveType Move::getType()
 {
-	return promotion;
+	return type;
 }
 
 bool Move::operator==(const Move& other) const
 {
-	return from == other.from && to == other.to && type == other.type && promotion == other.promotion;
+	return piece == other.piece && from == other.from && to == other.to && type == other.type;
 }

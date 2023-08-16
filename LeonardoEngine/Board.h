@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.h"
+#include "Move.h"
 #include <vector>
 class Board
 {
@@ -20,7 +21,7 @@ class Board
 
 		color turnColor = WHITE;
 
-		bitboard enPassant = 0;
+		bitboard enPassantSquare = 0;
 
 		bool whiteLeftCastleAvailable = true;
 		bool whiteRightCastleAvailable = true;
@@ -34,6 +35,8 @@ class Board
 		pieceType getType(bitboard pieceBB);
 
 		bool squareIsAttackedBy(square square, color color);
+
+		void executeMove(Move move);
 
 		bitboard getPawns();
 		bitboard getKnights();
@@ -50,10 +53,8 @@ class Board
 		std::vector<piece> getBlackPiecesList();
 
 		color getTurnColor();
-		void switchTurnColor();
 
-		bitboard getEnPassant();
-		void setEnPassant(bitboard position);
+		bitboard getEnPassantSquare();
 
 		bool getWhiteLeftCastleAvailable();
 		bool getWhiteRightCastleAvailable();

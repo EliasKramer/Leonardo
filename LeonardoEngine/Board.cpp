@@ -124,6 +124,90 @@ bool Board::checkDirectionForAttack(square position, direction dir, bitboard ene
 	return false;
 }
 
+void Board::executeMove(Move move) 
+{
+	square from = move.getFrom();
+	square to = move.getTo();
+	bitboard fromBB = 1ULL << from;
+	bitboard toBB = 1ULL << to;
+	bitboard fromToBB = fromBB | toBB;
+
+	if (fromToBB & 0x1)
+	{
+		whiteLeftCastleAvailable = false;
+	}
+	else if (fromToBB & 0x80)
+	{
+		whiteRightCastleAvailable = false;
+	}
+	else if (fromToBB & 0x100000000000000)
+	{
+		blackLeftCastleAvailable = false;
+	}
+	else if (fromToBB & 0x8000000000000000)
+	{
+		blackRightCastleAvailable = false;
+	}
+
+	bitboard *turnPiecesBB_p = turnColor == WHITE ? &whitePieces : &blackPieces;
+	bitboard *otherPiecesBB_p = turnColor == WHITE ? &blackPieces : &whitePieces;
+
+	*turnPiecesBB_p = (*turnPiecesBB_p & ~fromBB) | toBB;
+	*otherPiecesBB_p = *otherPiecesBB_p & ~toBB;
+
+	pawns = pawns & ~fromToBB;
+	knights = knights & ~fromToBB;
+	bishops = bishops & ~fromToBB;
+	rooks = rooks & ~fromToBB;
+	queens = queens & ~fromToBB;
+	kings = kings & ~fromToBB;
+
+	switch (move.getPieceType())
+	{
+		case PAWN:
+			pawns = pawns | toBB;
+			if (toBB & (fromBB << 16 | fromBB >> 16))
+			{
+				enPassantSquare = turnColor == WHITE ? toBB >> 8 : toBB << 8;
+			}
+			break;
+		case KNIGHT:
+			knights = knights | toBB;
+			break;
+		case BISHOP:
+			bishops = bishops | toBB;
+			break;
+		case ROOK:
+			rooks = rooks | toBB;
+			break;
+		case QUEEN:
+			queens = queens | toBB;
+			break;
+		case KING:
+			kings = kings | toBB;
+			turnColor == WHITE ? whiteCastle() : blackCastle();
+			break;
+	}
+
+	switch (move.getType())
+	{
+		case EN_PASSANT:
+			//we can empty the squares above and below the to square, because when a pawn is moved two squares, the square it came from must be empty 
+			*otherPiecesBB_p = *otherPiecesBB_p & ~(toBB >> 8 | toBB << 8);
+			pawns = pawns & ~(toBB >> 8 | toBB << 8);
+			break;
+		case CASTLE_LEFT:
+			*turnPiecesBB_p = (*turnPiecesBB_p & ~(toBB >> 2)) | (toBB << 1);
+			rooks = (rooks & ~(toBB >> 2)) | (toBB << 1);
+			break;
+		case CASTLE_RIGHT:
+			*turnPiecesBB_p = (*turnPiecesBB_p & ~(toBB << 1)) | (toBB >> 1);
+			rooks = (rooks & ~(toBB << 1)) | (toBB >> 1);
+			break;
+	}
+
+	turnColor = (color)!turnColor;
+}
 
 bitboard Board::getPawns()
 {
@@ -177,19 +261,9 @@ color Board::getTurnColor()
 	return turnColor;
 }
 
-void Board::switchTurnColor()
+bitboard Board::getEnPassantSquare()
 {
-	turnColor = (color)!turnColor;
-}
-
-bitboard Board::getEnPassant()
-{
-	return enPassant;
-}
-
-void Board::setEnPassant(bitboard position)
-{
-	enPassant = position;
+	return enPassantSquare;
 }
 
 bool Board::getWhiteLeftCastleAvailable()

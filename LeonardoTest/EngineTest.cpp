@@ -23,7 +23,7 @@ namespace EngineTest
 			pawn.position = A3;
 			pawn.type = PAWN;
 
-			Move regularMove(A3, A4);
+			Move regularMove(PAWN, A3, A4);
 
 			std::vector<Move> moves = getMovesForPawn(board, pawn);
 
@@ -42,8 +42,8 @@ namespace EngineTest
 			pawn.position = A2;
 			pawn.type = PAWN;
 
-			Move singleMove(A2, A3);
-			Move doubleMove(A2, A4);
+			Move singleMove(PAWN, A2, A3);
+			Move doubleMove(PAWN, A2, A4);
 			std::vector<Move> expected = { singleMove, doubleMove };
 
 			std::vector<Move> actual = getMovesForPawn(board, pawn);
@@ -64,9 +64,9 @@ namespace EngineTest
 			pawn.position = B3;
 			pawn.type = PAWN;
 
-			Move leftCapture(B3, A4);
-			Move regularMove(B3, B4);
-			Move rightCapture(B3, C4);
+			Move leftCapture(PAWN, B3, A4);
+			Move regularMove(PAWN, B3, B4);
+			Move rightCapture(PAWN, B3, C4);
 			std::vector<Move> expected = { leftCapture, regularMove, rightCapture };
 
 			std::vector<Move> actual = getMovesForPawn(board, pawn);
@@ -107,15 +107,15 @@ namespace EngineTest
 			Board board(pawns, 0, 0, 0, 0, 0, whitePieces, blackPieces);
 
 			bitboard enPassantPosition = 0x20000000000;
-			board.setEnPassant(enPassantPosition);
+			//board.setEnPassantSquare(enPassantPosition);
 
 			piece pawn;
 			pawn.color = WHITE;
 			pawn.position = A5;
 			pawn.type = PAWN;
 
-			Move regular(A5, A6);
-			Move enPassant(A5, B6, EN_PASSANT);
+			Move regular(PAWN, A5, A6);
+			Move enPassant(PAWN, A5, B6, EN_PASSANT);
 			std::vector<Move> expected = { regular, enPassant };
 
 			std::vector<Move> actual = getMovesForPawn(board, pawn);
@@ -136,14 +136,14 @@ namespace EngineTest
 			knight.position = D4;
 			knight.type = KNIGHT;
 
-			Move upUpRight(D4, E6);
-			Move rightRightUp(D4, F5);
-			Move rightRightDown(D4, F3);
-			Move downDownRight(D4, E2);
-			Move downDownLeft(D4, C2);
-			Move leftLeftDown(D4, B3);
-			Move leftLeftUp(D4, B5);
-			Move upUpLeft(D4, C6);
+			Move upUpRight(KNIGHT, D4, E6);
+			Move rightRightUp(KNIGHT, D4, F5);
+			Move rightRightDown(KNIGHT, D4, F3);
+			Move downDownRight(KNIGHT, D4, E2);
+			Move downDownLeft(KNIGHT, D4, C2);
+			Move leftLeftDown(KNIGHT, D4, B3);
+			Move leftLeftUp(KNIGHT, D4, B5);
+			Move upUpLeft(KNIGHT, D4, C6);
 			std::vector<Move> expected = { upUpRight, rightRightUp, rightRightDown, downDownRight, downDownLeft, leftLeftDown, leftLeftUp, upUpLeft };
 
 			std::vector<Move> actual = getMovesForKnight(board, knight);
@@ -166,16 +166,16 @@ namespace EngineTest
 
 			std::vector<Move> expected;
 			for (int i = 1; i < 5; i++) {
-				Move moveRank(D4, (square)(D4 + i * RIGHT));
+				Move moveRank(ROOK, D4, (square)(D4 + i * RIGHT));
 				expected.push_back(moveRank);
-				Move moveFile(D4, (square)(D4 + i * UP));
+				Move moveFile(ROOK, D4, (square)(D4 + i * UP));
 				expected.push_back(moveFile);
 			}
 
 			for (int i = 1; i < 4; i++) {
-				Move moveRank(D4, (square)(D4 + i * LEFT));
+				Move moveRank(ROOK, D4, (square)(D4 + i * LEFT));
 				expected.push_back(moveRank);
-				Move moveFile(D4, (square)(D4 + i * DOWN));
+				Move moveFile(ROOK, D4, (square)(D4 + i * DOWN));
 				expected.push_back(moveFile);
 			}
 
@@ -198,10 +198,10 @@ namespace EngineTest
 			rook.type = ROOK;
 
 			std::vector<Move> expected;
-			Move moveFile(A1, (square)(A1 + UP));
+			Move moveFile(ROOK, A1, (square)(A1 + UP));
 			expected.push_back(moveFile);
 			for (int i = 1; i < 4; i++) {
-				Move moveRank(A1, (square)(A1 + i * RIGHT));
+				Move moveRank(ROOK, A1, (square)(A1 + i * RIGHT));
 				expected.push_back(moveRank);
 			}
 
@@ -225,7 +225,7 @@ namespace EngineTest
 
 			std::vector<Move> expected;
 			for (int i = 1; i < 3; i++) {
-				Move moveRank(A1, (square)(A1 + i * RIGHT));
+				Move moveRank(ROOK, A1, (square)(A1 + i * RIGHT));
 				expected.push_back(moveRank);
 			}
 
@@ -249,16 +249,16 @@ namespace EngineTest
 
 			std::vector<Move> expected;
 			for (int i = 1; i < 5; i++) {
-				Move moveRightUp(D4, (square)(D4 + i * RIGHT_UP));
+				Move moveRightUp(BISHOP, D4, (square)(D4 + i * RIGHT_UP));
 				expected.push_back(moveRightUp);
 			}
 
 			for (int i = 1; i < 4; i++) {
-				Move moveLeftUp(D4, (square)(D4 + i * LEFT_UP));
+				Move moveLeftUp(BISHOP, D4, (square)(D4 + i * LEFT_UP));
 				expected.push_back(moveLeftUp);
-				Move moveLeftDown(D4, (square)(D4 + i * LEFT_DOWN));
+				Move moveLeftDown(BISHOP, D4, (square)(D4 + i * LEFT_DOWN));
 				expected.push_back(moveLeftDown);
-				Move moveRightDown(D4, (square)(D4 + i * RIGHT_DOWN));
+				Move moveRightDown(BISHOP, D4, (square)(D4 + i * RIGHT_DOWN));
 				expected.push_back(moveRightDown);
 			}
 
@@ -282,7 +282,7 @@ namespace EngineTest
 
 			std::vector<Move> expected;
 			for (int i = 1; i < 4; i++) {
-				Move moveRank(A1, (square)(A1 + i * RIGHT_UP));
+				Move moveRank(BISHOP, A1, (square)(A1 + i * RIGHT_UP));
 				expected.push_back(moveRank);
 			}
 
@@ -306,7 +306,7 @@ namespace EngineTest
 
 			std::vector<Move> expected;
 			for (int i = 1; i < 3; i++) {
-				Move moveRank(A1, (square)(A1 + i * RIGHT_UP));
+				Move moveRank(BISHOP, A1, (square)(A1 + i * RIGHT_UP));
 				expected.push_back(moveRank);
 			}
 
@@ -329,14 +329,14 @@ namespace EngineTest
 			king.position = B2;
 			king.type = KING;
 
-			Move up(B2, B3);
-			Move rightUp(B2, C3);
-			Move right(B2, C2);
-			Move rightDown(B2, C1);
-			Move down(B2, B1);
-			Move leftDown(B2, A1);
-			Move left(B2, A2);
-			Move leftUp(B2, A3);
+			Move up(KING, B2, B3);
+			Move rightUp(KING, B2, C3);
+			Move right(KING, B2, C2);
+			Move rightDown(KING, B2, C1);
+			Move down(KING, B2, B1);
+			Move leftDown(KING, B2, A1);
+			Move left(KING, B2, A2);
+			Move leftUp(KING, B2, A3);
 			std::vector<Move> expected = { up, rightUp, right, rightDown, down, leftDown, left, leftUp };
 
 			std::vector<Move> actual = getMovesForKing(board, king);
@@ -358,8 +358,8 @@ namespace EngineTest
 			king.position = E1;
 			king.type = KING;
 
-			Move castlingLeft1(E1, C1, CASTLE);
-			Move castlingRight1(E1, G1, CASTLE);
+			Move castlingLeft1(KING, E1, C1, CASTLE_LEFT);
+			Move castlingRight1(KING, E1, G1, CASTLE_RIGHT);
 
 			std::vector<Move> actual1 = getMovesForKing(board1, king);
 
@@ -373,8 +373,8 @@ namespace EngineTest
 			blackPieces = 0x100000000;
 			Board board2(0, 0, bishops, rooks, 0, kings, whitePieces, blackPieces);
 
-			Move castlingLeft2(E1, C1, CASTLE);
-			Move castlingRight2(E1, G1, CASTLE);
+			Move castlingLeft2(KING, E1, C1, CASTLE_LEFT);
+			Move castlingRight2(KING, E1, G1, CASTLE_RIGHT);
 
 			std::vector<Move> actual2 = getMovesForKing(board2, king);
 

@@ -83,7 +83,7 @@ std::vector<Move> getMovesForPawn(Board board, piece pawn)
 
 		if (!((1ULL << targetSquare) & board.getAllPieces()))
 		{
-			Move move(pawn.position, targetSquare);
+			Move move(pawn.type, pawn.position, targetSquare);
 			moves.push_back(move);
 
 			if (position & RANK_2)
@@ -91,7 +91,7 @@ std::vector<Move> getMovesForPawn(Board board, piece pawn)
 				targetSquare = (square)(pawn.position + 2 * dir);
 				if (!((1ULL << targetSquare) & piecesOfOtherColor))
 				{
-					Move move(pawn.position, targetSquare);
+					Move move(pawn.type, pawn.position, targetSquare);
 					moves.push_back(move);
 				}
 			}
@@ -102,12 +102,12 @@ std::vector<Move> getMovesForPawn(Board board, piece pawn)
 			bitboard targetPosition = 1ULL << targetSquare;
 			if (targetPosition & piecesOfOtherColor)
 			{
-				Move move(pawn.position, targetSquare);
+				Move move(pawn.type, pawn.position, targetSquare);
 				moves.push_back(move);
 			}
-			if (targetPosition & board.getEnPassant())
+			if (targetPosition & board.getEnPassantSquare())
 			{
-				Move move(pawn.position, targetSquare, EN_PASSANT);
+				Move move(pawn.type, pawn.position, targetSquare, EN_PASSANT);
 				moves.push_back(move);
 			}
 		}
@@ -117,12 +117,12 @@ std::vector<Move> getMovesForPawn(Board board, piece pawn)
 			bitboard targetPosition = 1ULL << targetSquare;
 			if (targetPosition & piecesOfOtherColor)
 			{
-				Move move(pawn.position, targetSquare);
+				Move move(pawn.type, pawn.position, targetSquare);
 				moves.push_back(move);
 			}
-			if (targetPosition & board.getEnPassant())
+			if (targetPosition & board.getEnPassantSquare())
 			{
-				Move move(pawn.position, targetSquare, EN_PASSANT);
+				Move move(pawn.type, pawn.position, targetSquare, EN_PASSANT);
 				moves.push_back(move);
 			}
 		}
@@ -224,7 +224,7 @@ std::vector<Move> getMovesForKing(Board board, piece king)
 			!board.squareIsAttackedBy(c18, (color)!board.getTurnColor()) &&
 			!board.squareIsAttackedBy(d18, (color)!board.getTurnColor()))
 		{
-			Move move(king.position, c18, CASTLE);
+			Move move(king.type, king.position, c18, CASTLE_LEFT);
 			moves.push_back(move);
 		}
 
@@ -233,7 +233,7 @@ std::vector<Move> getMovesForKing(Board board, piece king)
 			!board.squareIsAttackedBy(g18, (color)!board.getTurnColor()) &&
 			!board.squareIsAttackedBy(h18, (color)!board.getTurnColor()))
 		{
-			Move move(king.position, g18, CASTLE);
+			Move move(king.type, king.position, g18, CASTLE_RIGHT);
 			moves.push_back(move);
 		}
 	}
@@ -255,7 +255,7 @@ void addSlidingMovesInDirection(std::vector<Move>& moves, Board board, piece pie
 		nextPosition = 1ULL << nextSquare;
 		if (nextPosition & piecesOfOtherColor)
 		{
-			Move move(piece.position, nextSquare);
+			Move move(piece.type, piece.position, nextSquare);
 			moves.push_back(move);
 			break;
 		}
@@ -265,7 +265,7 @@ void addSlidingMovesInDirection(std::vector<Move>& moves, Board board, piece pie
 		}
 		else
 		{
-			Move move(piece.position, nextSquare);
+			Move move(piece.type, piece.position, nextSquare);
 			moves.push_back(move);
 		}
 		isAtEdge = nextPosition & EDGES.at(dir);
@@ -282,7 +282,7 @@ void addMoveInDirection(std::vector<Move>& moves, Board board, piece piece, dire
 	square targetSquare = (square)(piece.position + dir);
 	if (!((1ULL << piece.position) & EDGES.at(dir)) && !((1ULL << targetSquare) & piecesOfSameColor))
 	{
-		Move move(piece.position, targetSquare);
+		Move move(piece.type, piece.position, targetSquare);
 		moves.push_back(move);
 	}
 }
