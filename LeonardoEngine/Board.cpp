@@ -1,4 +1,6 @@
 #include "Board.h"
+#include <algorithm>
+#include <sstream>
 
 Board::Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces) : 
 	pawns(pawns), 
@@ -12,6 +14,86 @@ Board::Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks,
 	whitePiecesList(getPiecesOfColor(WHITE)),
 	blackPiecesList(getPiecesOfColor(BLACK))
 {
+}
+
+Board::Board(std::string FEN, color turnColor, square enPassantSquare, bool whiteLeftCastle, bool whiteRightCastle, bool blackLeftCastle, bool blackRightCastle) :
+	pawns(0),
+	knights(0),
+	bishops(0),
+	rooks(0),
+	queens(0),
+	kings(0),
+	turnColor(turnColor),
+	enPassantSquare(1ULL << enPassantSquare),
+	whiteLeftCastleAvailable(whiteLeftCastle),
+	whiteRightCastleAvailable(whiteRightCastle),
+	blackLeftCastleAvailable(blackLeftCastle),
+	blackRightCastleAvailable(blackRightCastle)
+{
+	std::replace(FEN.begin(), FEN.end(), '/', ' ');
+	std::stringstream iss(FEN);
+	std::string piecePlacement;
+
+	while (iss >> piecePlacement)
+	{
+		for (int i = (int)piecePlacement.size() - 1; i >= 0; i--)
+		{
+			whitePieces <<= 1;
+			blackPieces <<= 1;
+			pawns<<= 1;
+			knights <<= 1;
+			rooks <<= 1;
+			bishops <<= 1;
+			queens <<= 1;
+			kings <<= 1;
+			if (piecePlacement[i] >= '0' && piecePlacement[i] <= '8') 
+			{
+				whitePieces <<= (piecePlacement[i] - '0' - 1);
+				blackPieces <<= (piecePlacement[i] - '0' - 1);
+				pawns <<= (piecePlacement[i] - '0' - 1);
+				knights <<= (piecePlacement[i] - '0' - 1);
+				rooks <<= (piecePlacement[i] - '0' - 1);
+				bishops <<= (piecePlacement[i] - '0' - 1);
+				queens <<= (piecePlacement[i] - '0' - 1);
+				kings <<= (piecePlacement[i] - '0' - 1);
+				continue;
+			}
+			if (piecePlacement[i] >= 'A' && piecePlacement[i] <= 'Z')
+			{
+				whitePieces += 1;
+			}
+			else if (piecePlacement[i] >= 'a' && piecePlacement[i] <= 'z')
+			{
+				blackPieces += 1;
+			}
+			switch (piecePlacement[i])
+			{
+			case 'P': case 'p':
+				pawns += 1;
+				break;
+			case 'N': case 'n':
+				knights += 1;
+				break;
+			case 'R': case 'r':
+				rooks += 1;
+				break;
+			case 'B': case 'b':
+				bishops += 1;
+				break;
+			case 'Q': case 'q':
+				queens += 1;
+				break;
+			case 'K': case 'k':
+				kings += 1;
+				break;
+			default:
+				throw;
+			}
+		}
+	}
+
+	whitePiecesList = getPiecesOfColor(WHITE);
+	blackPiecesList = getPiecesOfColor(BLACK);
 }
 
 

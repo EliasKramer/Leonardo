@@ -32,6 +32,7 @@ class Board
 		bool checkDirectionForAttack(square square, direction dir, bitboard EnemySlidingPieces);
 	public:
 		Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces);
+		Board(std::string FEN, color turnColor, square enPassantSquare, bool whiteLeftCastle, bool whiteRightCastle, bool blackLeftCastle, bool blackRightCastle);
 		pieceType getType(bitboard pieceBB);
 
 		bool squareIsAttackedBy(square square, color color);
