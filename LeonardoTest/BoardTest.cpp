@@ -50,9 +50,7 @@ namespace BoardTest
 
 		TEST_METHOD(squareIsAttackedByPawnTest)
 		{
-			bitboard pawns = 0x100000;
-			bitboard whitePieces = 0x100000;
-			Board board(pawns, 0, 0, 0, 0, 0, whitePieces, 0);
+			Board board("8/8/8/8/8/4P3/8/8", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Assert::IsTrue(board.squareIsAttackedBy(D4, WHITE));
 			Assert::IsFalse(board.squareIsAttackedBy(E4, WHITE));
@@ -64,9 +62,7 @@ namespace BoardTest
 
 		TEST_METHOD(squareIsAttackedByKnightTest)
 		{
-			bitboard knights = 0x10000000;
-			bitboard whitePieces = 0x10000000;
-			Board board(0, knights, 0, 0, 0, 0, whitePieces, 0);
+			Board board("8/8/8/8/4N3/8/8/8", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Assert::IsTrue(board.squareIsAttackedBy(D2, WHITE));
 			Assert::IsFalse(board.squareIsAttackedBy(E2, WHITE));
@@ -86,9 +82,7 @@ namespace BoardTest
 
 		TEST_METHOD(squareIsAttackedByKingTest)
 		{
-			bitboard kings = 0x1;
-			bitboard whitePieces = 0x1;
-			Board board(0, 0, 0, 0, 0, kings, whitePieces, 0);
+			Board board("8/8/8/8/8/8/8/K7", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Assert::IsTrue(board.squareIsAttackedBy(A2, WHITE));
 			Assert::IsTrue(board.squareIsAttackedBy(B2, WHITE));
@@ -104,9 +98,7 @@ namespace BoardTest
 
 		TEST_METHOD(squareIsAttackedByBishopTest)
 		{
-			bitboard bishops = 0x100000;
-			bitboard whitePieces = 0x100000;
-			Board board(0, 0, bishops, 0, 0, 0, whitePieces, 0);
+			Board board("8/8/8/8/8/4B3/8/8", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Assert::IsTrue(board.squareIsAttackedBy(C1, WHITE));
 			Assert::IsTrue(board.squareIsAttackedBy(D2, WHITE));
@@ -124,9 +116,7 @@ namespace BoardTest
 
 		TEST_METHOD(squareIsAttackedByRookTest)
 		{
-			bitboard rooks = 0x100000;
-			bitboard whitePieces = 0x100000;
-			Board board(0, 0, 0, rooks, 0, 0, whitePieces, 0);
+			Board board("8/8/8/8/8/4R3/8/8", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Assert::IsTrue(board.squareIsAttackedBy(E1, WHITE));
 			Assert::IsTrue(board.squareIsAttackedBy(E2, WHITE));
@@ -142,20 +132,14 @@ namespace BoardTest
 
 		TEST_METHOD(squareIsGuardedByOwnPieceTest)
 		{
-			bitboard rooks = 0x1000100000;
-			bitboard whitePieces = 0x100000;
-			bitboard blackPieces = 0x1000000000;
-			Board board(0, 0, 0, rooks, 0, 0, whitePieces, blackPieces);
+			Board board("8/8/8/4r3/8/4R3/8/8", WHITE, SQUARE_NONE, true, true, true, true);
 			
 			Assert::IsFalse(board.squareIsAttackedBy(E6, WHITE));
 		}
 
 		TEST_METHOD(squareIsGuardedByEnemyPieceTest)
 		{
-			bitboard rooks = 0x100000;
-			bitboard pawns = 0x1000000000;
-			bitboard whitePieces = 0x1000100000;
-			Board board(pawns, 0, 0, rooks, 0, 0, whitePieces, 0);
+			Board board("8/8/8/4P3/8/4R3/8/8", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Assert::IsFalse(board.squareIsAttackedBy(E6, WHITE));
 		}
