@@ -76,7 +76,7 @@ enum row : bitboard
 
 extern const std::map<direction, bitboard> EDGES;
 
-struct piece 
+struct Piece 
 {
 	pieceType type;
 	color color;

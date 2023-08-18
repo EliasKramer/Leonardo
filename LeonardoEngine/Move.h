@@ -12,17 +12,19 @@ enum moveType : uint8_t {
 class Move
 {
 	private:
-		pieceType piece;
+		Piece *piece;
 		square from;
 		square to;
 		moveType type = NORMAL;
+		pieceType promotion = PIECE_NONE;
 	public:
-		Move(pieceType piece, square from, square to);
-		Move(pieceType piece, square from, square to, moveType type);
-		Move(square from, pieceType promotion);
-		pieceType getPieceType();
+		Move(Piece *piece, square from, square to);
+		Move(Piece *piece, square from, square to, moveType type);
+		Move(Piece *piece, square from, pieceType promotion);
+		Piece *getPiece();
 		square getFrom();
 		square getTo();
+		pieceType getPromotion();
 		moveType getType();
 
 		bool operator==(const Move& other) const;

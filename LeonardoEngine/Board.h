@@ -16,8 +16,8 @@ class Board
 		bitboard whitePieces;
 		bitboard blackPieces;
 
-		std::vector<piece> whitePiecesList;
-		std::vector<piece> blackPiecesList;
+		std::vector<Piece> whitePiecesList;
+		std::vector<Piece> blackPiecesList;
 		square whiteKingSquare;
 		square blackKingSquare;
 
@@ -30,7 +30,7 @@ class Board
 		bool blackLeftCastleAvailable = true;
 		bool blackRightCastleAvailable = true;
 
-		std::vector<piece> getPiecesOfColor(color color);
+		std::vector<Piece> getPiecesOfColor(color color);
 		bool checkDirectionForAttack(square square, direction dir, bitboard enemySlidingPieces);
 	public:
 		Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces);
@@ -54,8 +54,8 @@ class Board
 		bitboard getBlackPieces();
 		bitboard getAllPieces();
 
-		std::vector<piece> getWhitePiecesList();
-		std::vector<piece> getBlackPiecesList();
+		std::vector<Piece> getWhitePiecesList();
+		std::vector<Piece> getBlackPiecesList();
 
 		color getTurnColor();
 

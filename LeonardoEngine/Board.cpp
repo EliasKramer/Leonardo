@@ -102,16 +102,16 @@ Board::Board(std::string FEN, color turnColor, square enPassantSquare, bool whit
 }
 
 
-std::vector<piece> Board::getPiecesOfColor(color color)
+std::vector<Piece> Board::getPiecesOfColor(color color)
 {
-	std::vector<piece> pieces;
+	std::vector<Piece> pieces;
 	bitboard piecesBB = color == WHITE ? whitePieces : blackPieces;
 	bitboard currentPosition = 0x1;
 	for (uint8_t i = 0; i < 64; i++)
 	{
 		if (piecesBB & currentPosition)
 		{
-			piece currentPiece;
+			Piece currentPiece;
 			currentPiece.position = (square) i;
 			currentPiece.color = color;
 			currentPiece.type = getType(currentPosition);
@@ -249,7 +249,10 @@ void Board::executeMove(Move move)
 	queens = queens & ~fromToBB;
 	kings = kings & ~fromToBB;
 
-	switch (move.getPieceType())
+	Piece *piece = move.getPiece();
+	piece->position = to;
+
+	switch (piece->type)
 	{
 		case PAWN:
 			pawns = pawns | toBB;
@@ -300,6 +303,9 @@ void Board::executeMove(Move move)
 			*turnPiecesBB_p = (*turnPiecesBB_p & ~(toBB << 1)) | (toBB >> 1);
 			rooks = (rooks & ~(toBB << 1)) | (toBB >> 1);
 			break;
+		case PROMOTION:
+			piece->type = move.getPromotion();
+			break;
 	}
 
 	turnColor = (color)!turnColor;
@@ -349,11 +355,11 @@ bitboard Board::getAllPieces()
 	return whitePieces | blackPieces;
 }
 
-std::vector<piece> Board::getWhitePiecesList() 
+std::vector<Piece> Board::getWhitePiecesList() 
 {
 	return whitePiecesList;
 }
-std::vector<piece> Board::getBlackPiecesList()
+std::vector<Piece> Board::getBlackPiecesList()
 {
 	return blackPiecesList;
 }
