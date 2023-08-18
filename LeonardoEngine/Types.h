@@ -14,14 +14,16 @@ enum square : uint8_t
 	A5, B5, C5, D5, E5, F5, G5, H5,
 	A6, B6, C6, D6, E6, F6, G6, H6,
 	A7, B7, C7, D7, E7, F7, G7, H7,
-	A8, B8, C8, D8, E8, F8, G8, H8
+	A8, B8, C8, D8, E8, F8, G8, H8,
+
+	SQUARE_NONE
 };
 
 extern const std::array<std::string, 64> SQARE_NAMES;
 
 enum pieceType : uint8_t
 {
-	PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING, NONE
+	PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING, PIECE_NONE
 };
 
 enum color : uint8_t

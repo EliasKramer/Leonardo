@@ -8,6 +8,40 @@ namespace BoardTest
 	{
 	public:
 		BoardTest() {}
+
+		TEST_METHOD(FENConstructorTest)
+		{
+			std::string FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+			Board board1(FEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			Assert::AreEqual(0xffffULL, board1.getWhitePieces());
+			Assert::AreEqual(0xffff000000000000ULL, board1.getBlackPieces());
+
+			Assert::AreEqual(0xff00000000ff00ULL, board1.getPawns());
+			Assert::AreEqual(0x4200000000000042ULL, board1.getKnights());
+			Assert::AreEqual(0x2400000000000024ULL, board1.getBishops());
+			Assert::AreEqual(0x8100000000000081ULL, board1.getRooks());
+			Assert::AreEqual(0x800000000000008ULL, board1.getQueens());
+			Assert::AreEqual(0x1000000000000010ULL, board1.getKings());
+
+			Assert::AreEqual(0ULL, board1.getEnPassantSquare());
+
+			FEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R";
+			Board board2(FEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			Assert::AreEqual(0xffffULL, board1.getWhitePieces());
+			Assert::AreEqual(0xffff000000000000ULL, board1.getBlackPieces());
+
+			Assert::AreEqual(0xff00000000ff00ULL, board1.getPawns());
+			Assert::AreEqual(0x4200000000000042ULL, board1.getKnights());
+			Assert::AreEqual(0x2400000000000024ULL, board1.getBishops());
+			Assert::AreEqual(0x8100000000000081ULL, board1.getRooks());
+			Assert::AreEqual(0x800000000000008ULL, board1.getQueens());
+			Assert::AreEqual(0x1000000000000010ULL, board1.getKings());
+
+			Assert::AreEqual(0ULL, board1.getEnPassantSquare());
+		}
+
 		TEST_METHOD(squareIsNotAttackedTest)
 		{
 			Board board(0, 0, 0, 0, 0, 0, 0, 0);

@@ -24,7 +24,6 @@ Board::Board(std::string FEN, color turnColor, square enPassantSquare, bool whit
 	queens(0),
 	kings(0),
 	turnColor(turnColor),
-	enPassantSquare(1ULL << enPassantSquare),
 	whiteLeftCastleAvailable(whiteLeftCastle),
 	whiteRightCastleAvailable(whiteRightCastle),
 	blackLeftCastleAvailable(blackLeftCastle),
@@ -92,6 +91,8 @@ Board::Board(std::string FEN, color turnColor, square enPassantSquare, bool whit
 		}
 	}
 
+	this->enPassantSquare = enPassantSquare == SQUARE_NONE ? 0 : 1ULL << enPassantSquare;
+
 	whitePiecesList = getPiecesOfColor(WHITE);
 	blackPiecesList = getPiecesOfColor(BLACK);
 }
@@ -119,7 +120,7 @@ std::vector<piece> Board::getPiecesOfColor(color color)
 
 pieceType Board::getType(bitboard pieceBB) 
 {
-	pieceType type = NONE;
+	pieceType type = PIECE_NONE;
 	if (pieceBB & pawns)
 	{
 		type = PAWN;
