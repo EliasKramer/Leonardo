@@ -11,6 +11,8 @@ Board::Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks,
 	kings(kings), 
 	whitePieces(whitePieces), 
 	blackPieces(blackPieces),
+	whiteKingSquare(square(log2(kings & whitePieces))),
+	blackKingSquare(square(log2(kings & blackPieces))),
 	whitePiecesList(getPiecesOfColor(WHITE)),
 	blackPiecesList(getPiecesOfColor(BLACK))
 {
@@ -93,6 +95,8 @@ Board::Board(std::string FEN, color turnColor, square enPassantSquare, bool whit
 
 	this->enPassantSquare = enPassantSquare == SQUARE_NONE ? 0 : 1ULL << enPassantSquare;
 
+	whiteKingSquare = (square)(log2(kings & whitePieces));
+	whiteKingSquare = (square)(log2(kings & whitePieces));
 	whitePiecesList = getPiecesOfColor(WHITE);
 	blackPiecesList = getPiecesOfColor(BLACK);
 }
@@ -268,7 +272,16 @@ void Board::executeMove(Move move)
 			break;
 		case KING:
 			kings = kings | toBB;
-			turnColor == WHITE ? whiteCastle() : blackCastle();
+			if (turnColor == WHITE) 
+			{
+				whiteCastle();
+				whiteKingSquare = to;
+			}
+			else
+			{
+				blackCastle();
+				blackKingSquare = to;
+			}
 			break;
 	}
 
@@ -290,6 +303,12 @@ void Board::executeMove(Move move)
 	}
 
 	turnColor = (color)!turnColor;
+}
+
+bool Board::isMoveStrictlyLegal(Move move)
+{
+	executeMove(move);
+	return squareIsAttackedBy(turnColor == WHITE ? whiteKingSquare : blackKingSquare, (color)!turnColor);
 }
 
 bitboard Board::getPawns()
