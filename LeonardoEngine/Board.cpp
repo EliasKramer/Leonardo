@@ -227,7 +227,7 @@ void Board::executeMove(Move move)
 	{
 		whiteRightCastleAvailable = false;
 	}
-	else if (fromToBB & 0x100000000000000)
+	if (fromToBB & 0x100000000000000)
 	{
 		blackLeftCastleAvailable = false;
 	}
