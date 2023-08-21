@@ -101,7 +101,66 @@ Board::Board(std::string FEN, color turnColor, square enPassantSquare, bool whit
 	blackPiecesList = getPiecesOfColor(BLACK);
 }
 
+std::string Board::getFEN() 
+{
+	std::string FEN = "";
+	bitboard cur = 0x100000000000000;
+	for (int i = 0; i < 8; i++) 
+	{
+		int emptyCnt = 0;
+		for (int j = 0; j < 8; j++) 
+		{
+			if (cur & (whitePieces | blackPieces))
+			{
+				if (emptyCnt > 0)
+				{
+					FEN += std::to_string(emptyCnt);
+					emptyCnt = 0;
+				}
+				switch (getType(cur))
+					{
+				case PAWN:
+					FEN += cur & whitePieces ? 'P' : 'p';
+					break;
+				case KNIGHT:
+					FEN += cur & whitePieces ? 'N' : 'n';
+					break;
+				case BISHOP:
+					FEN += cur & whitePieces ? 'B' : 'b';
+					break;
+				case ROOK:
+					FEN += cur & whitePieces ? 'R' : 'r';
+					break;
+				case QUEEN:
+					FEN += cur & whitePieces ? 'Q' : 'q';
+					break;
+				case KING:
+					FEN += cur & whitePieces ? 'K' : 'k';
+					break;
+				}
+			}
+			else
+			{
+				emptyCnt++;
+			}
+			if (j < 7)
+			{
+				cur	<<= 1;
+			}
+		}
+		if (emptyCnt > 0)
+		{
+			FEN += std::to_string(emptyCnt);
+		}
+		if (i != 7) 
+		{
+			FEN += '/';
+		}
+		cur >>= 15;
+	}
 
+	return FEN;
+}
 std::vector<Piece> Board::getPiecesOfColor(color color)
 {
 	std::vector<Piece> pieces;

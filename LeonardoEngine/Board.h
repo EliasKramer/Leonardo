@@ -36,6 +36,7 @@ class Board
 		Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces);
 		Board(std::string FEN, color turnColor, square enPassantSquare, bool whiteLeftCastle, bool whiteRightCastle, bool blackLeftCastle, bool blackRightCastle);
 		pieceType getType(bitboard pieceBB);
+		std::string getFEN();
 
 		bool squareIsAttackedBy(square square, color color);
 
