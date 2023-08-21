@@ -20,7 +20,7 @@ class Move
 	public:
 		Move(Piece *piece, square from, square to);
 		Move(Piece *piece, square from, square to, moveType type);
-		Move(Piece *piece, square from, pieceType promotion);
+		Move(Piece *piece, square from, square to, pieceType promotion);
 		Piece *getPiece();
 		square getFrom();
 		square getTo();

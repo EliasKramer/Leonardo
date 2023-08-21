@@ -299,17 +299,26 @@ void Board::executeMove(Move move)
 	bitboard *otherPiecesBB_p = turnColor == WHITE ? &blackPieces : &whitePieces;
 
 	*turnPiecesBB_p = (*turnPiecesBB_p & ~fromBB) | toBB;
-	*otherPiecesBB_p = *otherPiecesBB_p & ~toBB;
+	if (*otherPiecesBB_p & toBB)
+	{
+		*otherPiecesBB_p = *otherPiecesBB_p & ~toBB;
 
-	pawns = pawns & ~fromToBB;
-	knights = knights & ~fromToBB;
-	bishops = bishops & ~fromToBB;
-	rooks = rooks & ~fromToBB;
-	queens = queens & ~fromToBB;
-	kings = kings & ~fromToBB;
+		pawns = pawns & ~fromToBB;
+		knights = knights & ~fromToBB;
+		bishops = bishops & ~fromToBB;
+		rooks = rooks & ~fromToBB;
+		queens = queens & ~fromToBB;
+		kings = kings & ~fromToBB;
+
+		removePieceFromList((color)!turnColor, to);
+	}
 
 	Piece *piece = move.getPiece();
 	piece->position = to;
+	if (move.getType() == PROMOTION)
+	{
+		piece->type = move.getPromotion();
+	}
 
 	switch (piece->type)
 	{
@@ -350,24 +359,53 @@ void Board::executeMove(Move move)
 	switch (move.getType())
 	{
 		case EN_PASSANT:
-			//we can empty the squares above and below the to square, because when a pawn is moved two squares, the square it came from must be empty 
-			*otherPiecesBB_p = *otherPiecesBB_p & ~(toBB >> 8 | toBB << 8);
+			if (turnColor == WHITE) 
+			{
+				removePieceFromList(BLACK, (square)(to - 8));
+				*otherPiecesBB_p = *otherPiecesBB_p & ~(toBB >> 8);
+			}
+			else
+			{
+				removePieceFromList(WHITE, (square)(to + 8));
+				*otherPiecesBB_p = *otherPiecesBB_p & ~(toBB << 8);
+			}
+			////we can empty the squares above and below the to square, because when a pawn is moved two squares, the square it came from must be empty 
+			//*otherPiecesBB_p = *otherPiecesBB_p & ~(toBB >> 8 | toBB << 8);
+			//this is obsolete now since we check for the turn color anyways which is sad because it was such a satisfying solution
 			pawns = pawns & ~(toBB >> 8 | toBB << 8);
 			break;
 		case CASTLE_LEFT:
 			*turnPiecesBB_p = (*turnPiecesBB_p & ~(toBB >> 2)) | (toBB << 1);
 			rooks = (rooks & ~(toBB >> 2)) | (toBB << 1);
+			movePieceFromList((color)turnColor, (square)(to - 2), (square)(to + 1));
 			break;
 		case CASTLE_RIGHT:
 			*turnPiecesBB_p = (*turnPiecesBB_p & ~(toBB << 1)) | (toBB >> 1);
 			rooks = (rooks & ~(toBB << 1)) | (toBB >> 1);
-			break;
-		case PROMOTION:
-			piece->type = move.getPromotion();
+			movePieceFromList((color)turnColor, (square)(to + 1), (square)(to - 1));
 			break;
 	}
 
 	turnColor = (color)!turnColor;
+}
+
+void Board::movePieceFromList(color color, square from, square to)
+{
+	std::vector<Piece> *list_p = color == WHITE ? &whitePiecesList : &blackPiecesList;
+
+	auto it = std::find_if(list_p->begin(), list_p->end(), [from](Piece piece) {return piece.position == from; });
+	if (it != list_p->end())
+	{
+		it->position = to;
+	}
+}
+
+void Board::removePieceFromList(color color, square square)
+{
+	std::vector<Piece> *list_p = color == WHITE ? &whitePiecesList : &blackPiecesList;
+	auto it = std::find_if(list_p->begin(), list_p->end(), [square](Piece piece) {return piece.position == square; });
+	int index = std::distance(list_p->begin(), it);
+	list_p->erase(std::next(list_p->begin(), index));
 }
 
 bool Board::isMoveStrictlyLegal(Move move)

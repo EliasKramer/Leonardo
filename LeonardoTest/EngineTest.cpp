@@ -68,17 +68,17 @@ namespace EngineTest
 
 		TEST_METHOD(getPromotionPawnMovesTest)
 		{
-			Board board("P7/8/8/8/8/8/8/8", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("8/P7/8/8/8/8/8/8", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece pawn;
 			pawn.color = WHITE;
-			pawn.position = A8;
+			pawn.position = A7;
 			pawn.type = PAWN;
 
-			Move promoteN(&pawn, A8, KNIGHT);
-			Move promoteB(&pawn, A8, BISHOP);
-			Move promoteR(&pawn, A8, ROOK);
-			Move promoteQ(&pawn, A8, QUEEN);
+			Move promoteN(&pawn, A7, A8, KNIGHT);
+			Move promoteB(&pawn, A7, A8, BISHOP);
+			Move promoteR(&pawn, A7, A8, ROOK);
+			Move promoteQ(&pawn, A7, A8, QUEEN);
 			std::vector<Move> expected = { promoteN, promoteB, promoteR, promoteQ };
 
 			std::vector<Move> actual = getMovesForPawn(board, pawn);

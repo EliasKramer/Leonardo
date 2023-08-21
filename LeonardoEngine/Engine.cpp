@@ -62,71 +62,74 @@ std::vector<Move> getMovesForPawn(Board board, Piece &pawn)
 {
 	std::vector<Move> moves;
 	bitboard position = 1ULL << pawn.position;
-	if (position & RANK_8 || position & RANK_1)
+
+	direction dir = pawn.color == WHITE ? UP : DOWN;
+	bitboard piecesOfOtherColor = pawn.color == WHITE ? board.getBlackPieces() : board.getWhitePieces();
+
+	square targetSquare = (square)(pawn.position + dir);
+	bitboard target = 1ULL << targetSquare;
+
+	if (!(target & board.getAllPieces()))
 	{
-		Move promoteN(&pawn, pawn.position, KNIGHT);
-		Move promoteB(&pawn, pawn.position, BISHOP);
-		Move promoteR(&pawn, pawn.position, ROOK);
-		Move promoteQ(&pawn, pawn.position, QUEEN);
+		if (target & RANK_8 || target & RANK_1)
+		{
+			Move promoteN(&pawn, pawn.position, targetSquare, KNIGHT);
+			Move promoteB(&pawn, pawn.position, targetSquare, BISHOP);
+			Move promoteR(&pawn, pawn.position, targetSquare, ROOK);
+			Move promoteQ(&pawn, pawn.position, targetSquare, QUEEN);
 
-		moves.push_back(promoteN);
-		moves.push_back(promoteB);
-		moves.push_back(promoteR);
-		moves.push_back(promoteQ);
-	}
-	else
-	{
-		direction dir = pawn.color == WHITE ? UP : DOWN;
-		bitboard piecesOfOtherColor = pawn.color == WHITE ? board.getBlackPieces() : board.getWhitePieces();
-
-		square targetSquare = (square)(pawn.position + dir);
-
-		if (!((1ULL << targetSquare) & board.getAllPieces()))
+			moves.push_back(promoteN);
+			moves.push_back(promoteB);
+			moves.push_back(promoteR);
+			moves.push_back(promoteQ);
+		}
+		else
 		{
 			Move move(&pawn, pawn.position, targetSquare);
 			moves.push_back(move);
+		}
 
-			if (position & RANK_2)
-			{
-				targetSquare = (square)(pawn.position + 2 * dir);
-				if (!((1ULL << targetSquare) & piecesOfOtherColor))
-				{
-					Move move(&pawn, pawn.position, targetSquare);
-					moves.push_back(move);
-				}
-			}
-		}
-		if (!(position & FILE_A))
+		if (position & RANK_2)
 		{
-			targetSquare = (square)(pawn.position + dir + LEFT);
-			bitboard targetPosition = 1ULL << targetSquare;
-			if (targetPosition & piecesOfOtherColor)
+			targetSquare = (square)(pawn.position + 2 * dir);
+			if (!((1ULL << targetSquare) & piecesOfOtherColor))
 			{
 				Move move(&pawn, pawn.position, targetSquare);
-				moves.push_back(move);
-			}
-			if (targetPosition & board.getEnPassantSquare())
-			{
-				Move move(&pawn, pawn.position, targetSquare, EN_PASSANT);
-				moves.push_back(move);
-			}
-		}
-		if (!(position & FILE_H))
-		{
-			targetSquare = (square)(pawn.position + dir + RIGHT);
-			bitboard targetPosition = 1ULL << targetSquare;
-			if (targetPosition & piecesOfOtherColor)
-			{
-				Move move(&pawn, pawn.position, targetSquare);
-				moves.push_back(move);
-			}
-			if (targetPosition & board.getEnPassantSquare())
-			{
-				Move move(&pawn, pawn.position, targetSquare, EN_PASSANT);
 				moves.push_back(move);
 			}
 		}
 	}
+	if (!(position & FILE_A))
+	{
+		targetSquare = (square)(pawn.position + dir + LEFT);
+		bitboard targetPosition = 1ULL << targetSquare;
+		if (targetPosition & piecesOfOtherColor)
+		{
+			Move move(&pawn, pawn.position, targetSquare);
+			moves.push_back(move);
+		}
+		if (targetPosition & board.getEnPassantSquare())
+		{
+			Move move(&pawn, pawn.position, targetSquare, EN_PASSANT);
+			moves.push_back(move);
+		}
+	}
+	if (!(position & FILE_H))
+	{
+		targetSquare = (square)(pawn.position + dir + RIGHT);
+		bitboard targetPosition = 1ULL << targetSquare;
+		if (targetPosition & piecesOfOtherColor)
+		{
+			Move move(&pawn, pawn.position, targetSquare);
+			moves.push_back(move);
+		}
+		if (targetPosition & board.getEnPassantSquare())
+		{
+			Move move(&pawn, pawn.position, targetSquare, EN_PASSANT);
+			moves.push_back(move);
+		}
+	}
+
 	return moves;
 }
 

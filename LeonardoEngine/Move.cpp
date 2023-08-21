@@ -15,10 +15,10 @@ Move::Move(Piece *piece, square from, square to, moveType type) :
 {
 }
 
-Move::Move(Piece *piece, square from, pieceType promotion) :
+Move::Move(Piece *piece, square from, square to, pieceType promotion) :
 	piece(piece),
 	from(from), 
-	to(from), 
+	to(to), 
 	promotion(promotion),
 	type(PROMOTION)
 {

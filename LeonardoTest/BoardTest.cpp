@@ -143,5 +143,170 @@ namespace BoardTest
 
 			Assert::IsFalse(board.squareIsAttackedBy(E6, WHITE));
 		}
+
+		TEST_METHOD(executeNormalMove)
+		{
+			Board board("8/8/8/8/8/8/3P4/8", WHITE, SQUARE_NONE, true, true, true, true);
+
+			Piece pawn;
+			pawn.color = WHITE;
+			pawn.type = PAWN;
+			pawn.position = D2;
+
+			Move move = Move(&pawn, D2, D4);
+
+			board.executeMove(move);
+			std::string expected = "8/8/8/8/3P4/8/8/8";
+
+			Assert::AreEqual((int)D4, (int)pawn.position);
+			Assert::AreEqual(expected, board.getFEN());
+		}
+
+		TEST_METHOD(executeCaptureMove)
+		{
+			Board board("8/8/8/8/8/4p3/3P4/8", WHITE, SQUARE_NONE, true, true, true, true);
+
+			Piece pawn;
+			pawn.color = WHITE;
+			pawn.type = PAWN;
+			pawn.position = D2;
+
+			Piece enemyPawn;
+			enemyPawn.color = BLACK;
+			enemyPawn.type = PAWN;
+			enemyPawn.position = E3;
+
+			Move move = Move(&pawn, D2, E3);
+
+			board.executeMove(move);
+			std::string expected = "8/8/8/8/8/4P3/8/8";
+
+			Assert::AreEqual((int)E3, (int)pawn.position);
+			Assert::IsFalse(board.getBlackPieces());
+			Assert::IsTrue(board.getBlackPiecesList().empty());
+			Assert::AreEqual(expected, board.getFEN());
+		}
+
+		TEST_METHOD(executeEnPassantMove)
+		{
+			Board board("8/8/8/3Pp3/8/8/8/8", WHITE, E6, true, true, true, true);
+
+			Piece pawn;
+			pawn.color = WHITE;
+			pawn.type = PAWN;
+			pawn.position = D5;
+
+			Piece enemyPawn;
+			enemyPawn.color = BLACK;
+			enemyPawn.type = PAWN;
+			enemyPawn.position = E5;
+
+			Move move = Move(&pawn, D5, E6, EN_PASSANT);
+
+			board.executeMove(move);
+			std::string expected = "8/8/4P3/8/8/8/8/8";
+
+			Assert::AreEqual((int)E6, (int)pawn.position);
+			Assert::IsFalse(board.getBlackPieces());
+			Assert::IsTrue(board.getBlackPiecesList().empty());
+			Assert::AreEqual(expected, board.getFEN());
+		}
+
+		TEST_METHOD(executePromotionMove)
+		{
+			Board board("8/3P4/8/8/8/8/8/8", WHITE, SQUARE_NONE, true, true, true, true);
+
+			Piece pawn;
+			pawn.color = WHITE;
+			pawn.type = PAWN;
+			pawn.position = D7;
+
+			Move move = Move(&pawn, D7, D8, QUEEN);
+
+			board.executeMove(move);
+			std::string expected = "3Q4/8/8/8/8/8/8/8";
+
+			Assert::AreEqual((int)D8, (int)pawn.position);
+			Assert::AreEqual((int)QUEEN, (int)pawn.type);
+			Assert::AreEqual(expected, board.getFEN());
+		}
+
+		TEST_METHOD(executeLeftCastlingMove)
+		{
+			Board board("8/8/8/8/8/8/8/R3K2R", WHITE, SQUARE_NONE, true, true, true, true);
+
+			Piece king;
+			king.color = WHITE;
+			king.type = KING;
+			king.position = E1;
+
+			Move move = Move(&king, E1, C1, CASTLE_LEFT);
+
+			board.executeMove(move);
+			std::vector<Piece> whitePieces = board.getWhitePiecesList();
+			Piece leftRook = whitePieces.at(0);
+			std::string expected = "8/8/8/8/8/8/8/2KR3R";
+
+			Assert::AreEqual((int)C1, (int)king.position);
+			Assert::AreEqual((int)D1, (int)leftRook.position);
+			Assert::AreEqual(expected, board.getFEN());
+		}
+
+		TEST_METHOD(executeRightCastlingMove)
+		{
+			Board board("r3k2r/8/8/8/8/8/8/8", BLACK, SQUARE_NONE, true, true, true, true);
+
+			Piece king;
+			king.color = BLACK;
+			king.type = KING;
+			king.position = E8;
+
+			Move move = Move(&king, E8, G8, CASTLE_RIGHT);
+
+			board.executeMove(move);
+			std::vector<Piece> blackPieces = board.getBlackPiecesList();
+			Piece rightRook = blackPieces.at(2);
+			std::string expected = "r4rk1/8/8/8/8/8/8/8";
+
+			Assert::AreEqual((int)G8, (int)king.position);
+			Assert::AreEqual((int)F8, (int)rightRook.position);
+			Assert::AreEqual(expected, board.getFEN());
+		}
+
+		TEST_METHOD(executeMoveMakesCastlingUnavailable)
+		{
+			Board board("8/8/8/8/r7/8/8/R3K2R", WHITE, SQUARE_NONE, true, true, true, true);
+
+			Piece rook;
+			rook.color = BLACK;
+			rook.type = ROOK;
+			rook.position = A4;
+
+			Move move = Move(&rook, A4, A1);
+
+			board.executeMove(move);
+
+			Assert::IsFalse(board.getWhiteLeftCastleAvailable());
+		}
+		
+		TEST_METHOD(executeMoveMakesEnPassantAvailable)
+		{
+			Board board("8/8/8/8/8/8/3P4/8", WHITE, SQUARE_NONE, true, true, true, true);
+
+			Piece pawn;
+			pawn.color = WHITE;
+			pawn.type = PAWN;
+			pawn.position = D2;
+
+			Move move = Move(&pawn, D2, D4);
+
+			board.executeMove(move);
+			std::string FEN = "8/8/8/8/3P4/8/8/8";
+			bitboard enPassant = 0x80000;
+
+			Assert::AreEqual((int)D4, (int)pawn.position);
+			Assert::AreEqual(FEN, board.getFEN());
+			Assert::AreEqual(enPassant, board.getEnPassantSquare());
+		}
 	};
 }
