@@ -369,9 +369,6 @@ void Board::executeMove(Move move)
 				removePieceFromList(WHITE, (square)(to + 8));
 				*otherPiecesBB_p = *otherPiecesBB_p & ~(toBB << 8);
 			}
-			////we can empty the squares above and below the to square, because when a pawn is moved two squares, the square it came from must be empty 
-			//*otherPiecesBB_p = *otherPiecesBB_p & ~(toBB >> 8 | toBB << 8);
-			//this is obsolete now since we check for the turn color anyways which is sad because it was such a satisfying solution
 			pawns = pawns & ~(toBB >> 8 | toBB << 8);
 			break;
 		case CASTLE_LEFT:
@@ -410,8 +407,73 @@ void Board::removePieceFromList(color color, square square)
 
 bool Board::isMoveStrictlyLegal(Move move)
 {
-	executeMove(move);
-	return squareIsAttackedBy(turnColor == WHITE ? whiteKingSquare : blackKingSquare, (color)!turnColor);
+	////instead of this it might be better to add another execute move method that skips editing the piece lists
+	//Piece piece = *move.getPiece();
+	//move.setPiece(&piece);
+
+	//executeMove(move);
+	//return squareIsAttackedBy(turnColor == WHITE ? whiteKingSquare : blackKingSquare, (color)!turnColor);
+
+	moveType moveType = move.getType();
+	if (moveType == CASTLE_LEFT || moveType == CASTLE_RIGHT)
+		return true;
+
+	square from = move.getFrom();
+	square to = move.getTo();
+	bitboard fromBB = 1ULL << from;
+	bitboard toBB = 1ULL << to;
+	bitboard fromToBB = fromBB | toBB;
+	bitboard* turnPiecesBB_p = turnColor == WHITE ? &whitePieces : &blackPieces;
+	bitboard* otherPiecesBB_p = turnColor == WHITE ? &blackPieces : &whitePieces;
+
+	*turnPiecesBB_p = (*turnPiecesBB_p & ~fromBB) | toBB;
+	*otherPiecesBB_p = *otherPiecesBB_p & ~toBB;
+
+	pawns = pawns & ~fromToBB;
+	knights = knights & ~fromToBB;
+	bishops = bishops & ~fromToBB;
+	rooks = rooks & ~fromToBB;
+	queens = queens & ~fromToBB;
+	kings = kings & ~fromToBB;
+
+	Piece* piece = move.getPiece();
+
+	switch (piece->type)
+	{
+	case PAWN:
+		pawns = pawns | toBB;
+		if (toBB & (fromBB << 16 | fromBB >> 16))
+		{
+			enPassantSquare = turnColor == WHITE ? toBB >> 8 : toBB << 8;
+		}
+		break;
+	case KNIGHT:
+		knights = knights | toBB;
+		break;
+	case BISHOP:
+		bishops = bishops | toBB;
+		break;
+	case ROOK:
+		rooks = rooks | toBB;
+		break;
+	case QUEEN:
+		queens = queens | toBB;
+		break;
+	case KING:
+		kings = kings | toBB;
+		turnColor == WHITE ? whiteKingSquare = to : blackKingSquare = to;
+		break;
+	}
+
+
+	if(moveType == EN_PASSANT)
+	{
+		//we can empty the squares above and below the to square, because when a pawn is moved two squares, the square it came from must be empty 
+		*otherPiecesBB_p = *otherPiecesBB_p & ~(toBB >> 8 | toBB << 8);
+		pawns = pawns & ~(toBB >> 8 | toBB << 8);
+	}
+
+	return !squareIsAttackedBy(turnColor == WHITE ? whiteKingSquare : blackKingSquare, (color)!turnColor);
 }
 
 bitboard Board::getPawns()

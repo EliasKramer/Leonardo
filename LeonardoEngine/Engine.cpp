@@ -5,7 +5,7 @@ std::vector<Move> getMoves(Board board)
 {
 	std::vector<Move> moves;
 	std::vector<Piece> pieces = board.getTurnColor() == WHITE ? board.getWhitePiecesList() : board.getBlackPiecesList();
-	for (Piece piece : pieces)
+	for (Piece &piece : pieces)
 	{
 		std::vector<Move> pieceMoves = getMovesForPiece(board, piece);
 		moves.insert(moves.end(), pieceMoves.begin(), pieceMoves.end());
