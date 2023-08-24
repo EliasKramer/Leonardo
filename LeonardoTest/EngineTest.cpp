@@ -10,6 +10,15 @@ namespace EngineTest
 	TEST_CLASS(EngineTest)
 	{
 	public:
+		TEST_METHOD(getMovesStartPosition)
+		{
+			std::string startPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+			Board board(startPositionFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			std::vector<Move> moves = getMoves(board);
+
+			Assert::AreEqual(20, (int)moves.size());
+		}
 
 		TEST_METHOD(getRegularPawnMoveTest)
 		{
