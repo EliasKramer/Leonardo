@@ -6,9 +6,9 @@
 #include "Board.h"
 #include "Move.h"
 
-std::vector<Move> getMoves(Board board, color color);
+std::vector<Move> getMoves(Board board);
 
-std::vector<Move> getMoves(Board board, color color, int depth);
+std::vector<Move> getMoves(Board board, int depth);
 
 
 std::vector<Move> getMovesForPiece(Board board, Piece &piece);

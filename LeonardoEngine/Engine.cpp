@@ -1,10 +1,10 @@
 #include "engine.h"
 #include <cmath>
 
-std::vector<Move> getMoves(Board board, color color)
+std::vector<Move> getMoves(Board board)
 {
 	std::vector<Move> moves;
-	std::vector<Piece> pieces = color == WHITE ? board.getWhitePiecesList() : board.getBlackPiecesList();
+	std::vector<Piece> pieces = board.getTurnColor() == WHITE ? board.getWhitePiecesList() : board.getBlackPiecesList();
 	for (Piece piece : pieces)
 	{
 		std::vector<Move> pieceMoves = getMovesForPiece(board, piece);
@@ -13,16 +13,16 @@ std::vector<Move> getMoves(Board board, color color)
 	return moves;
 }
 
-std::vector<Move> getMoves(Board board, color color, int depth)
+std::vector<Move> getMoves(Board board, int depth)
 {
-	std::vector<Move> moves = getMoves(board, color);
+	std::vector<Move> moves = getMoves(board);
 	if (depth != 1)
 	{
 		for (Move move : moves)
 		{
 			Board newBoard(board);
-			//move.apply(newBoard);
-			std::vector<Move> nextMoves = getMoves(newBoard, color == WHITE ? BLACK : WHITE, depth - 1);
+			newBoard.executeMove(move);
+			std::vector<Move> nextMoves = getMoves(newBoard, depth - 1);
 			moves.insert(moves.end(), nextMoves.begin(), nextMoves.end());
 		}
 	}
@@ -74,19 +74,26 @@ std::vector<Move> getMovesForPawn(Board board, Piece &pawn)
 		if (target & RANK_8 || target & RANK_1)
 		{
 			Move promoteN(&pawn, pawn.position, targetSquare, KNIGHT);
-			Move promoteB(&pawn, pawn.position, targetSquare, BISHOP);
-			Move promoteR(&pawn, pawn.position, targetSquare, ROOK);
-			Move promoteQ(&pawn, pawn.position, targetSquare, QUEEN);
 
-			moves.push_back(promoteN);
-			moves.push_back(promoteB);
-			moves.push_back(promoteR);
-			moves.push_back(promoteQ);
+			Board newBoard(board);
+			if (newBoard.isMoveStrictlyLegal(promoteN))
+			{
+				Move promoteB(&pawn, pawn.position, targetSquare, BISHOP);
+				Move promoteR(&pawn, pawn.position, targetSquare, ROOK);
+				Move promoteQ(&pawn, pawn.position, targetSquare, QUEEN);
+
+				moves.push_back(promoteN);
+				moves.push_back(promoteB);
+				moves.push_back(promoteR);
+				moves.push_back(promoteQ);
+			}
 		}
 		else
 		{
 			Move move(&pawn, pawn.position, targetSquare);
-			moves.push_back(move);
+			Board newBoard(board);
+			if (newBoard.isMoveStrictlyLegal(move))
+				moves.push_back(move);
 		}
 
 		if (position & RANK_2)
@@ -95,7 +102,9 @@ std::vector<Move> getMovesForPawn(Board board, Piece &pawn)
 			if (!((1ULL << targetSquare) & piecesOfOtherColor))
 			{
 				Move move(&pawn, pawn.position, targetSquare);
-				moves.push_back(move);
+				Board newBoard(board);
+				if (newBoard.isMoveStrictlyLegal(move))
+					moves.push_back(move);
 			}
 		}
 	}
@@ -106,12 +115,16 @@ std::vector<Move> getMovesForPawn(Board board, Piece &pawn)
 		if (targetPosition & piecesOfOtherColor)
 		{
 			Move move(&pawn, pawn.position, targetSquare);
-			moves.push_back(move);
+			Board newBoard(board);
+			if (newBoard.isMoveStrictlyLegal(move))
+				moves.push_back(move);
 		}
 		if (targetPosition & board.getEnPassantSquare())
 		{
 			Move move(&pawn, pawn.position, targetSquare, EN_PASSANT);
-			moves.push_back(move);
+			Board newBoard(board);
+			if (newBoard.isMoveStrictlyLegal(move))
+				moves.push_back(move);
 		}
 	}
 	if (!(position & FILE_H))
@@ -121,12 +134,16 @@ std::vector<Move> getMovesForPawn(Board board, Piece &pawn)
 		if (targetPosition & piecesOfOtherColor)
 		{
 			Move move(&pawn, pawn.position, targetSquare);
-			moves.push_back(move);
+			Board newBoard(board);
+			if (newBoard.isMoveStrictlyLegal(move))
+				moves.push_back(move);
 		}
 		if (targetPosition & board.getEnPassantSquare())
 		{
 			Move move(&pawn, pawn.position, targetSquare, EN_PASSANT);
-			moves.push_back(move);
+			Board newBoard(board);
+			if (newBoard.isMoveStrictlyLegal(move))
+				moves.push_back(move);
 		}
 	}
 
@@ -259,7 +276,9 @@ void addSlidingMovesInDirection(std::vector<Move>& moves, Board board, Piece &pi
 		if (nextPosition & piecesOfOtherColor)
 		{
 			Move move(&piece, piece.position, nextSquare);
-			moves.push_back(move);
+			Board newBoard(board);
+			if (newBoard.isMoveStrictlyLegal(move))
+				moves.push_back(move);
 			break;
 		}
 		else if (nextPosition & board.getAllPieces())
@@ -269,7 +288,9 @@ void addSlidingMovesInDirection(std::vector<Move>& moves, Board board, Piece &pi
 		else
 		{
 			Move move(&piece, piece.position, nextSquare);
-			moves.push_back(move);
+			Board newBoard(board);
+			if (newBoard.isMoveStrictlyLegal(move))
+				moves.push_back(move);
 		}
 		isAtEdge = nextPosition & EDGES.at(dir);
 	}
@@ -286,6 +307,8 @@ void addMoveInDirection(std::vector<Move>& moves, Board board, Piece &piece, dir
 	if (!((1ULL << piece.position) & EDGES.at(dir)) && !((1ULL << targetSquare) & piecesOfSameColor))
 	{
 		Move move(&piece, piece.position, targetSquare);
-		moves.push_back(move);
+		Board newBoard(board);
+		if (newBoard.isMoveStrictlyLegal(move))
+			moves.push_back(move);
 	}
 }
