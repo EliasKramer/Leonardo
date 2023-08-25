@@ -14,7 +14,7 @@ const std::map<direction, bitboard> EDGES = {
 	{ DOWN, RANK_1 },
 	{ DOWN_DOWN_LEFT, RANK_1 | RANK_2 | FILE_A },
 	{ LEFT_DOWN, RANK_1 | FILE_A },
-	{ LEFT_LEFT_DOWN, RANK_1 | RANK_2 | FILE_A },
+	{ LEFT_LEFT_DOWN, RANK_1 | FILE_A | FILE_B },
 
 	{ LEFT, FILE_A },
 	{ LEFT_LEFT_UP, RANK_8 | FILE_A | FILE_B },
