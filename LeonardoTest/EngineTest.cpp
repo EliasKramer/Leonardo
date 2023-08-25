@@ -7,7 +7,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace EngineTest
 {
-	TEST_CLASS(EngineTest)
+	TEST_CLASS(MoveGenerationTest)
 	{
 	public:
 		TEST_METHOD(getMovesStartPosition)
@@ -23,6 +23,21 @@ namespace EngineTest
 			Assert::AreEqual((int)WHITE, (int)piece.color);
 			Assert::AreEqual((int)KNIGHT, (int)piece.type);
 		}
+
+		TEST_METHOD(getMovesStartPositionDepthTwo)
+		{
+			std::string startPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+			Board board(startPositionFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			std::vector<Move> moves = getMoves(board, 2);
+
+			Assert::AreEqual(400, (int)moves.size());
+		}
+	};
+
+	TEST_CLASS(EngineTest)
+	{
+	public:
 
 		TEST_METHOD(getRegularPawnMoveTest)
 		{
