@@ -20,7 +20,7 @@ Board::Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks,
 	}
 	if (kings & blackPieces)
 	{
-		blackKingSquare = (square)(log2(kings & whitePieces));
+		blackKingSquare = (square)(log2(kings & blackPieces));
 	}
 }
 
@@ -107,7 +107,7 @@ Board::Board(std::string FEN, Color turnColor, square enPassantSquare, bool whit
 	}
 	if (kings & blackPieces)
 	{
-		blackKingSquare = (square)(log2(kings & whitePieces));
+		blackKingSquare = (square)(log2(kings & blackPieces));
 	}
 	whitePiecesList = getPiecesOfColor(WHITE);
 	blackPiecesList = getPiecesOfColor(BLACK);
