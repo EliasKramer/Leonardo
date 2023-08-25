@@ -11,14 +11,20 @@ Board::Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks,
 	kings(kings), 
 	whitePieces(whitePieces), 
 	blackPieces(blackPieces),
-	whiteKingSquare(square(log2(kings & whitePieces))),
-	blackKingSquare(square(log2(kings & blackPieces))),
 	whitePiecesList(getPiecesOfColor(WHITE)),
 	blackPiecesList(getPiecesOfColor(BLACK))
 {
+	if (kings & whitePieces)
+	{
+		whiteKingSquare = (square)(log2(kings & whitePieces));
+	}
+	if (kings & blackPieces)
+	{
+		blackKingSquare = (square)(log2(kings & whitePieces));
+	}
 }
 
-Board::Board(std::string FEN, color turnColor, square enPassantSquare, bool whiteLeftCastle, bool whiteRightCastle, bool blackLeftCastle, bool blackRightCastle) :
+Board::Board(std::string FEN, Color turnColor, square enPassantSquare, bool whiteLeftCastle, bool whiteRightCastle, bool blackLeftCastle, bool blackRightCastle) :
 	pawns(0),
 	knights(0),
 	bishops(0),
@@ -95,8 +101,14 @@ Board::Board(std::string FEN, color turnColor, square enPassantSquare, bool whit
 
 	this->enPassantSquare = enPassantSquare == SQUARE_NONE ? 0 : 1ULL << enPassantSquare;
 
-	whiteKingSquare = (square)(log2(kings & whitePieces));
-	whiteKingSquare = (square)(log2(kings & whitePieces));
+	if (kings & whitePieces)
+	{
+		whiteKingSquare = (square)(log2(kings & whitePieces));
+	}
+	if (kings & blackPieces)
+	{
+		blackKingSquare = (square)(log2(kings & whitePieces));
+	}
 	whitePiecesList = getPiecesOfColor(WHITE);
 	blackPiecesList = getPiecesOfColor(BLACK);
 }
@@ -161,7 +173,7 @@ std::string Board::getFEN()
 
 	return FEN;
 }
-std::vector<Piece> Board::getPiecesOfColor(color color)
+std::vector<Piece> Board::getPiecesOfColor(Color color)
 {
 	std::vector<Piece> pieces;
 	bitboard piecesBB = color == WHITE ? whitePieces : blackPieces;
@@ -211,7 +223,7 @@ pieceType Board::getType(bitboard pieceBB)
 	return type;
 }
 
-bool Board::squareIsAttackedBy(square square, color color)
+bool Board::squareIsAttackedBy(square square, Color color)
 {
 	bitboard position = 1ULL << square;
 
@@ -310,7 +322,7 @@ void Board::executeMove(Move move)
 		queens = queens & ~fromToBB;
 		kings = kings & ~fromToBB;
 
-		removePieceFromList((color)!turnColor, to);
+		removePieceFromList((Color)!turnColor, to);
 	}
 
 	Piece *piece = move.getPiece();
@@ -374,19 +386,19 @@ void Board::executeMove(Move move)
 		case CASTLE_LEFT:
 			*turnPiecesBB_p = (*turnPiecesBB_p & ~(toBB >> 2)) | (toBB << 1);
 			rooks = (rooks & ~(toBB >> 2)) | (toBB << 1);
-			movePieceFromList((color)turnColor, (square)(to - 2), (square)(to + 1));
+			movePieceFromList((Color)turnColor, (square)(to - 2), (square)(to + 1));
 			break;
 		case CASTLE_RIGHT:
 			*turnPiecesBB_p = (*turnPiecesBB_p & ~(toBB << 1)) | (toBB >> 1);
 			rooks = (rooks & ~(toBB << 1)) | (toBB >> 1);
-			movePieceFromList((color)turnColor, (square)(to + 1), (square)(to - 1));
+			movePieceFromList((Color)turnColor, (square)(to + 1), (square)(to - 1));
 			break;
 	}
 
-	turnColor = (color)!turnColor;
+	turnColor = (Color)!turnColor;
 }
 
-void Board::movePieceFromList(color color, square from, square to)
+void Board::movePieceFromList(Color color, square from, square to)
 {
 	std::vector<Piece> *list_p = color == WHITE ? &whitePiecesList : &blackPiecesList;
 
@@ -397,7 +409,7 @@ void Board::movePieceFromList(color color, square from, square to)
 	}
 }
 
-void Board::removePieceFromList(color color, square square)
+void Board::removePieceFromList(Color color, square square)
 {
 	std::vector<Piece> *list_p = color == WHITE ? &whitePiecesList : &blackPiecesList;
 	auto it = std::find_if(list_p->begin(), list_p->end(), [square](Piece piece) {return piece.position == square; });
@@ -473,7 +485,7 @@ bool Board::isMoveStrictlyLegal(Move move)
 		pawns = pawns & ~(toBB >> 8 | toBB << 8);
 	}
 
-	return !squareIsAttackedBy(turnColor == WHITE ? whiteKingSquare : blackKingSquare, (color)!turnColor);
+	return !squareIsAttackedBy(turnColor == WHITE ? whiteKingSquare : blackKingSquare, (Color)!turnColor);
 }
 
 bitboard Board::getPawns()
@@ -523,7 +535,7 @@ std::vector<Piece> Board::getBlackPiecesList()
 	return blackPiecesList;
 }
 
-color Board::getTurnColor()
+Color Board::getTurnColor()
 {
 	return turnColor;
 }

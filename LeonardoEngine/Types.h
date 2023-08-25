@@ -26,7 +26,7 @@ enum pieceType : uint8_t
 	PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING, PIECE_NONE
 };
 
-enum color : uint8_t
+enum Color : uint8_t
 {
 	WHITE, BLACK 
 };
@@ -79,6 +79,6 @@ extern const std::map<direction, bitboard> EDGES;
 struct Piece 
 {
 	pieceType type;
-	color color;
+	Color color;
 	square position;
 };

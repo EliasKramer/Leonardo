@@ -18,10 +18,10 @@ class Board
 
 		std::vector<Piece> whitePiecesList;
 		std::vector<Piece> blackPiecesList;
-		square whiteKingSquare;
-		square blackKingSquare;
+		square whiteKingSquare = SQUARE_NONE;
+		square blackKingSquare = SQUARE_NONE;
 
-		color turnColor = WHITE;
+		Color turnColor = WHITE;
 
 		bitboard enPassantSquare = 0;
 
@@ -30,17 +30,17 @@ class Board
 		bool blackLeftCastleAvailable = true;
 		bool blackRightCastleAvailable = true;
 
-		std::vector<Piece> getPiecesOfColor(color color);
+		std::vector<Piece> getPiecesOfColor(Color color);
 		bool checkDirectionForAttack(square square, direction dir, bitboard enemySlidingPieces);
-		void movePieceFromList(color color, square from, square to);
-		void removePieceFromList(color color, square square);
+		void movePieceFromList(Color color, square from, square to);
+		void removePieceFromList(Color color, square square);
 	public:
 		Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces);
-		Board(std::string FEN, color turnColor, square enPassantSquare, bool whiteLeftCastle, bool whiteRightCastle, bool blackLeftCastle, bool blackRightCastle);
+		Board(std::string FEN, Color turnColor, square enPassantSquare, bool whiteLeftCastle, bool whiteRightCastle, bool blackLeftCastle, bool blackRightCastle);
 		pieceType getType(bitboard pieceBB);
 		std::string getFEN();
 
-		bool squareIsAttackedBy(square square, color color);
+		bool squareIsAttackedBy(square square, Color color);
 
 		void executeMove(Move move);
 
@@ -60,7 +60,7 @@ class Board
 		std::vector<Piece> getWhitePiecesList();
 		std::vector<Piece> getBlackPiecesList();
 
-		color getTurnColor();
+		Color getTurnColor();
 
 		bitboard getEnPassantSquare();
 

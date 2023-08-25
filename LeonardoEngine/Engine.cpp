@@ -226,7 +226,7 @@ std::vector<Move> getMovesForKing(Board board, Piece &king)
 	bitboard freeSpacesLeft = king.color == WHITE ? 0xe : 0xe00000000000000;
 	bitboard freeSpacesRight = king.color == WHITE ? 0x60 : 0x6000000000000000;
 
-	if (((leftCastleAvailable && !(freeSpacesLeft & board.getAllPieces())) || (rightCastleAvailable && !(freeSpacesRight & board.getAllPieces()))) && !board.squareIsAttackedBy(king.position, (color)!board.getTurnColor()))
+	if (((leftCastleAvailable && !(freeSpacesLeft & board.getAllPieces())) || (rightCastleAvailable && !(freeSpacesRight & board.getAllPieces()))) && !board.squareIsAttackedBy(king.position, (Color)!board.getTurnColor()))
 	{
 		square b18 = king.color == WHITE ? B1 : B8;
 		square c18 = king.color == WHITE ? C1 : C8;
@@ -239,19 +239,19 @@ std::vector<Move> getMovesForKing(Board board, Piece &king)
 		square h18 = king.color == WHITE ? H1 : H8;
 
 		if (leftCastleAvailable && !(freeSpacesLeft & board.getAllPieces()) &&
-			!board.squareIsAttackedBy(a18, (color)!board.getTurnColor()) &&
-			!board.squareIsAttackedBy(b18, (color)!board.getTurnColor()) &&
-			!board.squareIsAttackedBy(c18, (color)!board.getTurnColor()) &&
-			!board.squareIsAttackedBy(d18, (color)!board.getTurnColor()))
+			!board.squareIsAttackedBy(a18, (Color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(b18, (Color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(c18, (Color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(d18, (Color)!board.getTurnColor()))
 		{
 			Move move(&king, king.position, c18, CASTLE_LEFT);
 			moves.push_back(move);
 		}
 
 		if (rightCastleAvailable && !(freeSpacesRight & board.getAllPieces()) &&
-			!board.squareIsAttackedBy(f18, (color)!board.getTurnColor()) &&
-			!board.squareIsAttackedBy(g18, (color)!board.getTurnColor()) &&
-			!board.squareIsAttackedBy(h18, (color)!board.getTurnColor()))
+			!board.squareIsAttackedBy(f18, (Color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(g18, (Color)!board.getTurnColor()) &&
+			!board.squareIsAttackedBy(h18, (Color)!board.getTurnColor()))
 		{
 			Move move(&king, king.position, g18, CASTLE_RIGHT);
 			moves.push_back(move);

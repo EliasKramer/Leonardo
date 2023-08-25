@@ -17,12 +17,16 @@ namespace EngineTest
 
 			std::vector<Move> moves = getMoves(board);
 
+			Piece piece = *moves.at(0).getPiece();
+
 			Assert::AreEqual(20, (int)moves.size());
+			Assert::AreEqual((int)WHITE, (int)piece.color);
+			Assert::AreEqual((int)KNIGHT, (int)piece.type);
 		}
 
 		TEST_METHOD(getRegularPawnMoveTest)
 		{
-			Board board("8/8/8/8/8/P7/8/8", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("8/8/8/8/8/P7/8/K7", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece pawn;
 			pawn.color = WHITE;
@@ -38,7 +42,7 @@ namespace EngineTest
 
 		TEST_METHOD(getStartPositionPawnMovesTest)
 		{
-			Board board("8/8/8/8/8/8/P7/8", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("8/8/8/8/8/8/P7/K7", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece pawn;
 			pawn.color = WHITE;
@@ -57,7 +61,7 @@ namespace EngineTest
 
 		TEST_METHOD(getCapturePawnMovesTest)
 		{
-			Board board("8/8/8/8/p1p5/1P6/8/8", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("8/8/8/8/p1p5/1P6/8/K7", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece pawn;
 			pawn.color = WHITE;
@@ -77,7 +81,7 @@ namespace EngineTest
 
 		TEST_METHOD(getPromotionPawnMovesTest)
 		{
-			Board board("8/P7/8/8/8/8/8/8", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("8/P7/8/8/8/8/8/K7", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece pawn;
 			pawn.color = WHITE;
@@ -98,7 +102,7 @@ namespace EngineTest
 
 		TEST_METHOD(getEnPassantPawnMoveTest)
 		{
-			Board board("8/8/8/Pp6/8/8/8/8", WHITE, B6, true, true, true, true);
+			Board board("8/8/8/Pp6/8/8/8/K7", WHITE, B6, true, true, true, true);
 
 			Piece pawn;
 			pawn.color = WHITE;
@@ -117,7 +121,7 @@ namespace EngineTest
 
 		TEST_METHOD(getKnightMovesTest)
 		{
-			Board board("8/8/8/8/3N4/8/8/8", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("8/8/8/8/3N4/8/8/K7", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece knight;
 			knight.color = WHITE;
@@ -142,7 +146,7 @@ namespace EngineTest
 
 		TEST_METHOD(getRegularRookMovesTest)
 		{
-			Board board("8/8/8/8/3R4/8/8/8", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("8/8/8/8/3R4/8/8/K7", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece rook;
 			rook.color = WHITE;
@@ -172,7 +176,7 @@ namespace EngineTest
 
 		TEST_METHOD(getCaptureRookMovesTest)
 		{
-			Board board("8/8/8/8/8/8/r7/R2r4", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("7K/8/8/8/8/8/r7/R2r4", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece rook;
 			rook.color = WHITE;
@@ -195,7 +199,7 @@ namespace EngineTest
 
 		TEST_METHOD(getCollisionRookMovesTest)
 		{
-			Board board("8/8/8/8/8/8/R7/R2R4", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("8/8/8/8/8/8/R7/R2R3K", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece rook;
 			rook.color = WHITE;
@@ -216,7 +220,7 @@ namespace EngineTest
 
 		TEST_METHOD(getRegularBishopMovesTest) 
 		{
-			Board board("8/8/8/8/3B4/8/8/8", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("8/8/8/8/3B4/8/8/7K", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece bishop;
 			bishop.color = WHITE;
@@ -246,7 +250,7 @@ namespace EngineTest
 
 		TEST_METHOD(getCaptureBishopMovesTest)
 		{
-			Board board("8/8/8/8/3b4/8/8/B7", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("8/8/8/8/3b4/8/8/B6K", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece bishop;
 			bishop.color = WHITE;
@@ -267,7 +271,7 @@ namespace EngineTest
 
 		TEST_METHOD(getCollisionBishopMovesTest)
 		{
-			Board board("8/8/8/8/3B4/8/8/B7", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board("8/8/8/8/3B4/8/8/B6K", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Piece bishop;
 			bishop.color = WHITE;
