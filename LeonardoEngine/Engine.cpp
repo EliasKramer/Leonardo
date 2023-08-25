@@ -18,12 +18,20 @@ std::vector<Move> getMoves(Board board, int depth)
 	std::vector<Move> moves = getMoves(board);
 	if (depth != 1)
 	{
-		for (Move move : moves)
+		int size = moves.size();
+		int i = 0;
+		//for (Move move : moves)
+		for(auto it = moves.begin(); i < size ; ++it)
 		{
 			Board newBoard(board);
-			newBoard.executeMove(move);
+			//newBoard.executeMove(move);
+			newBoard.executeMove(*it);
 			std::vector<Move> nextMoves = getMoves(newBoard, depth - 1);
 			moves.insert(moves.end(), nextMoves.begin(), nextMoves.end());
+
+			it = moves.begin();
+			std::advance(it, i);
+			i++;
 		}
 	}
 	return moves;
