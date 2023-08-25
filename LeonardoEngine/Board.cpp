@@ -419,13 +419,6 @@ void Board::removePieceFromList(Color color, square square)
 
 bool Board::isMoveStrictlyLegal(Move move)
 {
-	////instead of this it might be better to add another execute move method that skips editing the piece lists
-	//Piece piece = *move.getPiece();
-	//move.setPiece(&piece);
-
-	//executeMove(move);
-	//return squareIsAttackedBy(turnColor == WHITE ? whiteKingSquare : blackKingSquare, (color)!turnColor);
-
 	moveType moveType = move.getType();
 	if (moveType == CASTLE_LEFT || moveType == CASTLE_RIGHT)
 		return true;

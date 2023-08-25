@@ -332,7 +332,7 @@ namespace EngineTest
 			Assert::IsTrue(std::find(actual1.begin(), actual1.end(), castlingLeft1) != actual1.end());
 			Assert::IsTrue(std::find(actual1.begin(), actual1.end(), castlingRight1) != actual1.end());
 
-			Board board2("8/8/8/r7/8/8/8/R3KB1R", WHITE, SQUARE_NONE, true, true, true, true);
+			Board board2("8/8/8/2r5/8/8/8/R3KB1R", WHITE, SQUARE_NONE, true, true, true, true);
 
 			Move castlingLeft2(&king, E1, C1, CASTLE_LEFT);
 			Move castlingRight2(&king, E1, G1, CASTLE_RIGHT);
