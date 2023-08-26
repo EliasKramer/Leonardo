@@ -17,7 +17,7 @@ vector3 leonardo_util::get_policy_output_format()
 
 vector3 leonardo_util::get_value_nnet_output()
 {
-	return vector3(2, 1, 1);
+	return vector3(1, 1, 1);
 }
 
 void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& m)
@@ -212,7 +212,7 @@ void leonardo_util::set_value_nnet_output(matrix& output, const ChessBoard& game
 	// 0 | 1
 	//draw or stalemate
 	// 0.5 | 0.5
-
+	/*
 	output.set_at_flat_host(0,
 		(state == GameState::WhiteWon && color == White) ||
 		(state == GameState::BlackWon && color == Black)
@@ -226,7 +226,12 @@ void leonardo_util::set_value_nnet_output(matrix& output, const ChessBoard& game
 	{
 		output.set_at_flat_host(0, 0.5f);
 		output.set_at_flat_host(1, 0.5f);
-	}
+	}*/
+	output.set_at_flat_host(0,
+		(state == GameState::WhiteWon && color == White) ||
+		(state == GameState::BlackWon && color == Black) ? 50.0f :
+		(state == GameState::BlackWon && color == White) ||
+		(state == GameState::WhiteWon && color == Black) ? -50.0f : 0.0f);
 
 	output.sync_device_and_host();
 }
@@ -243,10 +248,10 @@ float leonardo_util::get_value_nnet_output(matrix& output)
 	//not necessary?
 	//output.sync_device_and_host();
 
-	float own_score = output.get_at_flat_host(0);
-	float enemy_score = output.get_at_flat_host(1);
+	//float own_score = output.get_at_flat_host(0);
+	//float enemy_score = output.get_at_flat_host(1);
 
-	return own_score - enemy_score;
+	return output.get_at_flat_host(0);// own_score - enemy_score;
 }
 
 matrix& leonardo_util::matrix_map_get(

@@ -70,7 +70,7 @@ public:
 	leonardo_overlord(std::string name);
 
 	void train();
-	void train_policy();
+	void train_on_gm_games();
 
 private:
 	void train_value_nnet_thread_fn(

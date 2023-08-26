@@ -9,6 +9,12 @@ int main()
 {
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 	/*
+	neural_network test("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\firestorm_epoch_2100\\value.parameters");
+	std::cout << test.parameter_analysis();
+	return 0;
+	*/
+
+	/*
 	neural_network other = neural_network("C:\\Users\\Elias\\Desktop\\i5_overlord\\actual_overlord_epoch_0\\policy.parameters");
 	neural_network local = neural_network("C:\\Users\\Elias\\Desktop\\i5_overlord\\actual_overlord_epoch_5\\policy.parameters");
 
@@ -18,10 +24,13 @@ int main()
 	std::cout << "same format: " << local.nn_equal_format(other) << std::endl;
 	std::cout << "same format: " << local.equal_parameter(other) << std::endl;
 	*/
-	leonardo_overlord overlord("test");
+	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
+	leonardo_overlord overlord("better_value");
 	//overlord.test_value_nnet();
-	overlord.train_policy();
+	overlord.train_on_gm_games();
 	return 0;
+	ChessBoard b(STARTING_FEN);
+	b.getFen();
 	/*
 	data_space mock;
 	mock.to_string(); //remove - used to not get optimized away

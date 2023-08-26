@@ -2,7 +2,7 @@
 #include <cmath>
 void leonardo_overlord::save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet)
 {
-	std::cout << "\nsaving best network to file";
+	std::cout << "\nsaving best network to file " << epoch << "\n";
 	//check if folder exists
 	if (!std::filesystem::exists("models"))
 	{
@@ -384,7 +384,22 @@ leonardo_overlord::leonardo_overlord(
 	//best_value_nnet = neural_network("value.parameters");
 	//best_policy_nnet = neural_network("policy.parameters");
 
-	best_value_nnet = neural_network("value.parameters");
+	//best_value_nnet = neural_network("value.parameters");
+	
+	best_value_nnet.set_input_format(leonardo_util::get_input_format());
+	best_value_nnet.add_fully_connected_layer(2048, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(2048, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output(), identity_fn);
+	best_value_nnet.xavier_initialization();
+	
+	//best_value_nnet = neural_network("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\firestormV2_epoch_6600\\value.parameters");
+
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
 	/*
 	best_policy_nnet.add_fully_connected_layer(2048, leaky_relu_fn);
@@ -398,8 +413,8 @@ leonardo_overlord::leonardo_overlord(
 	best_policy_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	best_policy_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	*/
-	best_policy_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	//best_policy_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	//best_policy_nnet.add_fully_connected_layer(64, leaky_relu_fn);
 	/*
 	*/
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
@@ -469,66 +484,104 @@ static void train_new_on_move(neural_network& policy_nnet, const ChessBoard& boa
 	policy_nnet.back_propagation(input, label);
 }
 
-void leonardo_overlord::train_policy()
+static float get_curr_reward(const ChessBoard& board, const std::unique_ptr<Move>& move, bool last_move)
 {
-	chess_arena arena(
-		"pit",
-		std::make_unique<leonardo_bot>(best_policy_nnet, distributed_random),
-		std::make_unique<leonardo_bot>(new_policy_nnet, distributed_random)
-	);
-	chess_arena arena_random(
-		"pit",
-		std::make_unique<RandomPlayer>(),
-		std::make_unique<leonardo_bot>(new_policy_nnet, max)
-	);
+	ChessColor color = board.getCurrentTurnColor();
 
+	if (last_move)
+	{
+		return 0; //is set by the data afterwards
+		/*
+		ChessBoard copy_board = board.getCopyByValue();
+		copy_board.makeMove(*move.get());
+		GameState state = copy_board.getGameState();
+		if ((state == WhiteWon && color == White) || (state == BlackWon && color == Black))
+		{
+			//won
+			/*
+				8*1
+				2*3,3
+				2*3,2
+				1*9
+				2*5
+			
+			return 50;
+		}
+		else if ((state == WhiteWon && color == Black) || (state == BlackWon && color == White))
+		{
+			//lost
+			return -50;
+		}
+		else
+		{
+			return 0;
+		}*/
+	}
+
+	std::vector<std::unique_ptr<Move>>& moves = board.getAllLegalMoves();
+	BoardRepresentation rep = board.getBoardRepresentation();
+	BitBoard enemy_color = color == White ? rep.PiecesOfColor[Black] : rep.PiecesOfColor[White];
+	Square destination_square = move.get()->getDestination();
+	if (bitboardsOverlap(BB_SQUARE[destination_square], enemy_color))
+	{
+		ChessPiece captured_piece = rep.getPieceAt(destination_square);
+		float value = (float)PIECETYPE_VALUE[captured_piece.getType()] / 100.0f;
+		return value;
+	}
+	else
+	{
+		//move without any progress
+		return -0.1f;
+	}
+}
+
+void leonardo_overlord::train_on_gm_games()
+{
 	std::cout << "reading games file\n";
 	std::vector<std::string> games = read_file_lines("games.txt");
 	std::cout << "done. " << games.size() << " games loaded\n";
 	matrix input(leonardo_util::get_input_format());
-	matrix label(leonardo_util::get_policy_output_format());
+	matrix label(leonardo_util::get_value_nnet_output());
+
+	float learning_rate = 1;
 
 	int batch_size = 100;
 	int ds_idx = 0;
 	std::unique_ptr<data_space> ds;
-	for (int g = 0; g < games.size(); g++)
+	int start_idx = 0;
+	for (int g = start_idx; g < games.size(); g++)
 	{
 		if (g % batch_size == 0)
 		{
-			if (g != 0)
+			if (g != start_idx)
 			{
-				std::cout << "learning on " << ds->get_item_count() << " positions \n";
-				ds->copy_to_gpu();
-				new_policy_nnet.learn_on_ds(*ds.get(), 2, 1024, 0.1f, true);
+				std::cout << get_current_time_str() << "\n";
+				if(gpu_mode)
+					ds->copy_to_gpu();
 				
+				new_value_nnet.sync_device_and_host();
+				best_value_nnet.sync_device_and_host();
+
 				std::cout << "testing\n";
+				test_result test_res = new_value_nnet.test_on_ds(*ds.get());
+				std::cout << test_res.to_string() << "\n";
+				
+				auto start = std::chrono::high_resolution_clock::now();
+				std::cout << "learning on " << ds->get_item_count() << " positions \n";
+				new_value_nnet.learn_on_ds(*ds.get(), 1, 100, learning_rate, true);
+				auto end = std::chrono::high_resolution_clock::now();
+				std::cout << "done. took " << ms_to_str(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()) << "\n";
+				learning_rate *= 0.99f;
 
-				new_policy_nnet.sync_device_and_host();
-				best_policy_nnet.sync_device_and_host();
+				new_value_nnet.sync_device_and_host();
+				best_value_nnet.sync_device_and_host();
 
-				arena_result arena_result = arena.play(1000);
+				best_value_nnet.set_parameters(new_value_nnet);
 
-				int win_score = arena_result.player_2_won - arena_result.player_1_won;
-				if (win_score > 0)
-				{
-					std::cout
-						<< "---------------------\n"
-						<< "new network is better (won " << win_score << " more)\n"
-						<< "---------------------\n";
-					best_policy_nnet.set_parameters(new_policy_nnet);
-					save_best_to_file(g, false, true);
-				}
-				else
-				{
-					std::cout
-						<< "--------------------\n"
-						<< "new network is worse (lost " << (-win_score) << " more)\n"
-						<< "--------------------\n";
-				}
+				new_value_nnet.sync_device_and_host();
+				best_value_nnet.sync_device_and_host();
 
-				arena_result = arena_random.play(1000);
-				win_score = arena_result.player_2_won - arena_result.player_1_won;
-				std::cout << "against random: " << (win_score > 0 ? "better" : "worse") << "(" << win_score << ")" << "\n";
+				save_best_to_file(g, true, false);
 			}
 
 			ds_idx = 0;
@@ -541,29 +594,59 @@ void leonardo_overlord::train_policy()
 			ds = std::make_unique<data_space>(
 				batch_item_size,
 				leonardo_util::get_input_format(),
-				leonardo_util::get_policy_output_format());
+				leonardo_util::get_value_nnet_output());
 		}
-		std::vector<std::string> master_moves = split_string(games[g], ' ');	
-
-		ChessBoard board(STARTING_FEN);
-
-		for (int m = 0; m < master_moves.size(); m++)
+		std::vector<std::string> master_moves = split_string(games[g], ' ');
+		if (master_moves.size() == 0)
 		{
+			std::cout << "mater moves are empty\n";
+			continue;
+		}
+		std::vector<float> rewards;
+		std::vector<float> ds_indices;
+		ChessBoard board(STARTING_FEN);
+		bool white_won = true;
+		bool found_move = false;
+		for (int m = 0; m < (int)master_moves.size(); m++)
+		{
+			if (m == 0)
+			{
+				if (master_moves[0] == "1")
+				{
+					white_won = true;
+				}
+				else if (master_moves[0] == "0")
+				{
+					white_won = false;
+				}
+				else
+				{
+					std::cout << "no outcome found\n";
+				}
+				continue;
+			}
+
 			std::vector<std::unique_ptr<Move>> moves = board.getAllLegalMoves();
-			bool found_move = false;
+			found_move = false;
 			for (int i = 0; i < moves.size(); i++)
 			{
 				if (moves[i]->getString() == master_moves[m])
 				{
 					//add to ds
 					leonardo_util::set_matrix_from_chessboard(board, input);
-					leonardo_util::set_move_value(*moves[i].get(), label, 1.0f, board.getCurrentTurnColor());
-					smart_assert(label.contains_non_zero_items());
+					//leonardo_util::set_move_value(*moves[i].get(), label, 1.0f, board.getCurrentTurnColor());
+					//smart_assert(label.contains_non_zero_items());
 					ds->set_data(input, ds_idx);
-					ds->set_label(label, ds_idx);
-					leonardo_util::set_move_value(*moves[i].get(), label, 0.0f, board.getCurrentTurnColor());
-					smart_assert(!label.contains_non_zero_items());
-					
+					//ds->set_label(label, ds_idx);
+					//leonardo_util::set_move_value(*moves[i].get(), label, 0.0f, board.getCurrentTurnColor());
+					ds_indices.push_back(ds_idx);
+					rewards.push_back(get_curr_reward(board, moves[i], m == master_moves.size() - 1));
+					if (rewards.size() != 1)
+					{
+						float curr_reward = rewards[rewards.size() - 1];
+						rewards[rewards.size() - 2] -= curr_reward;
+					}
+
 					board.makeMove(*moves[i].get());
 					found_move = true;
 					ds_idx++;
@@ -576,6 +659,57 @@ void leonardo_overlord::train_policy()
 				break;
 			}
 		}
+		if (!found_move)
+		{
+			std::cout << "not move found. continuing\n";
+			continue;
+		}
+		
+		float reward_sum = 0.0f;
+		float discount_factor = 0.9f;
+		std::vector<float> discounted_rewards(rewards.size());
+		//set last value
+		bool white_last_played = master_moves.size() % 2 == 0; //it would be != 0, but we have a "won" data in the beginning, so it's 1 more
+		const int WINSCORE = 20;
+		if (white_last_played == white_won) //person who played last won
+		{
+			rewards[rewards.size() - 1] = WINSCORE;
+			discounted_rewards[rewards.size() - 1] = WINSCORE;
+			rewards[rewards.size() - 2] = -WINSCORE;
+			discounted_rewards[rewards.size() - 2] = -WINSCORE;
+		}
+		else if (white_last_played != white_won) //person who played last lost
+		{
+			rewards[rewards.size() - 1] = -WINSCORE;
+			discounted_rewards[rewards.size() - 1] = -WINSCORE;
+			rewards[rewards.size() - 2] = WINSCORE;
+			discounted_rewards[rewards.size() - 2] = WINSCORE;
+		}
+		else // draw
+		{
+			std::cout << "this should not happen 1\n";
+		}
+
+		//this is shit, but yolo
+		for (int i = rewards.size() - 3; i >= 0; i -= 2)
+		{
+			float prev_discounted_reward = discounted_rewards[i + 2];
+			discounted_rewards[i] = rewards[i] + discount_factor * prev_discounted_reward;
+		}
+		for (int i = rewards.size() - 4; i >= 0; i -= 2)
+		{
+			float prev_discounted_reward = discounted_rewards[i + 2];
+			discounted_rewards[i] = rewards[i] + discount_factor * prev_discounted_reward;
+		}
+
+		//set discounted rewards
+		for (int i = 0; i < rewards.size(); i++)
+		{
+			//std::cout << "master move: " << master_moves[i+1] << " reward: " << rewards[i] << " discounted reward: " << discounted_rewards[i] << "\n";
+			label.set_at_flat_host(0, discounted_rewards[i]);
+			ds->set_label(label, ds_indices[i]);
+		}
+		
 	}
 }
 
