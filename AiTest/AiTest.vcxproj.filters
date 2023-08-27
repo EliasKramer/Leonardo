@@ -18,9 +18,6 @@
     <ClCompile Include="..\MockChessEngine\AlphaBetaPruningBot.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MockChessEngine\BitBoard.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\MockChessEngine\BoardRepresentation.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
@@ -126,12 +123,12 @@
     <ClCompile Include="value_net_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\MockChessEngine\MyBitBoard.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\MockChessEngine\AlphaBetaPruningBot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\BitBoard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\BoardRepresentation.h">
@@ -231,6 +228,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\assert_throw.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\MyBitBoard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include "DataAndTypes.h"
-#include "BitBoard.h"
+#include "MyBitBoard.h"
 
 std::vector<std::string> splitString(
 	std::string inputString,

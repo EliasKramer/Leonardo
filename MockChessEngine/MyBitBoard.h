@@ -70,27 +70,27 @@ enum Direction : int8_t {
 
 //if you start at one of the bits in the bitboard and go in the key direction, 
 //then your final position will not be on the board
-const std::map<Direction, BitBoard> INVALID_FIELDS_FOR_DIR
-{
+
+const std::map<Direction, BitBoard> INVALID_FIELDS_FOR_DIR = {
 	{NORTH, RANK_8},
-	{SOUTH, RANK_1},
-	{WEST, FILE_A},
-	{EAST, FILE_H},
-	
-	{NORTH_EAST, FILE_H | RANK_8},
-	{SOUTH_EAST, FILE_H | RANK_1},
-	{SOUTH_WEST, FILE_A | RANK_1},
-	{NORTH_WEST, FILE_A | RANK_8},
+	{ SOUTH, RANK_1 },
+	{ WEST, FILE_A },
+	{ EAST, FILE_H },
 
-	{NORTH_NORTH_EAST, FILE_H | RANK_8 | RANK_7},
-	{EAST_NORTH_EAST, FILE_H | FILE_G | RANK_8},
-	{EAST_SOUTH_EAST, FILE_H | FILE_G | RANK_1},
-	{SOUTH_SOUTH_EAST, FILE_H | RANK_1 | RANK_2},
+	{ NORTH_EAST, FILE_H | RANK_8 },
+	{ SOUTH_EAST, FILE_H | RANK_1 },
+	{ SOUTH_WEST, FILE_A | RANK_1 },
+	{ NORTH_WEST, FILE_A | RANK_8 },
 
-	{SOUTH_SOUTH_WEST, FILE_A | RANK_1 | RANK_2},
-	{WEST_SOUTH_WEST, FILE_A | FILE_B | RANK_1},
-	{WEST_NORTH_WEST, FILE_A | FILE_B | RANK_8},
-	{NORTH_NORTH_WEST, FILE_A | RANK_8 | RANK_7}
+	{ NORTH_NORTH_EAST, FILE_H | RANK_8 | RANK_7 },
+	{ EAST_NORTH_EAST, FILE_H | FILE_G | RANK_8 },
+	{ EAST_SOUTH_EAST, FILE_H | FILE_G | RANK_1 },
+	{ SOUTH_SOUTH_EAST, FILE_H | RANK_1 | RANK_2 },
+
+	{ SOUTH_SOUTH_WEST, FILE_A | RANK_1 | RANK_2 },
+	{ WEST_SOUTH_WEST, FILE_A | FILE_B | RANK_1 },
+	{ WEST_NORTH_WEST, FILE_A | FILE_B | RANK_8 },
+	{ NORTH_NORTH_WEST, FILE_A | RANK_8 | RANK_7 }
 };
 
 bool destinationIsOnBoard(Square start, Direction direction);

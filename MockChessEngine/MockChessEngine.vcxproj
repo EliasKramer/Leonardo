@@ -129,7 +129,7 @@
   <ItemGroup>
     <ClCompile Include="..\LeonardoAi\NeuroFox\util.cpp" />
     <ClCompile Include="AlphaBetaPruningBot.cpp" />
-    <ClCompile Include="BitBoard.cpp" />
+    <ClCompile Include="MyBitBoard.cpp" />
     <ClCompile Include="BoardRepresentation.cpp" />
     <ClCompile Include="ChessBoard.cpp" />
     <ClCompile Include="ChessPiece.cpp" />
@@ -151,7 +151,7 @@
   <ItemGroup>
     <ClInclude Include="..\LeonardoAi\NeuroFox\util.hpp" />
     <ClInclude Include="AlphaBetaPruningBot.h" />
-    <ClInclude Include="BitBoard.h" />
+    <ClInclude Include="MyBitBoard.h" />
     <ClInclude Include="BoardRepresentation.h" />
     <ClInclude Include="ChessBoard.h" />
     <ClInclude Include="ChessPiece.h" />

@@ -24,7 +24,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BitBoard.cpp">
+    <ClCompile Include="MyBitBoard.cpp">
       <Filter>Source Files\chess</Filter>
     </ClCompile>
     <ClCompile Include="BoardRepresentation.cpp">
@@ -83,7 +83,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BitBoard.h">
+    <ClInclude Include="MyBitBoard.h">
       <Filter>Header Files\chess</Filter>
     </ClInclude>
     <ClInclude Include="BoardRepresentation.h">

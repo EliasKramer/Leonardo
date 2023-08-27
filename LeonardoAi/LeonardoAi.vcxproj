@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MockChessEngine\AlphaBetaPruningBot.cpp" />
-    <ClCompile Include="..\MockChessEngine\BitBoard.cpp" />
     <ClCompile Include="..\MockChessEngine\BoardRepresentation.cpp" />
     <ClCompile Include="..\MockChessEngine\ChessBoard.cpp" />
     <ClCompile Include="..\MockChessEngine\ChessPiece.cpp" />
@@ -27,8 +26,31 @@
     <ClCompile Include="..\MockChessEngine\MoveDoublePawn.cpp" />
     <ClCompile Include="..\MockChessEngine\MoveEnPassant.cpp" />
     <ClCompile Include="..\MockChessEngine\MovePromote.cpp" />
+    <ClCompile Include="..\MockChessEngine\MyBitBoard.cpp" />
     <ClCompile Include="..\MockChessEngine\Player.cpp" />
     <ClCompile Include="..\MockChessEngine\RandomPlayer.cpp" />
+    <ClCompile Include="..\StockFish\benchmark.cpp" />
+    <ClCompile Include="..\StockFish\bitbase.cpp" />
+    <ClCompile Include="..\StockFish\bitboard.cpp" />
+    <ClCompile Include="..\StockFish\endgame.cpp" />
+    <ClCompile Include="..\StockFish\evaluate.cpp" />
+    <ClCompile Include="..\StockFish\material.cpp" />
+    <ClCompile Include="..\StockFish\misc.cpp" />
+    <ClCompile Include="..\StockFish\movegen.cpp" />
+    <ClCompile Include="..\StockFish\movepick.cpp" />
+    <ClCompile Include="..\StockFish\nnue\evaluate_nnue.cpp" />
+    <ClCompile Include="..\StockFish\nnue\features\half_ka_v2_hm.cpp" />
+    <ClCompile Include="..\StockFish\pawns.cpp" />
+    <ClCompile Include="..\StockFish\position.cpp" />
+    <ClCompile Include="..\StockFish\psqt.cpp" />
+    <ClCompile Include="..\StockFish\search.cpp" />
+    <ClCompile Include="..\StockFish\syzygy\tbprobe.cpp" />
+    <ClCompile Include="..\StockFish\thread.cpp" />
+    <ClCompile Include="..\StockFish\timeman.cpp" />
+    <ClCompile Include="..\StockFish\tt.cpp" />
+    <ClCompile Include="..\StockFish\tune.cpp" />
+    <ClCompile Include="..\StockFish\uci.cpp" />
+    <ClCompile Include="..\StockFish\ucioption.cpp" />
     <ClCompile Include="chess_arena.cpp" />
     <ClCompile Include="leonardo_bot.cpp" />
     <ClCompile Include="leonardo_overlord.cpp" />
@@ -45,10 +67,10 @@
     <ClCompile Include="NeuroFox\test_result.cpp" />
     <ClCompile Include="NeuroFox\util.cpp" />
     <ClCompile Include="NeuroFox\vector3.cpp" />
+    <ClCompile Include="stockfish_interface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\MockChessEngine\AlphaBetaPruningBot.h" />
-    <ClInclude Include="..\MockChessEngine\BitBoard.h" />
     <ClInclude Include="..\MockChessEngine\BoardRepresentation.h" />
     <ClInclude Include="..\MockChessEngine\ChessBoard.h" />
     <ClInclude Include="..\MockChessEngine\ChessPiece.h" />
@@ -63,8 +85,41 @@
     <ClInclude Include="..\MockChessEngine\MoveDoublePawn.h" />
     <ClInclude Include="..\MockChessEngine\MoveEnPassant.h" />
     <ClInclude Include="..\MockChessEngine\MovePromote.h" />
+    <ClInclude Include="..\MockChessEngine\MyBitBoard.h" />
     <ClInclude Include="..\MockChessEngine\Player.h" />
     <ClInclude Include="..\MockChessEngine\RandomPlayer.h" />
+    <ClInclude Include="..\StockFish\benchmark.h" />
+    <ClInclude Include="..\StockFish\bitboard.h" />
+    <ClInclude Include="..\StockFish\endgame.h" />
+    <ClInclude Include="..\StockFish\evaluate.h" />
+    <ClInclude Include="..\StockFish\incbin\incbin.h" />
+    <ClInclude Include="..\StockFish\material.h" />
+    <ClInclude Include="..\StockFish\misc.h" />
+    <ClInclude Include="..\StockFish\movegen.h" />
+    <ClInclude Include="..\StockFish\movepick.h" />
+    <ClInclude Include="..\StockFish\nnue\evaluate_nnue.h" />
+    <ClInclude Include="..\StockFish\nnue\features\half_ka_v2_hm.h" />
+    <ClInclude Include="..\StockFish\nnue\layers\affine_transform.h" />
+    <ClInclude Include="..\StockFish\nnue\layers\affine_transform_sparse_input.h" />
+    <ClInclude Include="..\StockFish\nnue\layers\clipped_relu.h" />
+    <ClInclude Include="..\StockFish\nnue\layers\simd.h" />
+    <ClInclude Include="..\StockFish\nnue\layers\sqr_clipped_relu.h" />
+    <ClInclude Include="..\StockFish\nnue\nnue_accumulator.h" />
+    <ClInclude Include="..\StockFish\nnue\nnue_architecture.h" />
+    <ClInclude Include="..\StockFish\nnue\nnue_common.h" />
+    <ClInclude Include="..\StockFish\nnue\nnue_feature_transformer.h" />
+    <ClInclude Include="..\StockFish\pawns.h" />
+    <ClInclude Include="..\StockFish\position.h" />
+    <ClInclude Include="..\StockFish\psqt.h" />
+    <ClInclude Include="..\StockFish\search.h" />
+    <ClInclude Include="..\StockFish\syzygy\tbprobe.h" />
+    <ClInclude Include="..\StockFish\thread.h" />
+    <ClInclude Include="..\StockFish\thread_win32_osx.h" />
+    <ClInclude Include="..\StockFish\timeman.h" />
+    <ClInclude Include="..\StockFish\tt.h" />
+    <ClInclude Include="..\StockFish\tune.h" />
+    <ClInclude Include="..\StockFish\types.h" />
+    <ClInclude Include="..\StockFish\uci.h" />
     <ClInclude Include="chess_arena.hpp" />
     <ClInclude Include="leonardo_bot.hpp" />
     <ClInclude Include="leonardo_overlord.hpp" />
@@ -83,6 +138,7 @@
     <ClInclude Include="NeuroFox\test_result.hpp" />
     <ClInclude Include="NeuroFox\util.hpp" />
     <ClInclude Include="NeuroFox\vector3.hpp" />
+    <ClInclude Include="stockfish_interface.hpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="NeuroFox\gpu_math.cu" />
@@ -91,6 +147,12 @@
     <ProjectReference Include="..\MockChessEngine\MockChessEngine.vcxproj">
       <Project>{944091fe-c183-4ddf-b910-12047d02ed20}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\StockFish\StockFish.vcxproj">
+      <Project>{b6a8644e-094e-480d-b2ac-2d5c26e0f08e}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\StockFish\Makefile" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6065E741-45F5-4EDC-8583-D513CFE48A0B}</ProjectGuid>
@@ -130,7 +192,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

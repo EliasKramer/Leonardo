@@ -13,6 +13,7 @@
 #include <memory>
 #include "./NeuroFox/data_space.hpp"
 #include <filesystem>
+#include "stockfish_interface.hpp"
 
 class leonardo_overlord
 {

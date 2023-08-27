@@ -19,6 +19,12 @@
     <Filter Include="header\nnet">
       <UniqueIdentifier>{6d3863ff-9832-452b-9ffb-4e9f12a90b17}</UniqueIdentifier>
     </Filter>
+    <Filter Include="header\sf">
+      <UniqueIdentifier>{73b6557f-780d-4162-beb5-b98f720aff5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sf">
+      <UniqueIdentifier>{abe71d9b-5af9-4a31-bdd5-389e6f46d8b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NeuroFox\convolutional_layer.cpp">
@@ -105,9 +111,6 @@
     <ClCompile Include="..\MockChessEngine\Constants.cpp">
       <Filter>source\chess</Filter>
     </ClCompile>
-    <ClCompile Include="..\MockChessEngine\BitBoard.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
     <ClCompile Include="..\MockChessEngine\AlphaBetaPruningBot.cpp">
       <Filter>source\chess</Filter>
     </ClCompile>
@@ -121,6 +124,78 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\benchmark.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\bitbase.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\bitboard.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\endgame.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\evaluate.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\material.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\misc.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\movegen.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\movepick.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\pawns.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\position.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\psqt.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\search.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\thread.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\timeman.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\tt.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\tune.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\uci.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\ucioption.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\MyBitBoard.cpp">
+      <Filter>source\chess</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\nnue\evaluate_nnue.cpp">
+      <Filter>sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\nnue\features\half_ka_v2_hm.cpp">
+      <Filter>sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\syzygy\tbprobe.cpp">
+      <Filter>sf</Filter>
+    </ClCompile>
+    <ClCompile Include="stockfish_interface.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -168,9 +243,6 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="chess_arena.hpp">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\BitBoard.h">
       <Filter>header\chess</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\BoardRepresentation.h">
@@ -233,10 +305,117 @@
     <ClInclude Include="NeuroFox\assert_throw.hpp">
       <Filter>header\nnet</Filter>
     </ClInclude>
+    <ClInclude Include="..\StockFish\benchmark.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\bitboard.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\endgame.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\evaluate.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\material.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\misc.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\movegen.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\movepick.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\pawns.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\position.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\psqt.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\search.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\thread.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\thread_win32_osx.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\timeman.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\tt.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\tune.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\types.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\uci.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\MyBitBoard.h">
+      <Filter>header\chess</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\layers\affine_transform.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\layers\affine_transform_sparse_input.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\layers\clipped_relu.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\evaluate_nnue.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\features\half_ka_v2_hm.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\incbin\incbin.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\nnue_architecture.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\nnue_accumulator.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\nnue_common.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\nnue_feature_transformer.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\layers\simd.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\layers\sqr_clipped_relu.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\syzygy\tbprobe.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="stockfish_interface.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="NeuroFox\gpu_math.cu">
       <Filter>source\nnet</Filter>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\StockFish\Makefile">
+      <Filter>header\sf</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -518,7 +518,6 @@ static float get_curr_reward(const ChessBoard& board, const std::unique_ptr<Move
 		}*/
 	}
 
-	std::vector<std::unique_ptr<Move>>& moves = board.getAllLegalMoves();
 	BoardRepresentation rep = board.getBoardRepresentation();
 	BitBoard enemy_color = color == White ? rep.PiecesOfColor[Black] : rep.PiecesOfColor[White];
 	Square destination_square = move.get()->getDestination();
@@ -648,6 +647,9 @@ void leonardo_overlord::train_on_gm_games()
 					}
 
 					board.makeMove(*moves[i].get());
+					
+					std::cout << moves[i].get()->getString() << " - " << stockfish_interface::eval(board.getFen(), 10) << "\n";
+				
 					found_move = true;
 					ds_idx++;
 					break;

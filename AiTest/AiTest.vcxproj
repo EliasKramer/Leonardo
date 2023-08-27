@@ -177,7 +177,6 @@
     <ClCompile Include="..\LeonardoAi\NeuroFox\util.cpp" />
     <ClCompile Include="..\LeonardoAi\NeuroFox\vector3.cpp" />
     <ClCompile Include="..\MockChessEngine\AlphaBetaPruningBot.cpp" />
-    <ClCompile Include="..\MockChessEngine\BitBoard.cpp" />
     <ClCompile Include="..\MockChessEngine\BoardRepresentation.cpp" />
     <ClCompile Include="..\MockChessEngine\ChessBoard.cpp" />
     <ClCompile Include="..\MockChessEngine\ChessPiece.cpp" />
@@ -192,6 +191,7 @@
     <ClCompile Include="..\MockChessEngine\MoveDoublePawn.cpp" />
     <ClCompile Include="..\MockChessEngine\MoveEnPassant.cpp" />
     <ClCompile Include="..\MockChessEngine\MovePromote.cpp" />
+    <ClCompile Include="..\MockChessEngine\MyBitBoard.cpp" />
     <ClCompile Include="..\MockChessEngine\Player.cpp" />
     <ClCompile Include="..\MockChessEngine\RandomPlayer.cpp" />
     <ClCompile Include="board_flipper_test.cpp" />
@@ -226,7 +226,6 @@
     <ClInclude Include="..\LeonardoAi\NeuroFox\util.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\vector3.hpp" />
     <ClInclude Include="..\MockChessEngine\AlphaBetaPruningBot.h" />
-    <ClInclude Include="..\MockChessEngine\BitBoard.h" />
     <ClInclude Include="..\MockChessEngine\BoardRepresentation.h" />
     <ClInclude Include="..\MockChessEngine\ChessBoard.h" />
     <ClInclude Include="..\MockChessEngine\ChessPiece.h" />
@@ -241,6 +240,7 @@
     <ClInclude Include="..\MockChessEngine\MoveDoublePawn.h" />
     <ClInclude Include="..\MockChessEngine\MoveEnPassant.h" />
     <ClInclude Include="..\MockChessEngine\MovePromote.h" />
+    <ClInclude Include="..\MockChessEngine\MyBitBoard.h" />
     <ClInclude Include="..\MockChessEngine\Player.h" />
     <ClInclude Include="..\MockChessEngine\RandomPlayer.h" />
   </ItemGroup>

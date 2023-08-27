@@ -1,5 +1,5 @@
 #pragma once
-#include "BitBoard.h"
+#include "MyBitBoard.h"
 #include "DataAndTypes.h"
 #include "ChessPiece.h"
 #include <memory>
