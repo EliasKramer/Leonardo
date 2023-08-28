@@ -9,6 +9,7 @@
 #include <mutex>
 // Define mutex for synchronized output
 #include <iostream>
+#include "main.h"
 
 int main(int argc, char* argv[])
 {
@@ -16,12 +17,17 @@ int main(int argc, char* argv[])
 	//float evaluation = stockfish_interface::eval(STARTING_FEN.c_str(), 12);
 	//sync_cout << "evaluation: " << evaluation << sync_endl;
 	
+	//neural_network nn("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\lil_stockfish_small_fast_epoch_16800\\value.parameters");
+	//std::cout << nn.parameter_analysis();
+	//return 0;
 	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
-	leonardo_overlord overlord("better_value");
-	overlord.train_on_gm_games();
-	
+	leonardo_overlord overlord("uiuiui");
+	//overlord.train_on_gm_games();
+	overlord.create_dataset();
 
 	return 0;
+	matrix m;
+	m.get_string();
 
 	ChessBoard b(STARTING_FEN);
 	b.getFen();

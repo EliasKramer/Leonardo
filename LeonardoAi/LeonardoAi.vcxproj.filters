@@ -407,6 +407,7 @@
     <ClInclude Include="stockfish_interface.hpp">
       <Filter>header</Filter>
     </ClInclude>
+    <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="NeuroFox\gpu_math.cu">

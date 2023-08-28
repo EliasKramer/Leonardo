@@ -72,6 +72,7 @@ public:
 
 	void train();
 	void train_on_gm_games();
+	void create_dataset();
 
 private:
 	void train_value_nnet_thread_fn(

@@ -387,14 +387,16 @@ leonardo_overlord::leonardo_overlord(
 	//best_value_nnet = neural_network("value.parameters");
 	
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
-	best_value_nnet.add_fully_connected_layer(2048, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(2048, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output(), identity_fn);
 	best_value_nnet.xavier_initialization();
 	
@@ -448,6 +450,19 @@ static std::vector<std::string> read_file_lines(const std::string& filename) {
 
 	file.close();
 	return lines;
+}
+
+static void write_file_lines(const std::string& filename, std::vector<std::string> lines)
+{
+	std::ofstream file(filename);
+	if (!file.is_open()) {
+		std::cerr << "Error: Could not open file '" << filename << "'" << std::endl;
+		return;
+	}
+	for (std::string line : lines) {
+		file << line << std::endl;
+	}
+	file.close();
 }
 
 static std::vector<std::string> split_string(const std::string& input, char separator) {
@@ -504,7 +519,7 @@ static float get_curr_reward(const ChessBoard& board, const std::unique_ptr<Move
 				2*3,2
 				1*9
 				2*5
-			
+
 			return 50;
 		}
 		else if ((state == WhiteWon && color == Black) || (state == BlackWon && color == White))
@@ -542,12 +557,13 @@ void leonardo_overlord::train_on_gm_games()
 	matrix input(leonardo_util::get_input_format());
 	matrix label(leonardo_util::get_value_nnet_output());
 
-	float learning_rate = 1;
-
 	int batch_size = 100;
 	int ds_idx = 0;
 	std::unique_ptr<data_space> ds;
-	int start_idx = 0;
+	int start_idx = 16900;
+
+	int depth = 4;
+
 	for (int g = start_idx; g < games.size(); g++)
 	{
 		if (g % batch_size == 0)
@@ -555,22 +571,21 @@ void leonardo_overlord::train_on_gm_games()
 			if (g != start_idx)
 			{
 				std::cout << get_current_time_str() << "\n";
-				if(gpu_mode)
+				if (gpu_mode)
 					ds->copy_to_gpu();
-				
+
 				new_value_nnet.sync_device_and_host();
 				best_value_nnet.sync_device_and_host();
 
 				std::cout << "testing\n";
 				test_result test_res = new_value_nnet.test_on_ds(*ds.get());
 				std::cout << test_res.to_string() << "\n";
-				
+
 				auto start = std::chrono::high_resolution_clock::now();
 				std::cout << "learning on " << ds->get_item_count() << " positions \n";
-				new_value_nnet.learn_on_ds(*ds.get(), 1, 100, learning_rate, true);
+				new_value_nnet.learn_on_ds(*ds.get(), 1, 100, 0.0001, true);
 				auto end = std::chrono::high_resolution_clock::now();
 				std::cout << "done. took " << ms_to_str(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()) << "\n";
-				learning_rate *= 0.99f;
 
 				new_value_nnet.sync_device_and_host();
 				best_value_nnet.sync_device_and_host();
@@ -594,6 +609,9 @@ void leonardo_overlord::train_on_gm_games()
 				batch_item_size,
 				leonardo_util::get_input_format(),
 				leonardo_util::get_value_nnet_output());
+
+			std::cout << "start playing games. depth: " << depth << "\n";
+
 		}
 		std::vector<std::string> master_moves = split_string(games[g], ' ');
 		if (master_moves.size() == 0)
@@ -638,18 +656,22 @@ void leonardo_overlord::train_on_gm_games()
 					ds->set_data(input, ds_idx);
 					//ds->set_label(label, ds_idx);
 					//leonardo_util::set_move_value(*moves[i].get(), label, 0.0f, board.getCurrentTurnColor());
-					ds_indices.push_back(ds_idx);
-					rewards.push_back(get_curr_reward(board, moves[i], m == master_moves.size() - 1));
+					//ds_indices.push_back(ds_idx);
+					//rewards.push_back(get_curr_reward(board, moves[i], m == master_moves.size() - 1));
+					/*
 					if (rewards.size() != 1)
 					{
 						float curr_reward = rewards[rewards.size() - 1];
 						rewards[rewards.size() - 2] -= curr_reward;
 					}
+					*/
+					float stockfish_eval = stockfish_interface::eval(board.getFen(), depth);
+
+					//std::cout << " - " << stockfish_eval << " - " << board.getFen() << " - " << moves[i].get()->getString()<<"\n";
+					label.set_at_flat_host(0, stockfish_eval);
+					ds->set_label(label, ds_idx);
 
 					board.makeMove(*moves[i].get());
-					
-					std::cout << moves[i].get()->getString() << " - " << stockfish_interface::eval(board.getFen(), 10) << "\n";
-				
 					found_move = true;
 					ds_idx++;
 					break;
@@ -661,57 +683,127 @@ void leonardo_overlord::train_on_gm_games()
 				break;
 			}
 		}
-		if (!found_move)
+		std::cout << ".";
+		if ((g + 1) % 10 == 0)
 		{
-			std::cout << "not move found. continuing\n";
+			std::cout << "\n";
+		}
+	}
+}
+
+void leonardo_overlord::create_dataset()
+{
+	std::vector<std::string> games = read_file_lines("games.txt");
+	std::vector<std::string> dataset = read_file_lines("dataset.txt");
+
+	std::vector<std::string> config = split_string(dataset[0], ' ');
+	int depth = std::stoi(config[1]);
+	char seperator = ';';
+	int start_idx = std::stoi(split_string(dataset[dataset.size() - 1], seperator)[0]);
+
+	std::cout << "start_idx: " << start_idx << "\n";
+	std::cout << "depth: " << depth << "\n";
+
+
+	if (depth < 4 || depth > 50)
+	{
+		std::cout << "depth should be between 4 and 50\n";
+		return;
+	}
+	if (start_idx < 0)
+	{
+		std::cout << "start_idx should be higher than 0\n";
+		return;
+	}
+
+	int master_move_sum = 0;
+	int played_games_sum = 0;
+	int stepsize = 10;
+
+	auto start = std::chrono::high_resolution_clock::now();
+	auto local_start = std::chrono::high_resolution_clock::now();
+	for (int g = start_idx; g < games.size(); g++)
+	{
+		std::vector<std::string> master_moves = split_string(games[g], ' ');
+		if (master_moves.size() == 0)
+		{
+			std::cout << "mater moves are empty\n";
 			continue;
 		}
-		
-		float reward_sum = 0.0f;
-		float discount_factor = 0.9f;
-		std::vector<float> discounted_rewards(rewards.size());
-		//set last value
-		bool white_last_played = master_moves.size() % 2 == 0; //it would be != 0, but we have a "won" data in the beginning, so it's 1 more
-		const int WINSCORE = 20;
-		if (white_last_played == white_won) //person who played last won
+		ChessBoard board(STARTING_FEN);
+		bool white_won = true;
+		bool found_move = false;
+		for (int m = 0; m < (int)master_moves.size(); m++)
 		{
-			rewards[rewards.size() - 1] = WINSCORE;
-			discounted_rewards[rewards.size() - 1] = WINSCORE;
-			rewards[rewards.size() - 2] = -WINSCORE;
-			discounted_rewards[rewards.size() - 2] = -WINSCORE;
-		}
-		else if (white_last_played != white_won) //person who played last lost
-		{
-			rewards[rewards.size() - 1] = -WINSCORE;
-			discounted_rewards[rewards.size() - 1] = -WINSCORE;
-			rewards[rewards.size() - 2] = WINSCORE;
-			discounted_rewards[rewards.size() - 2] = WINSCORE;
-		}
-		else // draw
-		{
-			std::cout << "this should not happen 1\n";
-		}
+			if (m == 0)
+			{
+				if (master_moves[0] == "1")
+				{
+					white_won = true;
+				}
+				else if (master_moves[0] == "0")
+				{
+					white_won = false;
+				}
+				else
+				{
+					std::cout << "no outcome found\n";
+				}
+				continue;
+			}
 
-		//this is shit, but yolo
-		for (int i = rewards.size() - 3; i >= 0; i -= 2)
-		{
-			float prev_discounted_reward = discounted_rewards[i + 2];
-			discounted_rewards[i] = rewards[i] + discount_factor * prev_discounted_reward;
-		}
-		for (int i = rewards.size() - 4; i >= 0; i -= 2)
-		{
-			float prev_discounted_reward = discounted_rewards[i + 2];
-			discounted_rewards[i] = rewards[i] + discount_factor * prev_discounted_reward;
-		}
+			std::vector<std::unique_ptr<Move>> moves = board.getAllLegalMoves();
+			found_move = false;
+			for (int i = 0; i < moves.size(); i++)
+			{
+				if (moves[i]->getString() == master_moves[m])
+				{
+					float stockfish_eval = stockfish_interface::eval(board.getFen(), depth);
+					std::string data_piece =
+						std::to_string(g) + seperator +
+						std::to_string(m) + seperator +
+						moves[i].get()->getString() + seperator +
+						std::to_string(stockfish_eval) + seperator +
+						board.getFen();
+					dataset.push_back(data_piece);
 
-		//set discounted rewards
-		for (int i = 0; i < rewards.size(); i++)
-		{
-			//std::cout << "master move: " << master_moves[i+1] << " reward: " << rewards[i] << " discounted reward: " << discounted_rewards[i] << "\n";
-			label.set_at_flat_host(0, discounted_rewards[i]);
-			ds->set_label(label, ds_indices[i]);
+					master_move_sum++;
+
+					board.makeMove(*moves[i].get());
+
+					found_move = true;
+					break;
+				}
+			}
+			if (!found_move)
+			{
+				std::cout << "no move found: " + std::to_string(g) + " " + master_moves[m] + "\n";
+				break;
+			}
 		}
-		
+		if ((g + 1) % stepsize == 0)
+		{
+			played_games_sum += stepsize;
+			//time elapsed
+			auto end = std::chrono::high_resolution_clock::now();
+			auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+			auto local_elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - local_start);
+			local_start = std::chrono::high_resolution_clock::now();
+			std::cout << "\n";
+			std::cout << "time elapsed: " << ms_to_str(elapsed_ms.count())<< "\n";
+			std::cout << "time per game: " << (float)(elapsed_ms.count())/(played_games_sum) << "ms\n";
+			std::cout << "time per move: " << (float)elapsed_ms.count() / (master_move_sum) << "ms\n";
+			//remaining with start idx
+			int elapsed_iterations = g - start_idx + 1;
+			int remaining_iterations = games.size() - elapsed_iterations;
+			
+			int remaining_ms = (int)((float)elapsed_ms.count() / (float)elapsed_iterations * (float)remaining_iterations);
+
+			std::cout << "remaining time: " << ms_to_str(remaining_ms) <<"\n";
+			std::cout << (g+1) << "/" << games.size();
+			//write to dataset file
+			write_file_lines("dataset.txt", dataset);
+		}
 	}
 }
 
