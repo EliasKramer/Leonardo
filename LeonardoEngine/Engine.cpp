@@ -39,31 +39,22 @@ std::vector<Move> getMoves(Board board, int depth)
 
 
 std::vector<Move> getMovesForPiece(Board board, Piece &piece)
-{
-	std::vector<Move> moves;
-	
-	switch (piece.type)
+{	switch (piece.type)
 	{
 		case PAWN:
-			moves = getMovesForPawn(board, piece);
-			break;
+			return getMovesForPawn(board, piece);
 		case KNIGHT:
-			moves = getMovesForKnight(board, piece);
-			break;
+			return getMovesForKnight(board, piece);
 		case BISHOP:
-			moves = getMovesForBishop(board, piece);
-			break;
+			return getMovesForBishop(board, piece);
 		case ROOK:
-			moves = getMovesForRook(board, piece);
-			break;
+			return getMovesForRook(board, piece);
 		case QUEEN:
-			moves = getMovesForQueen(board, piece);
-			break;
+			return getMovesForQueen(board, piece);
 		case KING:
-			moves = getMovesForKing(board, piece);
-			break;
+			return getMovesForKing(board, piece);
 	}
-	return moves;
+	throw;
 }
 
 std::vector<Move> getMovesForPawn(Board board, Piece &pawn)
