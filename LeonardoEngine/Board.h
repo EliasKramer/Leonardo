@@ -57,8 +57,8 @@ class Board
 		bitboard getBlackPieces();
 		bitboard getAllPieces();
 
-		std::vector<Piece> getWhitePiecesList();
-		std::vector<Piece> getBlackPiecesList();
+		std::vector<Piece> &getWhitePiecesList();
+		std::vector<Piece> &getBlackPiecesList();
 
 		Color getTurnColor();
 

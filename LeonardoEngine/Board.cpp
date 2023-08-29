@@ -519,11 +519,11 @@ bitboard Board::getAllPieces()
 	return whitePieces | blackPieces;
 }
 
-std::vector<Piece> Board::getWhitePiecesList() 
+std::vector<Piece> &Board::getWhitePiecesList() 
 {
 	return whitePiecesList;
 }
-std::vector<Piece> Board::getBlackPiecesList()
+std::vector<Piece> &Board::getBlackPiecesList()
 {
 	return blackPiecesList;
 }
