@@ -31,7 +31,7 @@ class Board
 		bool blackRightCastleAvailable = true;
 
 		std::vector<Piece> getPiecesOfColor(Color color);
-		bool checkDirectionForAttack(square square, direction dir, bitboard enemySlidingPieces);
+		bool checkDirectionForAttack(square square, direction dir, bitboard enemySlidingPieces) const;
 		void movePieceFromList(Color color, square from, square to);
 		void removePieceFromList(Color color, square square);
 	public:
@@ -40,34 +40,34 @@ class Board
 		pieceType getType(bitboard pieceBB);
 		std::string getFEN();
 
-		bool squareIsAttackedBy(square square, Color color);
+		bool squareIsAttackedBy(square square, Color color) const;
 
 		void executeMove(Move move);
 
 		bool isMoveStrictlyLegal(Move move);
 
-		bitboard getPawns();
-		bitboard getKnights();
-		bitboard getBishops();
-		bitboard getRooks();
-		bitboard getQueens();
-		bitboard getKings();
+		bitboard getPawns() const;
+		bitboard getKnights() const;
+		bitboard getBishops() const;
+		bitboard getRooks() const;
+		bitboard getQueens() const;
+		bitboard getKings() const;
 
-		bitboard getWhitePieces();
-		bitboard getBlackPieces();
-		bitboard getAllPieces();
+		bitboard getWhitePieces() const;
+		bitboard getBlackPieces() const;
+		bitboard getAllPieces() const;
 
 		std::vector<Piece> &getWhitePiecesList();
 		std::vector<Piece> &getBlackPiecesList();
 
-		Color getTurnColor();
+		Color getTurnColor() const;
 
-		bitboard getEnPassantSquare();
+		bitboard getEnPassantSquare() const;
 
-		bool getWhiteLeftCastleAvailable();
-		bool getWhiteRightCastleAvailable();
-		bool getBlackLeftCastleAvailable();
-		bool getBlackRightCastleAvailable();
+		bool getWhiteLeftCastleAvailable() const;
+		bool getWhiteRightCastleAvailable() const;
+		bool getBlackLeftCastleAvailable() const;
+		bool getBlackRightCastleAvailable() const;
 		void whiteCastle();
 		void blackCastle();
 };

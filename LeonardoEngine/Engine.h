@@ -6,24 +6,24 @@
 #include "Board.h"
 #include "Move.h"
 
-std::vector<Move> getMoves(Board board);
+std::vector<Move> getMoves(Board &board);
 
-std::vector<Move> getMoves(Board board, int depth);
+std::vector<Move> getMoves(Board &board, int depth);
 
 
-std::vector<Move> getMovesForPiece(Board board, Piece &piece);
+std::vector<Move> getMovesForPiece(const Board &board, Piece &piece);
 
-std::vector<Move> getMovesForPawn(Board board, Piece &pawn);
+std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn);
 
-std::vector<Move> getMovesForKnight(Board board, Piece &knight);
+std::vector<Move> getMovesForKnight(const Board &board, Piece &knight);
 
-std::vector<Move> getMovesForBishop(Board board, Piece &bishop);
+std::vector<Move> getMovesForBishop(const Board &board, Piece &bishop);
 
-std::vector<Move> getMovesForRook(Board board, Piece &rook);
+std::vector<Move> getMovesForRook(const Board &board, Piece &rook);
 
-std::vector<Move> getMovesForQueen(Board board, Piece &queen);
+std::vector<Move> getMovesForQueen(const Board &board, Piece &queen);
 
-std::vector<Move> getMovesForKing(Board board, Piece &king);
+std::vector<Move> getMovesForKing(const Board &board, Piece &king);
 
-void addSlidingMovesInDirection(std::vector<Move>& moves, Board board, Piece &piece, direction dir);
-void addMoveInDirection(std::vector<Move>& moves, Board board, Piece &piece, direction dir);
+void addSlidingMovesInDirection(std::vector<Move>& moves, const Board &board, Piece &piece, direction dir);
+void addMoveInDirection(std::vector<Move>& moves, const Board &board, Piece &piece, direction dir);

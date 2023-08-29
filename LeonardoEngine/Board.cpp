@@ -223,7 +223,7 @@ pieceType Board::getType(bitboard pieceBB)
 	return type;
 }
 
-bool Board::squareIsAttackedBy(square square, Color color)
+bool Board::squareIsAttackedBy(square square, Color color) const
 {
 	bitboard position = 1ULL << square;
 
@@ -259,7 +259,7 @@ bool Board::squareIsAttackedBy(square square, Color color)
 	return false;
 }
 
-bool Board::checkDirectionForAttack(square position, direction dir, bitboard enemySlidingPieces)
+bool Board::checkDirectionForAttack(square position, direction dir, bitboard enemySlidingPieces) const
 {
 	square nextSquare = position;
 	bitboard nextPosition = 1ULL << nextSquare;
@@ -481,40 +481,40 @@ bool Board::isMoveStrictlyLegal(Move move)
 	return !squareIsAttackedBy(turnColor == WHITE ? whiteKingSquare : blackKingSquare, (Color)!turnColor);
 }
 
-bitboard Board::getPawns()
+bitboard Board::getPawns() const
 {
 	return pawns;
 }
-bitboard Board::getKnights()
+bitboard Board::getKnights() const
 {
 	return knights;
 }
-bitboard Board::getBishops()
+bitboard Board::getBishops() const
 {
 	return bishops;
 }
-bitboard Board::getRooks()
+bitboard Board::getRooks() const
 {
 	return rooks;
 }
-bitboard Board::getQueens()
+bitboard Board::getQueens() const
 {
 	return queens;
 }
-bitboard Board::getKings()
+bitboard Board::getKings() const
 {
 	return kings;
 }
 
-bitboard Board::getWhitePieces()
+bitboard Board::getWhitePieces() const
 {
 	return whitePieces;
 }
-bitboard Board::getBlackPieces()
+bitboard Board::getBlackPieces() const
 {
 	return blackPieces;
 }
-bitboard Board::getAllPieces()
+bitboard Board::getAllPieces() const
 {
 	return whitePieces | blackPieces;
 }
@@ -528,32 +528,32 @@ std::vector<Piece> &Board::getBlackPiecesList()
 	return blackPiecesList;
 }
 
-Color Board::getTurnColor()
+Color Board::getTurnColor() const
 {
 	return turnColor;
 }
 
-bitboard Board::getEnPassantSquare()
+bitboard Board::getEnPassantSquare() const
 {
 	return enPassantSquare;
 }
 
-bool Board::getWhiteLeftCastleAvailable()
+bool Board::getWhiteLeftCastleAvailable() const
 {
 	return whiteLeftCastleAvailable;
 }
 
-bool Board::getWhiteRightCastleAvailable()
+bool Board::getWhiteRightCastleAvailable() const
 {
 	return whiteRightCastleAvailable;
 }
 
-bool Board::getBlackLeftCastleAvailable()
+bool Board::getBlackLeftCastleAvailable() const
 {
 	return blackLeftCastleAvailable;
 }
 
-bool Board::getBlackRightCastleAvailable()
+bool Board::getBlackRightCastleAvailable() const
 {
 	return blackRightCastleAvailable;
 }
