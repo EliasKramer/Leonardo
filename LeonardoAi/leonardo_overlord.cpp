@@ -385,7 +385,7 @@ leonardo_overlord::leonardo_overlord(
 	//best_policy_nnet = neural_network("policy.parameters");
 
 	//best_value_nnet = neural_network("value.parameters");
-	
+
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
 	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
@@ -399,7 +399,7 @@ leonardo_overlord::leonardo_overlord(
 	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output(), identity_fn);
 	best_value_nnet.xavier_initialization();
-	
+
 	//best_value_nnet = neural_network("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\firestormV2_epoch_6600\\value.parameters");
 
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
@@ -691,38 +691,18 @@ void leonardo_overlord::train_on_gm_games()
 	}
 }
 
-void leonardo_overlord::create_dataset()
+static void create_dataset_thread(
+	int depth,
+	std::vector<std::string>& games,
+	std::vector<std::string>& dataset,
+	std::mutex& dataset_mutex,
+	std::mutex& sf_mutex,
+	int idx_from, //inclusive
+	int idx_to, //exclusive
+	int& progress_counter
+)
 {
-	std::vector<std::string> games = read_file_lines("games.txt");
-	std::vector<std::string> dataset = read_file_lines("dataset.txt");
-
-	std::vector<std::string> config = split_string(dataset[0], ' ');
-	int depth = std::stoi(config[1]);
-	char seperator = ';';
-	int start_idx = std::stoi(split_string(dataset[dataset.size() - 1], seperator)[0]);
-
-	std::cout << "start_idx: " << start_idx << "\n";
-	std::cout << "depth: " << depth << "\n";
-
-
-	if (depth < 4 || depth > 50)
-	{
-		std::cout << "depth should be between 4 and 50\n";
-		return;
-	}
-	if (start_idx < 0)
-	{
-		std::cout << "start_idx should be higher than 0\n";
-		return;
-	}
-
-	int master_move_sum = 0;
-	int played_games_sum = 0;
-	int stepsize = 10;
-
-	auto start = std::chrono::high_resolution_clock::now();
-	auto local_start = std::chrono::high_resolution_clock::now();
-	for (int g = start_idx; g < games.size(); g++)
+	for (int g = idx_from; g < idx_to; g++)
 	{
 		std::vector<std::string> master_moves = split_string(games[g], ' ');
 		if (master_moves.size() == 0)
@@ -731,24 +711,15 @@ void leonardo_overlord::create_dataset()
 			continue;
 		}
 		ChessBoard board(STARTING_FEN);
-		bool white_won = true;
+
 		bool found_move = false;
+
+		std::string move_str = "";
+		std::string values_str = "";
 		for (int m = 0; m < (int)master_moves.size(); m++)
 		{
 			if (m == 0)
 			{
-				if (master_moves[0] == "1")
-				{
-					white_won = true;
-				}
-				else if (master_moves[0] == "0")
-				{
-					white_won = false;
-				}
-				else
-				{
-					std::cout << "no outcome found\n";
-				}
 				continue;
 			}
 
@@ -758,16 +729,12 @@ void leonardo_overlord::create_dataset()
 			{
 				if (moves[i]->getString() == master_moves[m])
 				{
+					std::lock_guard<std::mutex> lock(sf_mutex);
 					float stockfish_eval = stockfish_interface::eval(board.getFen(), depth);
-					std::string data_piece =
-						std::to_string(g) + seperator +
-						std::to_string(m) + seperator +
-						moves[i].get()->getString() + seperator +
-						std::to_string(stockfish_eval) + seperator +
-						board.getFen();
-					dataset.push_back(data_piece);
 
-					master_move_sum++;
+
+					move_str += moves[i].get()->getString() + " ";
+					values_str += std::to_string(stockfish_eval) + " ";
 
 					board.makeMove(*moves[i].get());
 
@@ -781,29 +748,113 @@ void leonardo_overlord::create_dataset()
 				break;
 			}
 		}
-		if ((g + 1) % stepsize == 0)
-		{
-			played_games_sum += stepsize;
-			//time elapsed
-			auto end = std::chrono::high_resolution_clock::now();
-			auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-			auto local_elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - local_start);
-			local_start = std::chrono::high_resolution_clock::now();
-			std::cout << "\n";
-			std::cout << "time elapsed: " << ms_to_str(elapsed_ms.count())<< "\n";
-			std::cout << "time per game: " << (float)(elapsed_ms.count())/(played_games_sum) << "ms\n";
-			std::cout << "time per move: " << (float)elapsed_ms.count() / (master_move_sum) << "ms\n";
-			//remaining with start idx
-			int elapsed_iterations = g - start_idx + 1;
-			int remaining_iterations = games.size() - elapsed_iterations;
-			
-			int remaining_ms = (int)((float)elapsed_ms.count() / (float)elapsed_iterations * (float)remaining_iterations);
+		std::lock_guard<std::mutex> lock(dataset_mutex);
+		std::string g_str = std::to_string(g);
+		dataset.push_back("" + g_str + ";" + move_str);
+		dataset.push_back("" + g_str + ";" + values_str);
+		progress_counter++;
+	}
+}
 
-			std::cout << "remaining time: " << ms_to_str(remaining_ms) <<"\n";
-			std::cout << (g+1) << "/" << games.size();
-			//write to dataset file
-			write_file_lines("dataset.txt", dataset);
+void leonardo_overlord::create_dataset()
+{
+	std::vector<std::string> games = read_file_lines("games.txt");
+	std::vector<std::string> dataset = read_file_lines("dataset.txt");
+
+	std::vector<std::string> config = split_string(dataset[0], ' ');
+	int depth = std::stoi(config[1]);
+	int start_point = std::stoi(config[3]);
+	int stop_point = std::stoi(config[5]);
+	int threads = std::stoi(config[7]);
+
+	std::cout << "depth: " << depth << "\n";
+	std::cout << "start_point: " << start_point << "\n";
+	std::cout << "stop_point: " << stop_point << "\n";
+	std::cout << "threads: " << threads << "\n";
+
+
+	if (depth < 4 || depth > 50)
+	{
+		std::cout << "depth should be between 4 and 50\n";
+		return;
+	}
+	if (start_point < 0)
+	{
+		std::cout << "start_idx should be higher than 0\n";
+		return;
+	}
+	if (threads < 1 || threads > 100)
+	{
+		std::cout << "threads should be between 1 and 100\n";
+		return;
+	}
+	if (start_point >= stop_point)
+	{
+		std::cout << "start_idx should be lower than stop_idx\n";
+		return;
+	}
+	if (stop_point > games.size())
+	{
+		std::cout << "stop_idx should be lower than the number of games (which is " << games.size() << ")\n";
+		return;
+	}
+
+
+	int master_move_sum = 0;
+	int played_games_sum = 0;
+
+	int progress_counter = 0;
+	std::mutex dataset_mutex;
+	std::mutex sf_mutex;
+
+	int total_games = stop_point - start_point;
+	int games_per_thread = total_games / threads;
+
+	std::vector<std::thread> thread_pool;
+
+	for (int i = 0; i < threads; i++)
+	{
+		int start_idx = i * games_per_thread;
+		int stop_idx = (i + 1) * games_per_thread;
+		if (i == threads - 1)
+		{
+			stop_idx = stop_point;
 		}
+
+		std::thread t(
+			create_dataset_thread,
+			depth,
+			std::ref(games),
+			std::ref(dataset),
+			std::ref(dataset_mutex),
+			std::ref(sf_mutex),
+			start_idx,
+			stop_idx,
+			std::ref(progress_counter));
+
+		thread_pool.push_back(std::move(t));
+	}
+
+	std::cout << threads << " threads started. each working on " << games_per_thread << " games\n";
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	while (progress_counter < total_games)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+		auto end = std::chrono::high_resolution_clock::now();
+		long long elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+		int remaining_ms = (total_games * elapsed_ms) / (std::max(1, progress_counter));
+
+		std::cout << "progress: " << progress_counter << "/" << total_games <<
+			" elapsed: " << ms_to_str(elapsed_ms) <<
+			" remaining: " << ms_to_str(remaining_ms) <<
+			"\n";
+
+		std::lock_guard<std::mutex> lock(dataset_mutex);
+		write_file_lines("dataset.txt", dataset);
 	}
 }
 
