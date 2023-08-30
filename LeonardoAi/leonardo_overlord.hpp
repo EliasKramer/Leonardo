@@ -26,7 +26,7 @@ private:
 	neural_network new_policy_nnet;
 	neural_network new_value_nnet;
 
-	bool gpu_mode = false;
+	const bool gpu_mode = true;
 
 	void save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet);
 
@@ -73,6 +73,7 @@ public:
 	void train();
 	void train_on_gm_games();
 	void create_dataset();
+	void train_on_dataset();
 
 private:
 	void train_value_nnet_thread_fn(

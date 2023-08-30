@@ -15,7 +15,7 @@ vector3 leonardo_util::get_policy_output_format()
 	return vector3(64, 64, 1);
 }
 
-vector3 leonardo_util::get_value_nnet_output()
+vector3 leonardo_util::get_value_nnet_output_format()
 {
 	return vector3(1, 1, 1);
 }
@@ -202,7 +202,7 @@ int leonardo_util::get_random_best_move(
 void leonardo_util::set_value_nnet_output(matrix& output, const ChessBoard& game, ChessColor color)
 {
 	GameState state = game.getGameState();
-	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output()));
+	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output_format()));
 	smart_assert(output.host_data_is_updated());
 	smart_assert(state != GameState::Ongoing);
 
@@ -236,14 +236,14 @@ void leonardo_util::set_value_nnet_output(matrix& output, const ChessBoard& game
 	output.sync_device_and_host();
 }
 
-float leonardo_util::get_value_nnet_output(matrix& output)
+float leonardo_util::get_value_nnet_output_format(matrix& output)
 {
 	if (!output.host_data_is_updated())
 	{
 		int x = 0;
 	}
 	smart_assert(output.host_data_is_updated());
-	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output()));
+	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output_format()));
 
 	//not necessary?
 	//output.sync_device_and_host();

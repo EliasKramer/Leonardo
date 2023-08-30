@@ -10,7 +10,7 @@ namespace leonardo_util
 {
 	vector3 get_input_format();
 	vector3 get_policy_output_format();
-	vector3 get_value_nnet_output();
+	vector3 get_value_nnet_output_format();
 
 	void set_matrix_from_chessboard(const ChessBoard& board, matrix& input);
 	int square_to_flat_idx(Square s, ChessColor color_to_move);
@@ -24,7 +24,7 @@ namespace leonardo_util
 
 	void set_value_nnet_output(matrix& output, const ChessBoard& game, ChessColor color);
 
-	float get_value_nnet_output(matrix& output);
+	float get_value_nnet_output_format(matrix& output);
 
 	matrix& matrix_map_get(
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,

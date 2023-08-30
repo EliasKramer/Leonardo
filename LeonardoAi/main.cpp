@@ -21,9 +21,9 @@ int main(int argc, char* argv[])
 	//std::cout << nn.parameter_analysis();
 	//return 0;
 	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
-	leonardo_overlord overlord("uiuiui");
+	leonardo_overlord overlord("ds_training");
 	//overlord.train_on_gm_games();
-	overlord.create_dataset();
+	overlord.train_on_dataset();
 
 	return 0;
 	matrix m;
