@@ -386,19 +386,13 @@ leonardo_overlord::leonardo_overlord(
 
 	//best_value_nnet = neural_network("value.parameters");
 
+	
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
-	best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
-
-	//best_value_nnet = neural_network("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\firestormV2_epoch_6600\\value.parameters");
+	
+	//best_value_nnet = neural_network("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\pre_calced_dataset_epoch_178200\\value.parameters");
 
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
 	/*
@@ -886,7 +880,7 @@ static void play_games(
 				leonardo_util::set_matrix_from_chessboard(board, input);
 				ds->set_data(input, ds_idx);
 
-				label.set_at_flat_host(0, sf_eval[m]);
+				label.set_at_flat_host(0, sf_eval[m] / 10);
 				ds->set_label(label, ds_idx);
 
 				board.makeMove(*moves[i].get());
@@ -916,53 +910,61 @@ void leonardo_overlord::train_on_dataset()
 	if (dataset.size() % 2 != 0)
 	{
 		std::cout << "dataset size is not even\n";
+		for (int i = 0; i < dataset.size() - 1; i += 2)
+		{
+			std::string l1 = dataset[i];
+			std::string l2 = dataset[i + 1];
+
+			std::vector<std::string> first_split = split_string(l1, ';');
+			std::vector<std::string> second_split = split_string(l2, ';');
+
+			if (first_split.size() != 2 && second_split.size() != 2)
+			{
+				std::cout << "invalid data\n";
+				std::cout << "line" << i << "\n";
+			}
+			if (first_split.size() == 0 || second_split.size() == 0)
+			{
+				continue;
+			}
+			if (first_split[0] != second_split[0])
+			{
+				std::cout << "invalid combination: line " << i << "\n";
+				return;
+			}
+		}
+
 		return;
 	}
-	for (int i = start_idx; i < dataset.size(); i += 2)
+
+	int testing_interval = 10;
+	int testing_counter = 0;
+
+	for (int i = start_idx; i < dataset.size() - 1; i += 2)
 	{
-		/*std::cout << get_current_time_str() << "\n";
-				if (gpu_mode)
-					ds->copy_to_gpu();
+		int game_idx = i / 2;
 
-				new_value_nnet.sync_device_and_host();
-				best_value_nnet.sync_device_and_host();
-
-				std::cout << "testing\n";
-				test_result test_res = new_value_nnet.test_on_ds(*ds.get());
-				std::cout << test_res.to_string() << "\n";
-
-				auto start = std::chrono::high_resolution_clock::now();
-				std::cout << "learning on " << ds->get_item_count() << " positions \n";
-				new_value_nnet.learn_on_ds(*ds.get(), 1, 100, 0.0001, true);
-				auto end = std::chrono::high_resolution_clock::now();
-				std::cout << "done. took " << ms_to_str(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()) << "\n";
-
-				new_value_nnet.sync_device_and_host();
-				best_value_nnet.sync_device_and_host();
-
-				best_value_nnet.set_parameters(new_value_nnet);
-
-				new_value_nnet.sync_device_and_host();
-				best_value_nnet.sync_device_and_host();
-
-				save_best_to_file(g, true, false);*/
-		if ((i) % games_per_training_step == 0)
+		if ((game_idx) % games_per_training_step == 0 || i == start_idx)
 		{
 			if (i != start_idx)
 			{
-				if(gpu_mode)
+				if (gpu_mode)
 					ds->copy_to_gpu();
 
-				new_value_nnet.sync_device_and_host();
-				best_value_nnet.sync_device_and_host();
+				if (testing_counter % testing_interval == 0)
+				{
+					new_value_nnet.sync_device_and_host();
+					best_value_nnet.sync_device_and_host();
 
-				std::cout << "testing\n";
-				test_result test_res = new_value_nnet.test_on_ds(*ds.get());
-				std::cout << test_res.to_string() << "\n";
-
-				std::cout << "learning\n";
+					std::cout << "testing\n";
+					test_result test_res = new_value_nnet.test_on_ds(*ds.get());
+					std::cout << test_res.to_string() << "\n";
+					testing_counter = 0;
+				}
+				std::cout << (game_idx) << "/" << data_count << " " << get_current_time_str() << "\n";
+				std::cout << "learning on " << ds->get_item_count() << " positions\n";
 				auto start = std::chrono::high_resolution_clock::now();
-				new_value_nnet.learn_on_ds(*ds, 1, 200, 0.0001, true);
+				new_value_nnet.learn_on_ds(*ds, 1, 1000, 0.01f, true);
 				auto end = std::chrono::high_resolution_clock::now();
 				long long elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 				std::cout << "learning took " << ms_to_str(elapsed_ms) << "\n";
@@ -970,19 +972,30 @@ void leonardo_overlord::train_on_dataset()
 				new_value_nnet.sync_device_and_host();
 				best_value_nnet.sync_device_and_host();
 
+				if (best_value_nnet.equal_parameter(new_value_nnet))
+				{
+					std::cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n";
+					std::cout << "no change between new and best value nnet\n";
+					std::cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n";
+				}
 				best_value_nnet.set_parameters(new_value_nnet);
 
 				new_value_nnet.sync_device_and_host();
 				best_value_nnet.sync_device_and_host();
 
-				save_best_to_file(i, true, false);
+				if (testing_counter == 0)
+				{
+					save_best_to_file(i, true, false);
+				}
+				std::cout << "---------------------\n";
+				testing_counter++;
 			}
 
 			ds_idx = 0;
 			ds.reset();
 			int move_sum = 0;
-			for (int mv = i; mv < std::min((int)dataset.size() - 1, (i + games_per_training_step)); mv += 2)
-			{//dont forget gpu
+			for (int mv = i; mv < std::min((int)dataset.size() - 1, (i + (games_per_training_step * 2))); mv += 2)
+			{
 				move_sum += split_string(dataset[mv], ' ').size();
 			}
 			ds = std::make_unique<data_space>(
@@ -1020,6 +1033,50 @@ void leonardo_overlord::train_on_dataset()
 		}
 
 		play_games(i, ds, ds_idx, master_moves, master_values);
+	}
+}
+
+void leonardo_overlord::test_eval_on_single_match(const std::string& moves)
+{
+	if (gpu_mode)
+	{
+		std::cout << "gpu mode not supported\n";
+		return;
+	}
+
+	std::vector<std::string> master_moves = split_string(moves, ' ');
+
+	matrix input(leonardo_util::get_input_format());
+	matrix label(leonardo_util::get_value_nnet_output_format());
+
+	ChessBoard board(STARTING_FEN);
+	bool found_move = false;
+	for (int m = 0; m < (int)master_moves.size(); m++)
+	{
+		std::vector<std::unique_ptr<Move>> moves = board.getAllLegalMoves();
+		found_move = false;
+		for (int i = 0; i < moves.size(); i++)
+		{
+			if (moves[i]->getString() == master_moves[m])
+			{
+				leonardo_util::set_matrix_from_chessboard(board, input);
+				new_value_nnet.forward_propagation(input);
+				float value_nnet_out = new_value_nnet.get_output().get_at_flat_host(0) * 10;
+
+				float sf_eval = stockfish_interface::eval(board.getFen(), 10);
+
+				std::cout << "move " << master_moves[m] << " value_nnet_out " << value_nnet_out << " sf_eval " << sf_eval << "\n";
+
+				board.makeMove(*moves[i].get());
+				found_move = true;
+				break;
+			}
+		}
+		if (!found_move)
+		{
+			std::cout << "no move found: " + master_moves[m] + "\n";
+			break;
+		}
 	}
 }
 

@@ -26,7 +26,7 @@ private:
 	neural_network new_policy_nnet;
 	neural_network new_value_nnet;
 
-	const bool gpu_mode = true;
+	const bool gpu_mode = false;
 
 	void save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet);
 
@@ -74,6 +74,7 @@ public:
 	void train_on_gm_games();
 	void create_dataset();
 	void train_on_dataset();
+	void test_eval_on_single_match(const std::string& moves);
 
 private:
 	void train_value_nnet_thread_fn(
