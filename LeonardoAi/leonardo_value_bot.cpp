@@ -217,65 +217,91 @@ float leonardo_value_bot::get_move_score_recursively(
 	}
 }
 
-int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& legal_moves)
+void leonardo_value_bot::thread_task(
+	int thread_id,
+	const std::string& move_str,
+	std::vector<float>& scores,
+	ChessBoard board)
 {
-	auto begin = std::chrono::high_resolution_clock::now();
-
-	//needs to choose the greatest negative numbner if black
 	bool isWhiteToMove = board.getCurrentTurnColor() == White;
 	int colorMult = isWhiteToMove ? 1 : -1;
 
 	int endPointsEvaluated = 0;
 	int nodesSearched = 0;
+	int maxCaptureDepthReached = 0;
 
-	int depth = 4;
+	float move_score =
+		get_move_score_recursively(
+			board,
+			depth,
+			!isWhiteToMove,
+			BLACK_WIN_EVAL_VALUE,
+			WHITE_WIN_EVAL_VALUE,
+			nodesSearched,
+			endPointsEvaluated,
+			maxCaptureDepthReached);
 
-	float bestMoveScore = -FLT_MAX;
-	float bestMoveIdx = 0;
+	scores[thread_id] = move_score;
+
+	std::cout
+		<< "Move: " + move_str
+		+ ", Score: " + std::to_string(move_score)
+		+ ", Max Capture Depth: " + std::to_string(maxCaptureDepthReached)
+		+ ", Endstates Evaluated: " + std::to_string(endPointsEvaluated)
+		+ "\n";
+}
+
+int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& legal_moves)
+{
+	auto begin = std::chrono::high_resolution_clock::now();
 
 	int moveIdx = 0;
+	std::vector<float> move_scores(legal_moves.size());
+	std::vector<std::thread> threads;
+
 	for (const std::unique_ptr<Move>& curr : legal_moves)
 	{
 		ChessBoard boardCopy = board;
 		boardCopy.makeMove(*curr);
 
-		int maxCaptureDepthReached = 0;
 
-		int endstatesBefore = endPointsEvaluated;
-
-		float moveScore =
-			get_move_score_recursively(
-				boardCopy,
-				depth - 1,
-				!isWhiteToMove,
-				BLACK_WIN_EVAL_VALUE,
-				WHITE_WIN_EVAL_VALUE,
-				nodesSearched,
-				endPointsEvaluated,
-				maxCaptureDepthReached
-			);
-
-		float currScore = colorMult * moveScore;
-
-		std::cout
-			<< "Move: " << curr.get()->getString()
-			<< ", Score: " << currScore
-			<< ", Max Capture Depth: " << maxCaptureDepthReached
-			<< ", Endstates Evaluated: " << endPointsEvaluated - endstatesBefore
-			<< std::endl;
-
-		if (currScore > bestMoveScore)
-		{
-			bestMoveScore = currScore;
-			bestMoveIdx = moveIdx;
-		}
+		threads.push_back(std::thread(
+			&leonardo_value_bot::thread_task,
+			this,
+			moveIdx,
+			curr.get()->getString(),
+			std::ref(move_scores),
+			boardCopy
+		));
 
 		moveIdx++;
+	}
+
+	for (std::thread& curr : threads)
+	{
+		if (curr.joinable())
+		{
+			curr.join();
+		}
+	}
+
+	float bestMoveScore = INT_MIN;
+	int bestMoveIdx = 0;
+	for (int i = 0; i < move_scores.size(); i++)
+	{
+		if (move_scores[i] > bestMoveScore)
+		{
+			bestMoveScore = move_scores[i];
+			bestMoveIdx = i;
+		}
 	}
 
 	auto end = std::chrono::high_resolution_clock::now();
 
 	long long duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+
+	std::cout << "done. took " << ms_to_str(duration) << "\n";
+	std::cout << "curren position according to stockfish: " << stockfish_interface::eval(board.getFen(), 8) << "\n";
 
 	return bestMoveIdx;
 }

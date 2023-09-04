@@ -3,6 +3,7 @@
 #include "../MockChessEngine/Player.h"
 #include "NeuroFox/neural_network.hpp"
 #include "leonardo_util.hpp"
+#include "stockfish_interface.hpp"
 
 class leonardo_value_bot : public Player
 {
@@ -27,6 +28,12 @@ private:
 		int& nodesSearched,
 		int& endStatesSearched,
 		int& maxCaptureDepthReached);
+
+	void thread_task(
+		int thread_id,
+		const std::string& move_str,
+		std::vector<float>& scores,
+		ChessBoard board);
 public:
 	leonardo_value_bot(neural_network given_value_nnet);
 	leonardo_value_bot(

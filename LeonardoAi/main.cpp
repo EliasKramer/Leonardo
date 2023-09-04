@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
 	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
 	
 	ChessGame game(
-		std::make_unique<leonardo_value_bot>(nnet, 2, true, 0.5f, 0.5f),
-		std::make_unique<leonardo_value_bot>(nnet, 2, true, 0.5f, 0.5f),
+		std::make_unique<AlphaBetaPruningBot>(4),
+		std::make_unique<leonardo_value_bot>(nnet, 3, true, 0.1f, 0.5f),
 		STARTING_FEN);
 
 	game.start();
