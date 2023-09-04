@@ -236,7 +236,7 @@ void leonardo_util::set_value_nnet_output(matrix& output, const ChessBoard& game
 	output.sync_device_and_host();
 }
 
-float leonardo_util::get_value_nnet_output_format(matrix& output)
+float leonardo_util::get_value_nnet_output(matrix& output)
 {
 	if (!output.host_data_is_updated())
 	{

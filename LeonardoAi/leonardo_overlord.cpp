@@ -63,7 +63,7 @@ float leonardo_overlord::search(
 		given_value_nnet.get_output().sync_device_and_host();
 		//the value network outputs a positive value if it thinks, that the current player is winning
 		//it does not matter if the current player is white or black
-		return -1 * leonardo_util::get_value_nnet_output_format(given_value_nnet.get_output()); //cpu
+		return -1 * leonardo_util::get_value_nnet_output(given_value_nnet.get_output()); //cpu
 	}
 
 	std::vector<std::unique_ptr<Move>> legal_moves = game.getAllLegalMoves();
@@ -388,7 +388,7 @@ leonardo_overlord::leonardo_overlord(
 
 	
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
-	//best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(250, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
 	
@@ -939,7 +939,7 @@ void leonardo_overlord::train_on_dataset()
 
 	int testing_interval = 10;
 	int testing_counter = 0;
-
+	auto global_timer_start = std::chrono::high_resolution_clock::now();
 	for (int i = start_idx; i < dataset.size() - 1; i += 2)
 	{
 		int game_idx = i / 2;
@@ -964,7 +964,7 @@ void leonardo_overlord::train_on_dataset()
 				std::cout << (game_idx) << "/" << data_count << " " << get_current_time_str() << "\n";
 				std::cout << "learning on " << ds->get_item_count() << " positions\n";
 				auto start = std::chrono::high_resolution_clock::now();
-				new_value_nnet.learn_on_ds(*ds, 1, 1000, 0.01f, true);
+				new_value_nnet.learn_on_ds(*ds, 1, 1, 0.0001f, true);
 				auto end = std::chrono::high_resolution_clock::now();
 				long long elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 				std::cout << "learning took " << ms_to_str(elapsed_ms) << "\n";
@@ -987,6 +987,12 @@ void leonardo_overlord::train_on_dataset()
 				{
 					save_best_to_file(i, true, false);
 				}
+
+				long long elapsed_global_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - global_timer_start).count();
+				long long remaining = remaining_time(elapsed_global_ms, game_idx, data_count);
+
+				std::cout << "elapsed: " << ms_to_str(elapsed_global_ms) << "\n"
+						<< "remaining: " << ms_to_str(remaining) << "\n";
 				std::cout << "---------------------\n";
 				testing_counter++;
 			}
@@ -1084,8 +1090,8 @@ void leonardo_overlord::train()
 {
 	chess_arena arena(
 		"pit",
-		std::make_unique<leonardo_bot>(best_policy_nnet, distributed_random),
-		std::make_unique<leonardo_bot>(new_policy_nnet, distributed_random)
+		std::make_unique<leonardo_policy_bot>(best_policy_nnet, distributed_random),
+		std::make_unique<leonardo_policy_bot>(new_policy_nnet, distributed_random)
 	);
 
 	int iterations_per_file_save = 1;

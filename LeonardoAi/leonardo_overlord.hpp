@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "chess_arena.hpp"
-#include "leonardo_bot.hpp"
+#include "leonardo_policy_bot.hpp"
 #include <memory>
 #include "./NeuroFox/data_space.hpp"
 #include <filesystem>
@@ -26,7 +26,7 @@ private:
 	neural_network new_policy_nnet;
 	neural_network new_value_nnet;
 
-	const bool gpu_mode = false;
+	const bool gpu_mode = true;
 
 	void save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet);
 

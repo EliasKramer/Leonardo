@@ -24,7 +24,7 @@ namespace leonardo_util
 
 	void set_value_nnet_output(matrix& output, const ChessBoard& game, ChessColor color);
 
-	float get_value_nnet_output_format(matrix& output);
+	float get_value_nnet_output(matrix& output);
 
 	matrix& matrix_map_get(
 		std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,

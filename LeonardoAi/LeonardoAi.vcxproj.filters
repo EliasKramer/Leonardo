@@ -117,7 +117,7 @@
     <ClCompile Include="..\MockChessEngine\Medicrius.cpp">
       <Filter>source\chess</Filter>
     </ClCompile>
-    <ClCompile Include="leonardo_bot.cpp">
+    <ClCompile Include="leonardo_policy_bot.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="leonardo_util.cpp">
@@ -196,6 +196,9 @@
       <Filter>sf</Filter>
     </ClCompile>
     <ClCompile Include="stockfish_interface.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="leonardo_value_bot.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -296,7 +299,7 @@
     <ClInclude Include="..\MockChessEngine\Medicrius.h">
       <Filter>header\chess</Filter>
     </ClInclude>
-    <ClInclude Include="leonardo_bot.hpp">
+    <ClInclude Include="leonardo_policy_bot.hpp">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="leonardo_util.hpp">
@@ -408,6 +411,9 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="main.h" />
+    <ClInclude Include="leonardo_value_bot.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="NeuroFox\gpu_math.cu">

@@ -9,7 +9,7 @@ enum _playstyle_t {
 	distributed_random //not really stochastic - stochastic would roll a dice for each move - this works a bit different
 } typedef e_playstyle_t;
 
-class leonardo_bot : public Player
+class leonardo_policy_bot : public Player
 {
 private:
 	neural_network& nn;
@@ -17,7 +17,7 @@ private:
 
 	e_playstyle_t playstyle;
 public:
-	leonardo_bot(
+	leonardo_policy_bot(
 		neural_network& given_nn, 
 		e_playstyle_t given_playstyle);
 

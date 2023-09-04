@@ -1,6 +1,6 @@
-#include "leonardo_bot.hpp"
+#include "leonardo_policy_bot.hpp"
 
-leonardo_bot::leonardo_bot(
+leonardo_policy_bot::leonardo_policy_bot(
 	neural_network& given_nn,
 	e_playstyle_t given_playstyle
 ) :
@@ -15,7 +15,7 @@ leonardo_bot::leonardo_bot(
 	}
 }
 
-int leonardo_bot::getMove(const ChessBoard& board, const UniqueMoveList& legal_moves)
+int leonardo_policy_bot::getMove(const ChessBoard& board, const UniqueMoveList& legal_moves)
 {
 	leonardo_util::set_matrix_from_chessboard(board, input_board);
 	input_board.sync_device_and_host();

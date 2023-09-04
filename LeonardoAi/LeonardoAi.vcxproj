@@ -52,9 +52,10 @@
     <ClCompile Include="..\StockFish\uci.cpp" />
     <ClCompile Include="..\StockFish\ucioption.cpp" />
     <ClCompile Include="chess_arena.cpp" />
-    <ClCompile Include="leonardo_bot.cpp" />
+    <ClCompile Include="leonardo_policy_bot.cpp" />
     <ClCompile Include="leonardo_overlord.cpp" />
     <ClCompile Include="leonardo_util.cpp" />
+    <ClCompile Include="leonardo_value_bot.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NeuroFox\convolutional_layer.cpp" />
     <ClCompile Include="NeuroFox\data_space.cpp" />
@@ -121,9 +122,10 @@
     <ClInclude Include="..\StockFish\types.h" />
     <ClInclude Include="..\StockFish\uci.h" />
     <ClInclude Include="chess_arena.hpp" />
-    <ClInclude Include="leonardo_bot.hpp" />
+    <ClInclude Include="leonardo_policy_bot.hpp" />
     <ClInclude Include="leonardo_overlord.hpp" />
     <ClInclude Include="leonardo_util.hpp" />
+    <ClInclude Include="leonardo_value_bot.hpp" />
     <ClInclude Include="main.h" />
     <ClInclude Include="NeuroFox\assert_throw.hpp" />
     <ClInclude Include="NeuroFox\convolutional_layer.hpp" />
