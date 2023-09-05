@@ -95,7 +95,7 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn)
 				moves.push_back(move);
 		}
 
-		if (position & RANK_2 || position & RANK_7)
+		if ((position & RANK_2) && pawn.color == WHITE || ((position & RANK_7) && pawn.color == BLACK))
 		{
 			targetSquare = (square)(pawn.position + 2 * dir);
 			if (!((1ULL << targetSquare) & piecesOfOtherColor))
