@@ -1,23 +1,25 @@
 #include "leonardo_value_bot.hpp"
 
 leonardo_value_bot::leonardo_value_bot(neural_network given_value_nnet)
-	: leonardo_value_bot(given_value_nnet, 4, false, 0.5f, 0.5f)
+	: leonardo_value_bot(given_value_nnet, 0, 4, false, 0.5f, 0.5f)
 {}
 
 leonardo_value_bot::leonardo_value_bot(
 	neural_network given_value_nnet,
 	int given_depth,
+	int max_capture_depth,
 	bool gpu_mode,
 	float nnet_influence,
 	float hard_coded_influence
 )
-	: Player("leonardo value bot " + std::to_string(nnet_influence)),
+	: Player("leonardo value bot (nnet: " + std::to_string(nnet_influence) + " hard coded: " + std::to_string(hard_coded_influence) + ")"),
 	value_net(given_value_nnet),
 	input_board(leonardo_util::get_input_format()),
 	depth(given_depth),
+	max_capture_depth(max_capture_depth),
 	gpu_mode(gpu_mode),
-	nnet_influence(0.5f),
-	hard_coded_influence(0.5f)
+	nnet_influence(nnet_influence),
+	hard_coded_influence(hard_coded_influence)
 {
 	if (gpu_mode)
 	{
@@ -38,7 +40,7 @@ float leonardo_value_bot::get_nnet_eval(const ChessBoard& board)
 
 	float color_mult = board.getCurrentTurnColor() == White ? 1.0f : -1.0f;
 
-	return nnet_eval * 100.0f * color_mult;
+	return nnet_eval * color_mult;
 }
 float leonardo_value_bot::get_simpel_eval(const ChessBoard& board)
 {
@@ -59,11 +61,11 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board)
 		{
 			if (board.getCurrentTurnColor() == White)
 			{
-				return -1000; //disencourages stalemates
+				return -1; //disencourages stalemates
 			}
 			else
 			{
-				return 1000;
+				return 1;
 			}
 		}
 		else
@@ -115,7 +117,63 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board)
 	//to encourage pawns for more structure, it would be useful to look if they get protected
 	//by another pawn. and increase the value if it is that way
 
-	return score;
+	return score / 100;
+}
+
+float leonardo_value_bot::get_eval(const ChessBoard& board)
+{
+	float hard_coded_eval = hard_coded_influence != 0 ? get_simpel_eval(board) : 0;
+	float nnet_eval = nnet_influence != 0 ? get_nnet_eval(board) : 0;
+
+	//std::cout << "Hard coded eval: " << hard_coded_eval << " Nnet eval: " << nnet_eval << std::endl;
+
+	return
+		hard_coded_eval * hard_coded_influence +
+		nnet_eval * nnet_influence;
+}
+
+float leonardo_value_bot::get_capture_move_score_recursively(
+	const ChessBoard& board,
+	int& nodesSearched,
+	int& endStatesSearched,
+	int& maxDepthReached,
+	int currDepth)
+{
+	throw std::runtime_error("stuff needs fixin");
+	UniqueMoveList possibleCaptures = board.getAllLegalCaptureMoves();
+
+	if (possibleCaptures.size() == 0 || currDepth >= max_capture_depth)
+	{
+		nodesSearched++;
+		endStatesSearched++;
+		maxDepthReached = std::max(maxDepthReached, currDepth);
+		float eval = get_eval(board);
+		return eval;
+	}
+
+	float bestEvaluationFound = -FLT_MAX;
+
+	for (std::unique_ptr<Move>& curr : possibleCaptures)
+	{
+		ChessBoard copyBoard = board.getCopyByValue();
+		copyBoard.makeMove(*curr);
+
+		nodesSearched++;
+		float evaluation =
+			get_capture_move_score_recursively(
+				copyBoard,
+				nodesSearched,
+				endStatesSearched,
+				maxDepthReached,
+				(currDepth + 1));
+
+		if (evaluation > bestEvaluationFound)
+		{
+			bestEvaluationFound = evaluation;
+		}
+	}
+
+	return bestEvaluationFound;
 }
 
 float leonardo_value_bot::get_move_score_recursively(
@@ -132,29 +190,14 @@ float leonardo_value_bot::get_move_score_recursively(
 	{
 		endStatesSearched++;
 		nodesSearched++;
-		/*
-		int currCaptureMovesDepth = 0;
-		int allCaptureMovesValue =
-			-getAllCaputureMoveScoreRecursively(
-				board,
-				-alpha,
-				-beta,
-				nodesSearched,
-				endStatesSearched,
-				currCaptureMovesDepth);
-
-		//std::cout << "Max depth: " << currCaptureMovesDepth << std::endl;
-		maxCaptureDepthReached = std::max(maxCaptureDepthReached, currCaptureMovesDepth);
-		return allCaptureMovesValue;*/
-
-		float hard_coded_eval = hard_coded_influence != 0 ? get_simpel_eval(board) : 0;
-		float nnet_eval = nnet_influence != 0 ? get_nnet_eval(board) : 0;
-
-		//std::cout << "Hard coded eval: " << hard_coded_eval << " Nnet eval: " << nnet_eval << std::endl;
-
-		return
-			hard_coded_eval * hard_coded_influence +
-			nnet_eval * nnet_influence;
+		return get_eval(board);
+		//------------
+		return -get_capture_move_score_recursively(
+			board,
+			nodesSearched,
+			endStatesSearched,
+			maxCaptureDepthReached,
+			1);
 	}
 	else
 	{
@@ -188,8 +231,8 @@ float leonardo_value_bot::get_move_score_recursively(
 					copyBoard,
 					depth - 1,
 					!isMaximizingPlayer,
-					-alpha,
-					-beta,
+					alpha,
+					beta,
 					nodesSearched,
 					endStatesSearched,
 					maxCaptureDepthReached);
@@ -224,7 +267,7 @@ void leonardo_value_bot::thread_task(
 	ChessBoard board)
 {
 	bool isWhiteToMove = board.getCurrentTurnColor() == White;
-	int colorMult = isWhiteToMove ? 1 : -1;
+	int colorMult = isWhiteToMove ? -1 : 1;
 
 	int endPointsEvaluated = 0;
 	int nodesSearched = 0;
@@ -234,18 +277,18 @@ void leonardo_value_bot::thread_task(
 		get_move_score_recursively(
 			board,
 			depth,
-			!isWhiteToMove,
+			isWhiteToMove,
 			BLACK_WIN_EVAL_VALUE,
 			WHITE_WIN_EVAL_VALUE,
 			nodesSearched,
 			endPointsEvaluated,
 			maxCaptureDepthReached);
 
-	scores[thread_id] = move_score;
+	scores[thread_id] = move_score * colorMult;
 
 	std::cout
 		<< "Move: " + move_str
-		+ ", Score: " + std::to_string(move_score)
+		+ ", Score: " + std::to_string(move_score * colorMult)
 		+ ", Max Capture Depth: " + std::to_string(maxCaptureDepthReached)
 		+ ", Endstates Evaluated: " + std::to_string(endPointsEvaluated)
 		+ "\n";
@@ -263,7 +306,6 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 	{
 		ChessBoard boardCopy = board;
 		boardCopy.makeMove(*curr);
-
 
 		threads.push_back(std::thread(
 			&leonardo_value_bot::thread_task,
@@ -285,7 +327,7 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 		}
 	}
 
-	float bestMoveScore = INT_MIN;
+	float bestMoveScore = -FLT_MAX;
 	int bestMoveIdx = 0;
 	for (int i = 0; i < move_scores.size(); i++)
 	{
@@ -301,7 +343,8 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 	long long duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
 
 	std::cout << "done. took " << ms_to_str(duration) << "\n";
-	std::cout << "curren position according to stockfish: " << stockfish_interface::eval(board.getFen(), 8) << "\n";
-
+	std::cout << "current position according to stockfish: " << stockfish_interface::eval(board.getFen(), 8) << "\n";
+	std::cout << "current position according to leonardo after searching: " << bestMoveScore << "\n";
+	std::cout << "leonardo static eval: " << get_eval(board) << "\n";
 	return bestMoveIdx;
 }

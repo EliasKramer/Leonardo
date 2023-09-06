@@ -388,7 +388,9 @@ leonardo_overlord::leonardo_overlord(
 
 	
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
-	best_value_nnet.add_fully_connected_layer(250, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
 	
@@ -964,7 +966,7 @@ void leonardo_overlord::train_on_dataset()
 				std::cout << (game_idx) << "/" << data_count << " " << get_current_time_str() << "\n";
 				std::cout << "learning on " << ds->get_item_count() << " positions\n";
 				auto start = std::chrono::high_resolution_clock::now();
-				new_value_nnet.learn_on_ds(*ds, 1, 1, 0.0001f, true);
+				new_value_nnet.learn_on_ds(*ds, 1,  100, 0.0001f, true);
 				auto end = std::chrono::high_resolution_clock::now();
 				long long elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 				std::cout << "learning took " << ms_to_str(elapsed_ms) << "\n";

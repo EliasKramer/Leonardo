@@ -11,6 +11,7 @@
 #include "Constants.h"
 #include "BoardRepresentation.h"
 #include <mutex>
+#include <unordered_map>
 
 const std::string STARTING_FEN =
 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -42,6 +43,8 @@ protected:
 	//the move number. 
 	//increases every time when black makes a move
 	uint16_t _moveNumber;
+
+	std::unordered_map<size_t, int> _moveRepetitionTable;
 
 	/*Move Generation*/
 	bool destinationIsSameColor(Square start, Direction direction, ChessColor color) const;
@@ -96,6 +99,8 @@ protected:
 
 	//checks if any side has enough material/pieces to win the game
 	bool insufficientMaterialCheck() const;
+
+	bool threeFoldRuleCheck() const;
 
 	char getPieceCharAt(Square pos) const;
 

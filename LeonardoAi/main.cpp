@@ -17,25 +17,27 @@ int main(int argc, char* argv[])
 {
 	stockfish_interface::init();
 	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
 
 	//float evaluation = stockfish_interface::eval(STARTING_FEN.c_str(), 12);
 	//sync_cout << "evaluation: " << evaluation << sync_endl;
-	
+
 	//neural_network nn("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\pre_calced_dataset_epoch_6200\\value.parameters");
 	//std::cout << nn.parameter_analysis();
 	//return 0;
-	neural_network nnet("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\one_layer_epoch_2540200\\value.parameters");
+	neural_network nnet("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\one_layer_epoch_2690200\\value.parameters");
 
-	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
-	
+
+
 	ChessGame game(
-		std::make_unique<AlphaBetaPruningBot>(4),
-		std::make_unique<leonardo_value_bot>(nnet, 3, true, 0.1f, 0.5f),
+		std::make_unique<leonardo_value_bot>(nnet, 4, 0, true, 0.00f, 1.0f),
+		std::make_unique<leonardo_value_bot>(nnet, 4, 0, true, 0.00f, 1.0f),
 		STARTING_FEN);
 
 	game.start();
-	
-	//leonardo_overlord overlord("one_layer");
+
+
+	//leonardo_overlord overlord("4small");
 	//overlord.train_on_dataset();
 	/*
 	overlord.test_eval_on_single_match(

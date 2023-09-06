@@ -16,8 +16,19 @@ private:
 	int depth;
 	bool gpu_mode;
 
+	int max_capture_depth;
+
 	float get_nnet_eval(const ChessBoard& board);
 	float get_simpel_eval(const ChessBoard& board);
+	float get_eval(const ChessBoard& board);
+
+
+	float get_capture_move_score_recursively(
+		const ChessBoard& board,
+		int& nodesSearched,
+		int& endStatesSearched,
+		int& maxDepthReached,
+		int currDepth);
 
 	float get_move_score_recursively(
 		const ChessBoard& board,
@@ -39,6 +50,7 @@ public:
 	leonardo_value_bot(
 		neural_network given_value_nnet,
 		int depth,
+		int max_capture_depth,
 		bool gpu_mode,
 		float nnet_influence,
 		float hard_coded_influence);

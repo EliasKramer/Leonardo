@@ -1,6 +1,7 @@
 ﻿#include "ChessBoard.h"
 #include <iostream>
 #include <random>
+
 bool ChessBoard::destinationIsSameColor(Square start, Direction direction, ChessColor color) const
 {
 	int newPos = (start + direction);
@@ -334,7 +335,7 @@ void ChessBoard::addRayMoves(
 					//if an opponent is on the new field you can take him,
 					//but cannot continue after that (you cannot jump over opponents)
 					moves.push_back(std::make_unique<Move>(start, currentSquare));
-							 
+
 					break;
 				}
 				else {
@@ -604,6 +605,18 @@ bool ChessBoard::insufficientMaterialCheck() const
 	//TODO
 	//if only one bishop or one knight is on the board, the game cant be won
 
+	return false;
+}
+
+bool ChessBoard::threeFoldRuleCheck() const
+{
+	chess_board_hasher hasher;
+	const size_t hash = hasher(*this);
+
+	if (_moveRepetitionTable.find(hash) != _moveRepetitionTable.end())
+	{
+		return _moveRepetitionTable.at(hash) >= 3;
+	}
 	return false;
 }
 
@@ -885,7 +898,7 @@ UniqueMoveList ChessBoard::getAllLegalMoves() const
 			}
 		),
 		list.end()
-				);
+	);
 
 	return list;
 }
@@ -906,7 +919,7 @@ UniqueMoveList ChessBoard::getAllLegalCaptureMoves() const
 			}
 		),
 		list.end()
-				);
+	);
 
 	return list;
 }
@@ -930,6 +943,18 @@ void ChessBoard::makeMove(const Move& move)
 	if (_currentTurnColor == Black)
 	{
 		_moveNumber++;
+	}
+
+	chess_board_hasher hasher;
+	size_t hash = hasher(*this);
+	if (_moveRepetitionTable.find(hash) == _moveRepetitionTable.end())
+	{
+		_moveRepetitionTable[hash] = 1;
+	}
+	else
+	{
+		//if the hash is already in the table, increment the counter (this is needed for the 3-fold repetition rule
+		_moveRepetitionTable[hash]++;
 	}
 
 	_currentTurnColor = getOppositeColor(_currentTurnColor);
@@ -972,8 +997,11 @@ GameState ChessBoard::getGameState() const
 			return Stalemate;
 		}
 	}
+	chess_board_hasher hasher;
+	size_t hash = hasher(*this);
 	if (_halfMoveClock == 50 ||
-		insufficientMaterialCheck())
+		insufficientMaterialCheck() ||
+		threeFoldRuleCheck())
 	{
 		return Draw;
 	}

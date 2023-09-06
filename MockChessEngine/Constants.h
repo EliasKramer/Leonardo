@@ -108,8 +108,8 @@ extern const int POSITION_VALUE_KING[DIFFERENT_CHESS_COLORS][DIFFERENT_GAME_DURA
 
 //there are some issues with int_min or max when multiplying by -1
 //therfore these are only high values and not max values
-const int WHITE_WIN_EVAL_VALUE = 1000000000;
-const int BLACK_WIN_EVAL_VALUE = -1000000000;
+const int WHITE_WIN_EVAL_VALUE =  1000000;
+const int BLACK_WIN_EVAL_VALUE = -1000000;
 
 const int GAME_STATE_EVALUATION[5] = {
 	WHITE_WIN_EVAL_VALUE, //white won 
