@@ -24,14 +24,14 @@ namespace EngineTest
 			Assert::AreEqual((int)KNIGHT, (int)piece.type);
 		}
 
-		TEST_METHOD(getMovesStartPositionDepthTwo)
+		TEST_METHOD(getNodesDepthTwo)
 		{
 			std::string startPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 			Board board(startPositionFEN, WHITE, SQUARE_NONE, true, true, true, true);
 
-			std::vector<Move> moves = getMoves(board, 2);
+			int nodes = getNodesForDepth(board, 2);
 
-			Assert::AreEqual(400, (int)moves.size());
+			Assert::AreEqual(400, nodes);
 		}
 	};
 

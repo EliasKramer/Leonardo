@@ -8,7 +8,7 @@
 
 std::vector<Move> getMoves(Board &board);
 
-std::vector<Move> getMoves(Board &board, int depth);
+int getNodesForDepth(Board& board, int depth);
 
 
 std::vector<Move> getMovesForPiece(const Board &board, Piece &piece);

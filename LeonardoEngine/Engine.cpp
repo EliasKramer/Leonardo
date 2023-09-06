@@ -13,28 +13,21 @@ std::vector<Move> getMoves(Board &board)
 	return moves;
 }
 
-std::vector<Move> getMoves(Board &board, int depth)
+int getNodesForDepth(Board& board, int depth)
 {
 	std::vector<Move> moves = getMoves(board);
-	if (depth != 1)
+	if (depth > 1)
 	{
-		int size = moves.size();
-		int i = 0;
-		//for (Move move : moves)
-		for(auto it = moves.begin(); i < size ; ++it)
+		int nodes = 0;
+		for (Move move : moves)
 		{
 			Board newBoard(board);
-			//newBoard.executeMove(move);
-			newBoard.executeMove(*it);
-			std::vector<Move> nextMoves = getMoves(newBoard, depth - 1);
-			moves.insert(moves.end(), nextMoves.begin(), nextMoves.end());
-
-			it = moves.begin();
-			std::advance(it, i);
-			i++;
+			newBoard.executeMove(move);
+			nodes += getNodesForDepth(newBoard, depth - 1);
 		}
+		return nodes;
 	}
-	return moves;
+	return moves.size();
 }
 
 
