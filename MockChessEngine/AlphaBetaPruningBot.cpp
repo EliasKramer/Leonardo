@@ -44,8 +44,8 @@ int AlphaBetaPruningBot::getMove(const ChessBoard& board, const UniqueMoveList& 
 				branchesPruned
 			);
 
-		float small_rand = random_float_excl(1.00, 1.15);
-		int currScore = colorMult * moveScore * small_rand;
+		//float small_rand = random_float_excl(1.00, 1.15);
+		int currScore = colorMult * moveScore;
 
 		/*
 		std::cout
@@ -133,8 +133,8 @@ int AlphaBetaPruningBot::getMoveScoreRecursively(
 					copyBoard,
 					depth - 1,
 					!isMaximizingPlayer,
-					-alpha,
-					-beta,
+					alpha,
+					beta,
 					nodesSearched,
 					endStatesSearched,
 					prunedBranches

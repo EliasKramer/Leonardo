@@ -25,13 +25,14 @@ int main(int argc, char* argv[])
 	//neural_network nn("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\pre_calced_dataset_epoch_6200\\value.parameters");
 	//std::cout << nn.parameter_analysis();
 	//return 0;
-	neural_network nnet("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\one_layer_epoch_2690200\\value.parameters");
+	//neural_network nnet("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\one_layer_epoch_2690200\\value.parameters");
+	neural_network nnet("C:\\Users\\Elias\\Desktop\\runin\\models\\4small_epoch_2244200\\value.parameters");
 
 	std::cout << "hab in die pawn pos werte rumgepuscht\n";
 
 	ChessGame game(
-		std::make_unique<leonardo_value_bot>(nnet, 3, 0, true, 0.00f, 1.0f),
-		std::make_unique<leonardo_value_bot>(nnet, 4, 0, true, 0.00f, 1.0f),
+		std::make_unique<leonardo_value_bot>(nnet, 3, 0, false, 0.0000f, 1.0f, 0.5f),
+		std::make_unique<AlphaBetaPruningBot>(4),
 		STARTING_FEN);
 
 	game.start();

@@ -1,7 +1,7 @@
 #include "leonardo_value_bot.hpp"
 
 leonardo_value_bot::leonardo_value_bot(neural_network given_value_nnet)
-	: leonardo_value_bot(given_value_nnet, 4, 0, false, 0.5f, 0.5f)
+	: leonardo_value_bot(given_value_nnet, 4, 0, false, 0.5f, 0.5f, 0.5f)
 {}
 
 leonardo_value_bot::leonardo_value_bot(
@@ -10,7 +10,8 @@ leonardo_value_bot::leonardo_value_bot(
 	int max_capture_depth,
 	bool gpu_mode,
 	float nnet_influence,
-	float hard_coded_influence
+	float hard_coded_influence,
+	float dropout
 )
 	: Player("leonardo value bot (nnet: " + std::to_string(nnet_influence) + " hard coded: " + std::to_string(hard_coded_influence) + ")"),
 	value_net(given_value_nnet),
@@ -19,7 +20,8 @@ leonardo_value_bot::leonardo_value_bot(
 	max_capture_depth(max_capture_depth),
 	gpu_mode(gpu_mode),
 	nnet_influence(nnet_influence),
-	hard_coded_influence(hard_coded_influence)
+	hard_coded_influence(hard_coded_influence),
+	dropout(dropout)
 {
 	if (gpu_mode)
 	{
@@ -246,8 +248,7 @@ float leonardo_value_bot::get_move_score_recursively(
 			copyBoard.makeMove(*curr);
 
 			nodes_searched++;
-			float evaluation =
-				get_move_score_recursively(
+			float evaluation = get_move_score_recursively(
 					copyBoard,
 					depth - 1,
 					!is_maximizing_player,

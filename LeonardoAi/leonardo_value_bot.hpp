@@ -18,6 +18,8 @@ private:
 
 	int max_capture_depth;
 
+	float dropout;
+
 	float get_nnet_eval(const ChessBoard& board);
 	float get_simpel_eval(const ChessBoard& board);
 	float get_eval(const ChessBoard& board);
