@@ -1,7 +1,7 @@
 #include "leonardo_value_bot.hpp"
 
 leonardo_value_bot::leonardo_value_bot(neural_network given_value_nnet)
-	: leonardo_value_bot(given_value_nnet, 0, 4, false, 0.5f, 0.5f)
+	: leonardo_value_bot(given_value_nnet, 4, 0, false, 0.5f, 0.5f)
 {}
 
 leonardo_value_bot::leonardo_value_bot(
@@ -53,7 +53,7 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board)
 	// - if black wins return lowest possible number
 	// - stalemate and draw is 0
 	GameState state = board.getGameState();
-	int gameStatePoints = GAME_STATE_EVALUATION[state];
+	float gameStatePoints = GAME_STATE_EVALUATION[state];
 	//if the game is still ongoing the value will be -1 and thus should be continued evaluating
 	if (gameStatePoints != -1)
 	{
@@ -75,7 +75,7 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board)
 	}
 
 	//now calculate the score
-	int score = 0;
+	float score = 0;
 
 	for (int i = A1; i <= H8; i++)
 	{
@@ -88,7 +88,7 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board)
 			if (bitboardsOverlap(idxBB, boardRep.PiecesOfType[typeIdx]))
 			{
 				//get the material value of the piece type
-				int materialValue = PIECETYPE_VALUE[typeIdx];
+				float materialValue = PIECETYPE_VALUE[typeIdx];
 
 				bool currPieceIsBlack = bitboardsOverlap(idxBB, boardRep.PiecesOfColor[Black]);
 				ChessColor currPieceColor = currPieceIsBlack ? Black : White;
@@ -134,70 +134,90 @@ float leonardo_value_bot::get_eval(const ChessBoard& board)
 
 float leonardo_value_bot::get_capture_move_score_recursively(
 	const ChessBoard& board,
-	int& nodesSearched,
-	int& endStatesSearched,
-	int& maxDepthReached,
-	int currDepth)
+	int curr_depth,
+	bool is_maximizing_player,
+	float alpha,
+	float beta,
+	int& nodes_searched,
+	int& end_states_searched,
+	int& max_depth_reached)
 {
-	throw std::runtime_error("stuff needs fixin");
-	UniqueMoveList possibleCaptures = board.getAllLegalCaptureMoves();
+	UniqueMoveList possible_capture_moves = board.getAllLegalCaptureMoves();
 
-	if (possibleCaptures.size() == 0 || currDepth >= max_capture_depth)
+	if (possible_capture_moves.size() == 0 || curr_depth >= max_capture_depth)
 	{
-		nodesSearched++;
-		endStatesSearched++;
-		maxDepthReached = std::max(maxDepthReached, currDepth);
+		nodes_searched++;
+		end_states_searched++;
+		max_depth_reached = std::max(max_depth_reached, curr_depth);
 		float eval = get_eval(board);
 		return eval;
 	}
 
-	float bestEvaluationFound = -FLT_MAX;
+	float best_eval = is_maximizing_player ? -FLT_MAX : FLT_MAX;
 
-	for (std::unique_ptr<Move>& curr : possibleCaptures)
+	for (std::unique_ptr<Move>& curr : possible_capture_moves)
 	{
 		ChessBoard copyBoard = board.getCopyByValue();
 		copyBoard.makeMove(*curr);
 
-		nodesSearched++;
-		float evaluation =
-			get_capture_move_score_recursively(
-				copyBoard,
-				nodesSearched,
-				endStatesSearched,
-				maxDepthReached,
-				(currDepth + 1));
+		nodes_searched++;
+		float evaluation = get_capture_move_score_recursively(
+			copyBoard,
+			curr_depth + 1,
+			!is_maximizing_player,
+			alpha,
+			beta,
+			nodes_searched,
+			end_states_searched,
+			max_depth_reached);
 
-		if (evaluation > bestEvaluationFound)
+		if (is_maximizing_player)
 		{
-			bestEvaluationFound = evaluation;
+			best_eval = std::max(best_eval, evaluation);
+			alpha = std::max(alpha, evaluation);
+			if (beta <= alpha)
+			{
+				break;
+			}
+		}
+		else
+		{
+			best_eval = std::min(best_eval, evaluation);
+			beta = std::min(beta, evaluation);
+			if (beta <= alpha)
+			{
+				break;
+			}
 		}
 	}
 
-	return bestEvaluationFound;
+	return best_eval;
 }
 
 float leonardo_value_bot::get_move_score_recursively(
 	const ChessBoard& board,
 	int depth,
-	bool isMaximizingPlayer,
+	bool is_maximizing_player,
 	float alpha,
 	float beta,
-	int& nodesSearched,
-	int& endStatesSearched,
-	int& maxCaptureDepthReached)
+	int& nodes_searched,
+	int& end_states_searched,
+	int& max_capture_depth_reached)
 {
-	if (depth == 0)
+	if (depth <= 0)
 	{
-		endStatesSearched++;
-		nodesSearched++;
-		return get_eval(board);
-		//------------
-		return -get_capture_move_score_recursively(
+		end_states_searched++;
+		nodes_searched++;
+		
+		return get_capture_move_score_recursively(
 			board,
-			nodesSearched,
-			endStatesSearched,
-			maxCaptureDepthReached,
-			1);
+			0,
+			is_maximizing_player,
+			alpha,
+			beta,
+			nodes_searched,
+			end_states_searched,
+			max_capture_depth_reached);
 	}
 	else
 	{
@@ -206,8 +226,8 @@ float leonardo_value_bot::get_move_score_recursively(
 		//no more moves
 		if (moves.size() == 0)
 		{
-			nodesSearched++;
-			endStatesSearched++;
+			nodes_searched++;
+			end_states_searched++;
 			//dont know if this works
 			return board.isKingInCheck() ?
 				(board.getCurrentTurnColor() == White ?
@@ -219,25 +239,25 @@ float leonardo_value_bot::get_move_score_recursively(
 					GAME_STATE_EVALUATION[WhiteWon] + depth)
 				: 0;
 		}
-		float bestEval = isMaximizingPlayer ? INT_MIN : INT_MAX;
+		float bestEval = is_maximizing_player ? INT_MIN : INT_MAX;
 		for (std::unique_ptr<Move>& curr : moves)
 		{
 			ChessBoard copyBoard = board.getCopyByValue();
 			copyBoard.makeMove(*curr);
 
-			nodesSearched++;
+			nodes_searched++;
 			float evaluation =
 				get_move_score_recursively(
 					copyBoard,
 					depth - 1,
-					!isMaximizingPlayer,
+					!is_maximizing_player,
 					alpha,
 					beta,
-					nodesSearched,
-					endStatesSearched,
-					maxCaptureDepthReached);
+					nodes_searched,
+					end_states_searched,
+					max_capture_depth_reached);
 
-			if (isMaximizingPlayer)
+			if (is_maximizing_player)
 			{
 				bestEval = std::max(bestEval, evaluation);
 				alpha = std::max(alpha, evaluation);
@@ -266,30 +286,30 @@ void leonardo_value_bot::thread_task(
 	std::vector<float>& scores,
 	ChessBoard board)
 {
-	bool isWhiteToMove = board.getCurrentTurnColor() == White;
-	int colorMult = isWhiteToMove ? -1 : 1;
+	bool is_white_to_move = board.getCurrentTurnColor() == White;
+	int colorMult = is_white_to_move ? -1 : 1;
 
 	int endPointsEvaluated = 0;
 	int nodesSearched = 0;
-	int maxCaptureDepthReached = 0;
+	int max_capture_depth_reached = 0;
 
 	float move_score =
 		get_move_score_recursively(
 			board,
-			depth,
-			isWhiteToMove,
+			depth-1,
+			is_white_to_move,
 			BLACK_WIN_EVAL_VALUE,
 			WHITE_WIN_EVAL_VALUE,
 			nodesSearched,
 			endPointsEvaluated,
-			maxCaptureDepthReached);
+			max_capture_depth_reached);
 
 	scores[thread_id] = move_score * colorMult;
 
 	std::cout
 		<< "Move: " + move_str
 		+ ", Score: " + std::to_string(move_score * colorMult)
-		+ ", Max Capture Depth: " + std::to_string(maxCaptureDepthReached)
+		+ ", Max Capture Depth reached: " + std::to_string(max_capture_depth_reached)
 		+ ", Endstates Evaluated: " + std::to_string(endPointsEvaluated)
 		+ "\n";
 }
@@ -315,7 +335,6 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 			std::ref(move_scores),
 			boardCopy
 		));
-
 		moveIdx++;
 	}
 

@@ -27,10 +27,10 @@ int main(int argc, char* argv[])
 	//return 0;
 	neural_network nnet("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\one_layer_epoch_2690200\\value.parameters");
 
-
+	std::cout << "hab in die pawn pos werte rumgepuscht\n";
 
 	ChessGame game(
-		std::make_unique<leonardo_value_bot>(nnet, 4, 0, true, 0.00f, 1.0f),
+		std::make_unique<leonardo_value_bot>(nnet, 3, 0, true, 0.00f, 1.0f),
 		std::make_unique<leonardo_value_bot>(nnet, 4, 0, true, 0.00f, 1.0f),
 		STARTING_FEN);
 

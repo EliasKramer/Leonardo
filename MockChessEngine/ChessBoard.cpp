@@ -1,7 +1,6 @@
 ﻿#include "ChessBoard.h"
 #include <iostream>
 #include <random>
-
 bool ChessBoard::destinationIsSameColor(Square start, Direction direction, ChessColor color) const
 {
 	int newPos = (start + direction);
@@ -756,6 +755,22 @@ ChessBoard::ChessBoard(const std::string& given_fen_code)
 
 	//keeps track of the moves (one move consists of one move of white and one move of black)
 	_moveNumber = std::stoi(split_fen_code[5]);
+
+	if (given_fen_code != STARTING_FEN)
+	{
+		//insert into three fold table
+		chess_board_hasher hasher;
+		const size_t hash = hasher(*this);
+
+		if (_moveRepetitionTable.find(hash) == _moveRepetitionTable.end())
+		{
+			_moveRepetitionTable[hash] = 1;
+		}
+		else
+		{
+			_moveRepetitionTable[hash]++;
+		}
+	}
 }
 
 std::string ChessBoard::getString() const
@@ -981,6 +996,8 @@ ChessBoard ChessBoard::getCopyByValue() const
 
 	board._moveNumber = _moveNumber;
 
+	board._moveRepetitionTable = _moveRepetitionTable;
+
 	return board;
 }
 
@@ -1117,7 +1134,7 @@ size_t chess_board_hasher::operator()(const ChessBoard& board) const
 
 	if (board.getCurrentTurnColor() == ChessColor::Black)
 	{
-		hash ^= black_to_move_zobrist;
+		//hash ^= black_to_move_zobrist;
 	}
 
 	for (int piece_type = 0; piece_type < 6; piece_type++)

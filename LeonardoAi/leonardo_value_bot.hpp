@@ -25,10 +25,14 @@ private:
 
 	float get_capture_move_score_recursively(
 		const ChessBoard& board,
+		int curr_depth,
+		bool is_maximizing_player,
+		float alpha,
+		float beta,
 		int& nodesSearched,
 		int& endStatesSearched,
-		int& maxDepthReached,
-		int currDepth);
+		int& maxDepthReached
+	);
 
 	float get_move_score_recursively(
 		const ChessBoard& board,
