@@ -9,7 +9,6 @@ class leonardo_value_bot : public Player
 {
 private:
 	neural_network value_net;
-	matrix input_board;
 
 	float nnet_influence;
 	float hard_coded_influence;
@@ -20,9 +19,10 @@ private:
 
 	float dropout;
 
-	float get_nnet_eval(const ChessBoard& board);
+	float get_nnet_eval(const ChessBoard& board, matrix& input_board);
 	float get_simpel_eval(const ChessBoard& board);
-	float get_eval(const ChessBoard& board);
+	float get_eval(const ChessBoard& board, matrix& input_board);
+	float get_eval(const ChessBoard& board, matrix& input_board, float nnet_inf, float hard_infl);
 
 
 	float get_capture_move_score_recursively(
@@ -33,7 +33,8 @@ private:
 		float beta,
 		int& nodesSearched,
 		int& endStatesSearched,
-		int& maxDepthReached
+		int& maxDepthReached,
+		matrix& input_board
 	);
 
 	float get_move_score_recursively(
@@ -44,7 +45,8 @@ private:
 		float beta,
 		int& nodesSearched,
 		int& endStatesSearched,
-		int& maxCaptureDepthReached);
+		int& maxCaptureDepthReached,
+		matrix& input_board);
 
 	void thread_task(
 		int thread_id,
@@ -59,7 +61,8 @@ public:
 		int max_capture_depth,
 		bool gpu_mode,
 		float nnet_influence,
-		float hard_coded_influence);
+		float hard_coded_influence,
+		float dropout);
 
 	int getMove(const ChessBoard& board, const UniqueMoveList& legal_moves) override;
 };

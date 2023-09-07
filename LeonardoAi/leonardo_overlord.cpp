@@ -377,6 +377,7 @@ leonardo_overlord::leonardo_overlord(
 	std::string name
 ) : name(name)
 {
+	std::cout << "initalizing overlord " << name << "\n";
 	//print curret directory
 	std::filesystem::path p = std::filesystem::current_path();
 	std::cout << "looking for nnets in " << p << '\n';
@@ -384,16 +385,21 @@ leonardo_overlord::leonardo_overlord(
 	//best_value_nnet = neural_network("value.parameters");
 	//best_policy_nnet = neural_network("policy.parameters");
 
-	//best_value_nnet = neural_network("value.parameters");
 
 	
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
-	best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(96, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(24, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(24, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(12, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(12, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(6, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(6, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
-	
+
+	//best_value_nnet = neural_network("C:\\Users\\Elias\\Desktop\\4small_epoch\\4small_epoch_2652200\\value.parameters");
+
 	//best_value_nnet = neural_network("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\pre_calced_dataset_epoch_178200\\value.parameters");
 
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());

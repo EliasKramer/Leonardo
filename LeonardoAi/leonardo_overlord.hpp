@@ -26,7 +26,7 @@ private:
 	neural_network new_policy_nnet;
 	neural_network new_value_nnet;
 
-	const bool gpu_mode = true;
+	const bool gpu_mode = false;
 
 	void save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet);
 
