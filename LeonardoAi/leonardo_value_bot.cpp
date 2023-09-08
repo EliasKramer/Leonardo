@@ -483,6 +483,13 @@ void leonardo_value_bot::thread_task(
 		input_board.enable_gpu_mode();
 	}
 
+	//iterative deepening.
+	//save best moves
+	//sort them										!!!!!!!!!!!!!!important!!!!!!!!!!!
+	
+	//search them first
+	//if the best move is found, stop searching
+
 	float move_score =
 		get_move_score_recursively(
 			board,
