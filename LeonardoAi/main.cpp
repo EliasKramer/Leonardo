@@ -14,6 +14,13 @@
 #include "leonardo_value_bot.hpp"
 #include "../MockChessEngine/HumanPlayer.h"
 
+static void write_to_file(std::string filename, std::string content)
+{
+	std::ofstream file(filename);
+	file << content;
+	file.close();
+}
+
 int main(int argc, char* argv[])
 {
 	stockfish_interface::init();
@@ -33,13 +40,48 @@ int main(int argc, char* argv[])
 	//std::cout << nnet.parameter_analysis();
 
 	std::cout << "hab in die pawn pos werte rumgepuscht\n";
+	write_to_file("stats.txt", "start");
+	chess_arena arena(
+		"ARENA",
+		std::make_unique<leonardo_value_bot>(nnet, 4, 0),
+		std::make_unique<leonardo_value_bot>(nnet, 4, 0));
 
+	//p1 is the best
+	//p2 is the new one
+	while (true)
+	{
+		arena_result result = arena.play(1);
+		std::cout << "------------\n";
+		if (result.player_2_won == 1)
+		{
+			std::cout << "better\n";
+			//new one is better - set best to new
+			((leonardo_value_bot*)(arena.player1.get()))->get_params_from_other(*(leonardo_value_bot*)(arena.player2.get()));
+			std::string param_string = ((leonardo_value_bot*)(arena.player1.get()))->param_string();
+			std::cout << param_string << "\n";
+			write_to_file("stats.txt", param_string);
+		}
+		else
+		{
+			std::cout << "equal or worse\n";
+
+			//new is equal or worse. reset
+			((leonardo_value_bot*)(arena.player2.get()))->get_params_from_other(*(leonardo_value_bot*)(arena.player1.get()));
+		}
+		std::cout << "------------\n";
+
+		((leonardo_value_bot*)(arena.player2.get()))->mutate();
+		std::cout << "mutated params: \n";
+		std::cout << ((leonardo_value_bot*)(arena.player2.get()))->param_string() << "\n";
+	}
+
+	/*
 	ChessGame game(
 		//std::make_unique<HumanPlayer>(),
 		//std::make_unique<AlphaBetaPruningBot>(4),
 		std::make_unique<leonardo_value_bot>(
 			nnet,
-			4, //depth 
+			4, //depth
 			4, //max capture depth
 			false, //gpu mode
 			0.0f, //nnet influence
@@ -48,7 +90,7 @@ int main(int argc, char* argv[])
 		),
 		std::make_unique<leonardo_value_bot>(
 			nnet,
-			4, //depth 
+			4, //depth
 			4, //max capture depth
 			false, //gpu mode
 			0.0f, //nnet influence
@@ -58,6 +100,8 @@ int main(int argc, char* argv[])
 		STARTING_FEN);
 
 	game.start();
+	*/
+
 	return 0;
 
 
