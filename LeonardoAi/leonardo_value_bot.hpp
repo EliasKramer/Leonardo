@@ -16,14 +16,14 @@ private:
 	float dropout = 0;
 	long ms_per_move = 150;
 
-	//simpel eval stats
-	float piece_value_mult = 3.0f;
-	float piece_pos_value_mult = 1.0f;
-	float pawn_same_color_bonus_mult = 0.01f;
-	float pawn_self_protection_mult = 0.1f;
-	float passed_pawn_mult = 1.0f;
-	float king_pos_mult = 1.2f;
-	float king_safety_mult = 1.3f;
+	float piece_value_mult;
+	float piece_pos_value_mult;
+	float pawn_same_color_bonus_mult;
+	float pawn_self_protection_mult;
+	float passed_pawn_mult;
+	float king_pos_mult;
+	float king_safety_mult;
+
 
 	float get_nnet_eval(const ChessBoard& board, matrix& input_board);
 	float get_simpel_eval(const ChessBoard& board);
@@ -70,7 +70,15 @@ public:
 	leonardo_value_bot(
 		neural_network given_value_nnet,
 		int max_capture_depth,
-		float dropout);
+		float dropout,
+		float piece_value_mult,
+		float piece_pos_value_mult,
+		float pawn_same_color_bonus_mult,
+		float pawn_self_protection_mult,
+		float passed_pawn_mult,
+		float king_pos_mult,
+		float king_safety_mult
+	);
 
 	void mutate();
 	void get_params_from_other(const leonardo_value_bot& other);

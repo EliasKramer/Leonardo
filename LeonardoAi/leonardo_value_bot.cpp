@@ -1,18 +1,34 @@
 #include "leonardo_value_bot.hpp"
 
 leonardo_value_bot::leonardo_value_bot(neural_network given_value_nnet)
-	: leonardo_value_bot(given_value_nnet, 4, 0)
-{}
+	: leonardo_value_bot(given_value_nnet, 4, 0, 0, 0, 0, 0, 0, 0, 0)
+{
+	throw std::runtime_error("not supported");
+}
 
 leonardo_value_bot::leonardo_value_bot(
 	neural_network given_value_nnet,
 	int max_capture_depth,
-	float dropout
+	float dropout,
+	float piece_value_mult,
+	float piece_pos_value_mult,
+	float pawn_same_color_bonus_mult,
+	float pawn_self_protection_mult,
+	float passed_pawn_mult,
+	float king_pos_mult,
+	float king_safety_mult
 )
 	: Player("leonardo value bot "),
 	value_net(given_value_nnet),
 	max_capture_depth(max_capture_depth),
-	dropout(dropout)
+	dropout(dropout),
+	piece_value_mult(piece_value_mult),
+	piece_pos_value_mult(piece_pos_value_mult),
+	pawn_same_color_bonus_mult(pawn_same_color_bonus_mult),
+	pawn_self_protection_mult(pawn_self_protection_mult),
+	passed_pawn_mult(passed_pawn_mult),
+	king_pos_mult(king_pos_mult),
+	king_safety_mult(king_safety_mult)
 {
 	if (given_value_nnet.is_in_gpu_mode())
 	{
@@ -23,7 +39,6 @@ leonardo_value_bot::leonardo_value_bot(
 
 void leonardo_value_bot::mutate()
 {
-	std::cout << "Mutate\n";
 	//random number between 0 and 6
 	//number gen
 	static std::random_device rd;
@@ -33,7 +48,7 @@ void leonardo_value_bot::mutate()
 	int rand_num = dis(gen);
 
 	//mutation amount
-	std::uniform_real_distribution<> dis2(0, 1);
+	std::uniform_real_distribution<> dis2(-0.3, 1);
 	float mutation_amount = dis2(gen);
 
 	float min_val = 0.001f;
@@ -638,7 +653,7 @@ void leonardo_value_bot::thread_task(
 		+ ", Endstates Evaluated: " + std::to_string(endPointsEvaluated)
 		+ "\n";
 #endif // PRINT_SEARCH_INFO
-}
+		}
 
 int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& legal_moves)
 {

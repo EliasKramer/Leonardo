@@ -21,6 +21,29 @@ static void write_to_file(std::string filename, std::string content)
 	file.close();
 }
 
+static void play_against_thread(
+	std::mutex& mutex,
+	int& score,
+	leonardo_value_bot& player,
+	leonardo_value_bot& adversary)
+{
+	chess_arena arena(
+		"the pit",
+		std::make_unique<leonardo_value_bot>(player),
+		std::make_unique<leonardo_value_bot>(adversary)
+	);
+	arena_result res = arena.play(1);
+	std::lock_guard<std::mutex> lock(mutex);
+	if (res.player_2_won == 1)
+	{
+		score++;
+	}
+	else if (res.player_1_won == 1)
+	{
+		score--;
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	stockfish_interface::init();
@@ -40,68 +63,118 @@ int main(int argc, char* argv[])
 	//std::cout << nnet.parameter_analysis();
 
 	std::cout << "hab in die pawn pos werte rumgepuscht\n";
-	write_to_file("stats.txt", "start");
-	chess_arena arena(
-		"ARENA",
-		std::make_unique<leonardo_value_bot>(nnet, 4, 0),
-		std::make_unique<leonardo_value_bot>(nnet, 4, 0));
 
-	//p1 is the best
-	//p2 is the new one
+	write_to_file("stats.txt", "start");
+	std::vector<std::unique_ptr<leonardo_value_bot>> best_players;
+	//push back a good player
+
+	best_players.push_back(
+		std::make_unique<leonardo_value_bot>(
+			nnet,
+			4,
+			0,
+			1.0f,
+			1.0f,
+			1.0f,
+			1.0f,
+			1.0f,
+			1.2f,
+			1.3f
+		)
+	);
+
+	leonardo_value_bot adversary = leonardo_value_bot(
+		nnet,
+		4,
+		0,
+		1.0f,
+		1.0f,
+		1.0f,
+		1.0f,
+		1.0f,
+		1.2f,
+		1.3f
+	);
+
 	while (true)
 	{
-		arena_result result = arena.play(1);
-		std::cout << "------------\n";
-		if (result.player_2_won == 1)
+		adversary.mutate();
+		std::cout << "mutating\n";
+		std::cout << "++\n";
+		std::cout << adversary.param_string();
+		std::cout << "++\n";
+
+
+		std::cout << "playing against best players (count: " + std::to_string(best_players.size()) + ")\n";
+		int score = 0;
+		std::mutex mutex;
+		std::vector<std::thread> threads;
+		for (int i = 0; i < best_players.size(); i++)
+		{
+			threads.push_back(std::thread(play_against_thread, std::ref(mutex), std::ref(score), std::ref(adversary), std::ref(*(best_players[i]))));
+		}
+		for (int i = 0; i < threads.size(); i++)
+		{
+			if (threads[i].joinable())
+			{
+				threads[i].join();
+			}
+		}
+		std::cout << "score: " << score << "\n";
+
+		if (score > 0)
 		{
 			std::cout << "better\n";
 			//new one is better - set best to new
-			((leonardo_value_bot*)(arena.player1.get()))->get_params_from_other(*(leonardo_value_bot*)(arena.player2.get()));
-			std::string param_string = ((leonardo_value_bot*)(arena.player1.get()))->param_string();
+			best_players.push_back(
+				std::make_unique<leonardo_value_bot>(adversary)
+			);
+			std::string param_string = adversary.param_string();
 			std::cout << param_string << "\n";
 			write_to_file("stats.txt", param_string);
 		}
 		else
 		{
 			std::cout << "equal or worse\n";
-
 			//new is equal or worse. reset
-			((leonardo_value_bot*)(arena.player2.get()))->get_params_from_other(*(leonardo_value_bot*)(arena.player1.get()));
+			adversary.get_params_from_other(*(best_players[best_players.size() - 1]));
 		}
-		std::cout << "------------\n";
-
-		((leonardo_value_bot*)(arena.player2.get()))->mutate();
-		std::cout << "mutated params: \n";
-		std::cout << ((leonardo_value_bot*)(arena.player2.get()))->param_string() << "\n";
+		std::cout << "---------------\n";
 	}
-
+	
 	/*
 	ChessGame game(
 		//std::make_unique<HumanPlayer>(),
 		//std::make_unique<AlphaBetaPruningBot>(4),
 		std::make_unique<leonardo_value_bot>(
 			nnet,
-			4, //depth
 			4, //max capture depth
-			false, //gpu mode
-			0.0f, //nnet influence
-			1.0f, //hard coded influence
-			0.0f //dropout
+			0, //dropout>
+			15.768575f,
+			14.918061f,
+			10.225163f,
+			10.497873f,
+			10.685966f,
+			13.680205f,
+			12.822161f
 		),
 		std::make_unique<leonardo_value_bot>(
 			nnet,
-			4, //depth
 			4, //max capture depth
-			false, //gpu mode
-			0.0f, //nnet influence
-			1.0f, //hard coded influence
-			0.0f //dropout
+			0, //dropout>
+			4.662848f,
+			4.214864f,
+			1.079292f,
+			3.812843f,
+			3.853191f,
+			1.530399f,
+			3.609846f
 		),
 		STARTING_FEN);
 
 	game.start();
-	*/
 
+	*/
 	return 0;
 
 
