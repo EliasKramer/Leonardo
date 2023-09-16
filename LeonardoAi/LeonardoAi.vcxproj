@@ -126,7 +126,6 @@
     <ClInclude Include="leonardo_overlord.hpp" />
     <ClInclude Include="leonardo_util.hpp" />
     <ClInclude Include="leonardo_value_bot.hpp" />
-    <ClInclude Include="main.h" />
     <ClInclude Include="NeuroFox\assert_throw.hpp" />
     <ClInclude Include="NeuroFox\convolutional_layer.hpp" />
     <ClInclude Include="NeuroFox\data_space.hpp" />

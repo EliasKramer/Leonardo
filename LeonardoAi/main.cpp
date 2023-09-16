@@ -9,7 +9,6 @@
 #include <mutex>
 // Define mutex for synchronized output
 #include <iostream>
-#include "main.h"
 
 #include "leonardo_value_bot.hpp"
 #include "../MockChessEngine/HumanPlayer.h"
@@ -44,11 +43,8 @@ static void play_against_thread(
 	}
 }
 
-int main(int argc, char* argv[])
+static void brute_force_good_params()
 {
-	stockfish_interface::init();
-	//SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
-	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
 
 	//float evaluation = stockfish_interface::eval(STARTING_FEN.c_str(), 12);
 	//sync_cout << "evaluation: " << evaluation << sync_endl;
@@ -57,14 +53,14 @@ int main(int argc, char* argv[])
 	//std::cout << nn.parameter_analysis();
 	//return 0;
 
-	neural_network nnet("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\one_layer_epoch_2690200\\value.parameters");
+	neural_network nnet;// ("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\one_layer_epoch_2690200\\value.parameters");
 	//neural_network nnet("C:\\Users\\Elias\\Desktop\\4small_epoch\\4small_epoch_2652200\\value.parameters");
 	//neural_network nnet("C:\\Users\\Elias\\Desktop\\runin\\models\\reasonable_epoch_18200\\value.parameters");
 	//std::cout << nnet.parameter_analysis();
 
-	std::cout << "hab in die pawn pos werte rumgepuscht\n";
 
-	write_to_file("stats.txt", "start");
+	//write_to_file("stats.txt", "start");
+
 	std::vector<std::unique_ptr<leonardo_value_bot>> best_players;
 	//push back a good player
 
@@ -73,13 +69,13 @@ int main(int argc, char* argv[])
 			nnet,
 			4,
 			0,
-			1.0f,
-			1.0f,
-			1.0f,
-			1.0f,
-			1.0f,
-			1.2f,
-			1.3f
+			1.231605f,
+			1.000000f,
+			2.698990f,
+			1.000000f,
+			0.736647f,
+			1.000000f,
+			2.038531f
 		)
 	);
 
@@ -87,18 +83,20 @@ int main(int argc, char* argv[])
 		nnet,
 		4,
 		0,
-		1.0f,
-		1.0f,
-		1.0f,
-		1.0f,
-		1.0f,
-		1.2f,
-		1.3f
+		1.231605f,
+		1.000000f,
+		2.698990f,
+		1.000000f,
+		0.736647f,
+		1.000000f,
+		2.038531f
 	);
 
 	while (true)
 	{
-		adversary.mutate();
+		adversary.mutate(-0.3f, 1.5f);
+		adversary.mutate(-0.3f, 1.5f);
+		adversary.mutate(-0.3f, 1.5f);
 		std::cout << "mutating\n";
 		std::cout << "++\n";
 		std::cout << adversary.param_string();
@@ -121,10 +119,14 @@ int main(int argc, char* argv[])
 			}
 		}
 		std::cout << "score: " << score << "\n";
+		float minimum_requirement = (float)best_players.size() * 0.75f;
+		std::cout << "minimum requirement: " << minimum_requirement << "\n";
 
-		if (score > 0)
+		if ((float)score > minimum_requirement)
 		{
+			std::cout << "+++++++\n";
 			std::cout << "better\n";
+			std::cout << "+++++++\n";
 			//new one is better - set best to new
 			best_players.push_back(
 				std::make_unique<leonardo_value_bot>(adversary)
@@ -141,50 +143,72 @@ int main(int argc, char* argv[])
 		}
 		std::cout << "---------------\n";
 	}
-	
-	/*
+}
+
+static void play_game()
+{
+	neural_network nnet;
+
 	ChessGame game(
 		//std::make_unique<HumanPlayer>(),
 		//std::make_unique<AlphaBetaPruningBot>(4),
 		std::make_unique<leonardo_value_bot>(
 			nnet,
-			4, //max capture depth
+			0, //max capture depth
 			0, //dropout>
-			15.768575f,
-			14.918061f,
-			10.225163f,
-			10.497873f,
-			10.685966f,
-			13.680205f,
-			12.822161f
+			1.0f,
+			0.00000f,
+			0.0,
+			0.000000f,
+			0.0,
+			.0f,
+			.0f
 		),
 		std::make_unique<leonardo_value_bot>(
 			nnet,
-			4, //max capture depth
+			0, //max capture depth
 			0, //dropout>
-			4.662848f,
-			4.214864f,
-			1.079292f,
-			3.812843f,
-			3.853191f,
-			1.530399f,
-			3.609846f
+			1.0f,
+			0.00000f,
+			0.0,
+			0.000000f,
+			0.0,
+			.0f,
+			.0f
 		),
-		STARTING_FEN);
+		"r1b1nb1r/ppq1k1p1/1n6/3pP2p/5P1P/P1NBP3/1P4P1/R1BQK2R w KQ - 0 18");
 
 	game.start();
+}
 
-	*/
-	return 0;
+static void eval_pos(std::string fen)
+{
+	neural_network nnet;
+	leonardo_value_bot bot(
+		nnet,
+		0, //max capture depth
+		0, //dropout>
+		4.231605f,
+		1.500000f,
+		0.698990f,
+		0.0100000f,
+		0.736647f,
+		.0f,
+		.0f);
 
+	bot.print_eval(fen);
+}
 
-	//leonardo_overlord overlord("reasonable");
-	//overlord.train_on_dataset();
-	/*
-	overlord.test_eval_on_single_match(
-	"g1f3 g8f6 c2c4 g7g6 g2g3 f8g7 f1g2 e8g8 d2d4 d7d6 b1c3 b8c6 e1g1 a7a6 h2h3 a8b8 c1g5 b7b5 c4b5 a6b5 d4d5 b5b4 g5f6 e7f6 d5c6 b4c3 b2c3 f6f5 d1d2 c8a6 f1b1 d8f6 f3d4 f6e5 e2e3 e5a5 b1b4 f8e8 a1b1 b8a8 a2a4 a5c5 d2c2 h7h5 h3h4 g7f6 c2b3 g8g7 g2d5 e8e7 d5f7 g7h6 f7c4 c5e5 c4a6 a8a6 b4b8 e5e4 b3b5 a6a7 b5c4 f6g7 b8b4 a7a8 d4e2 e4c2 e2d4 c2e4 d4b5 e4c2 b5d4 c2e4 b1d1 h6h7 c4d3 e4d5 b4b5 d5a2 "
-	);
-	*/
+int main(int argc, char* argv[])
+{
+	stockfish_interface::init();
+	//SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
+	std::cout << "hab in die pawn pos werte rumgepuscht\n";
+
+	//brute_force_good_params();
+	play_game();
+	//eval_pos("r1bqkb1r/pp3ppp/1n2p3/3pP3/7P/3B4/PP1NNPP1/R1BQK2R b KQkq - 0 10");
 
 	return 0;
 	matrix m;

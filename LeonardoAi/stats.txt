@@ -1,7 +1,7 @@
-piece_value_mult: 1.120607
-piece_pos_value_mult: 3.522524
-pawn_same_color_bonus_mult: 3.584344
-pawn_self_protection_mult: 3.436941
-passed_pawn_mult: 5.003204
-king_pos_mult: 4.864371
-king_safety_mult: 2.408746
+piece_value_mult: 1.231605
+piece_pos_value_mult: 1.729272
+pawn_same_color_bonus_mult: 3.589701
+pawn_self_protection_mult: 3.224031
+passed_pawn_mult: 2.209181
+king_pos_mult: 1.000000
+king_safety_mult: 2.795274

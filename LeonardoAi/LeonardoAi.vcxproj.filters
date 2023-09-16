@@ -410,7 +410,6 @@
     <ClInclude Include="stockfish_interface.hpp">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="main.h" />
     <ClInclude Include="leonardo_value_bot.hpp">
       <Filter>header</Filter>
     </ClInclude>

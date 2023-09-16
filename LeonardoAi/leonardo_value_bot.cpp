@@ -18,7 +18,7 @@ leonardo_value_bot::leonardo_value_bot(
 	float king_pos_mult,
 	float king_safety_mult
 )
-	: Player("leonardo value bot "),
+	: Player("leonardo value bot"),
 	value_net(given_value_nnet),
 	max_capture_depth(max_capture_depth),
 	dropout(dropout),
@@ -35,9 +35,29 @@ leonardo_value_bot::leonardo_value_bot(
 		std::cout << "not supported gpu mode\n";
 		return;
 	}
+	load_openings();
 }
 
-void leonardo_value_bot::mutate()
+void leonardo_value_bot::reroll_params()
+{
+	//random number between 0 and 6
+	//number gen
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	//random float
+
+	std::uniform_real_distribution<> dis(0.001, 5);
+
+	piece_value_mult = dis(gen);
+	piece_pos_value_mult = dis(gen);
+	pawn_same_color_bonus_mult = dis(gen);
+	pawn_self_protection_mult = dis(gen);
+	passed_pawn_mult = dis(gen);
+	king_pos_mult = dis(gen);
+	king_safety_mult = dis(gen);
+}
+
+void leonardo_value_bot::mutate(float min, float max)
 {
 	//random number between 0 and 6
 	//number gen
@@ -48,7 +68,7 @@ void leonardo_value_bot::mutate()
 	int rand_num = dis(gen);
 
 	//mutation amount
-	std::uniform_real_distribution<> dis2(-0.3, 1);
+	std::uniform_real_distribution<> dis2(min, max);
 	float mutation_amount = dis2(gen);
 
 	float min_val = 0.001f;
@@ -174,6 +194,10 @@ static int x_distance(Square s1, Square s2)
 
 float leonardo_value_bot::get_simpel_eval(const ChessBoard& board)
 {
+	return get_simpel_eval(board, false);
+}
+float leonardo_value_bot::get_simpel_eval(const ChessBoard& board, bool print)
+{
 	BoardRepresentation boardRep = board.getBoardRepresentation();
 
 	//get the obvious out the way 
@@ -189,11 +213,11 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board)
 		{
 			if (board.getCurrentTurnColor() == White)
 			{
-				return -1000000; //disencourages stalemates
+				return -10000; //disencourages stalemates
 			}
 			else
 			{
-				return 1000000;
+				return 10000;
 			}
 		}
 		else
@@ -207,6 +231,7 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board)
 
 	//now calculate the score
 	float score = 0;
+
 	float black_pawns_on_same_color = 0;
 	float white_pawns_on_same_color = 0;
 
@@ -310,39 +335,74 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board)
 			}
 		}
 	}
+	float material_value = score;
 
 	//worst case for color: 4 pawns on same color
 	//best case for color: 8 pawns on same color
 	float pawn_same_color_bonus = std::abs(white_pawns_on_same_color) - std::abs(black_pawns_on_same_color);
-	score += pawn_same_color_bonus * pawn_same_color_bonus_mult;
+	pawn_same_color_bonus *= pawn_same_color_bonus_mult;
+	score += pawn_same_color_bonus;
 
 	//worst case for color: 0 pawns protected
 	//best case for color: 7 pawns protected
 	float pawn_self_protection = white_pawn_self_protection - black_pawn_self_protection;
-	score += pawn_self_protection * pawn_self_protection_mult;
+	pawn_self_protection *= pawn_self_protection_mult;
+	score += pawn_self_protection;
 
-	//worst case 0
-	//best case 8
 	float passed_pawn_bonus = white_passed_pawn_bonus - black_passed_pawn_bonus;
-	score += passed_pawn_bonus * passed_pawn_mult;
+	passed_pawn_bonus *= passed_pawn_mult;
+	score += passed_pawn_bonus;
 
 	float king_safety = white_king_safety - black_king_safety;
-	score += king_safety * king_safety_mult;
+	king_safety *= king_safety_mult;
+	score += king_safety;
 
 	//Evaluating the king position
 	//usually the king is worth 20k and the position value is added to that.
 	//this is not done here, since these values cancel out. - could be done for clarity
-	float king_pos_val =
-		(POSITION_VALUE_KING[White][board.getGameDurationState()][boardRep.KingPos[White]] -
-			POSITION_VALUE_KING[Black][board.getGameDurationState()][boardRep.KingPos[Black]]);
+	float king_white_pos_val = POSITION_VALUE_KING[White][board.getGameDurationState()][boardRep.KingPos[White]] / 100;
+	float king_black_pos_val = POSITION_VALUE_KING[Black][board.getGameDurationState()][boardRep.KingPos[Black]] / 100;
 
-	score += (king_pos_val / 100) * king_pos_mult;
 
-	//TODO
-	//to encourage pawns for more structure, it would be useful to look if they get protected
-	//by another pawn. and increase the value if it is that way
 
-	//print fen, score and pawn protection
+	float king_pos_val = king_white_pos_val - king_black_pos_val;
+	king_pos_val *= king_pos_mult;
+	score += king_pos_val;
+
+	if (print)
+	{
+		//print summary of how the evaluation was formed
+		std::cout << "evaulation summary: \n"
+			<< score << " SCORE\n"
+			<< material_value << " material value\n"
+
+			<< pawn_same_color_bonus << " pawn same color bonus "
+			<< std::abs(white_pawns_on_same_color) << " - " << std::abs(black_pawns_on_same_color) << " = "
+			<< pawn_same_color_bonus / pawn_same_color_bonus_mult << " * "
+			<< pawn_same_color_bonus_mult << "\n"
+
+			<< pawn_self_protection << " pawn self protection "
+			<< white_pawn_self_protection << " - " << black_pawn_self_protection << " = "
+			<< pawn_self_protection / pawn_self_protection_mult << " * "
+			<< pawn_self_protection_mult << "\n"
+
+			<< passed_pawn_bonus << " passed pawn bonus "
+			<< white_passed_pawn_bonus << " - " << black_passed_pawn_bonus << " = "
+			<< passed_pawn_bonus / passed_pawn_mult << " * "
+			<< passed_pawn_mult << "\n"
+
+			<< king_safety << " king safety "
+			<< white_king_safety << " - " << black_king_safety << " = "
+			<< king_safety / king_safety_mult << " * "
+			<< king_safety_mult << "\n"
+
+			<< king_pos_val << " king pos val "
+			<< king_white_pos_val << " - " << king_black_pos_val << " = "
+			<< king_pos_val / king_pos_mult << " * "
+			<< king_pos_mult << "\n"
+
+			<< std::endl;
+	}
 
 	return score;
 }
@@ -374,7 +434,8 @@ float leonardo_value_bot::get_capture_move_score_recursively(
 	matrix& input_board,
 	long long allowed_time_ms,
 	std::chrono::steady_clock::time_point& start_time,
-	bool& search_finished)
+	bool& search_finished,
+	std::string& best_moves_str)
 {
 	//if time is up, return
 	if (std::chrono::steady_clock::now() > start_time + std::chrono::milliseconds(allowed_time_ms))
@@ -413,7 +474,8 @@ float leonardo_value_bot::get_capture_move_score_recursively(
 			max_depth_reached,
 			input_board,
 			allowed_time_ms,
-			start_time, search_finished);
+			start_time, search_finished,
+			best_moves_str);
 
 		if (is_maximizing_player)
 		{
@@ -450,7 +512,8 @@ float leonardo_value_bot::get_move_score_recursively(
 	matrix& input_board,
 	long long allowed_time_ms,
 	std::chrono::steady_clock::time_point& start_time,
-	bool& search_finished)
+	bool& search_finished,
+	std::string& best_moves_str)
 {
 	//if time is up, return
 	if (std::chrono::steady_clock::now() > start_time + std::chrono::milliseconds(allowed_time_ms))
@@ -476,7 +539,8 @@ float leonardo_value_bot::get_move_score_recursively(
 			input_board,
 			allowed_time_ms,
 			start_time,
-			search_finished);
+			search_finished,
+			best_moves_str);
 	}
 	else
 	{
@@ -498,8 +562,8 @@ float leonardo_value_bot::get_move_score_recursively(
 					GAME_STATE_EVALUATION[WhiteWon] + curr_depth) :
 				//draw
 				board.getCurrentTurnColor() == White ?
-				-2000000.0f :
-				2000000.0f;
+				-10000 :
+				10000;
 		}
 
 		bool nnet_pruning = false;
@@ -548,12 +612,20 @@ float leonardo_value_bot::get_move_score_recursively(
 		}
 
 		float bestEval = is_maximizing_player ? -FLT_MAX : FLT_MAX;
+		int best_idx = 0;
+		std::string best_move_str = "";
 		for (int i = 0; i < branch_count; i++)
 		{
+			if (moves[move_indices[i]].get()->getString() == "c3d5")
+			{
+				int a = 0; //DEBUG
+			}
 			ChessBoard copyBoard = board.getCopyByValue();
 			copyBoard.makeMove(*moves[move_indices[i]]);
 
 			nodes_searched++;
+
+			std::string best_move = "";
 			float evaluation = get_move_score_recursively(
 				copyBoard,
 				curr_depth - 1,
@@ -566,7 +638,8 @@ float leonardo_value_bot::get_move_score_recursively(
 				input_board,
 				allowed_time_ms,
 				start_time,
-				search_finished);
+				search_finished,
+				best_move);
 
 			if (is_maximizing_player)
 			{
@@ -586,9 +659,134 @@ float leonardo_value_bot::get_move_score_recursively(
 					break;
 				}
 			}
+
+			if (bestEval == evaluation)
+			{
+				best_idx = i;
+				best_move_str = best_move;
+			}
 		}
+
+		best_moves_str = moves[best_idx].get()->getString() + "(d" + std::to_string(curr_depth) + ", val:" + std::to_string(bestEval) + ") " + best_move_str;
+
 		return bestEval;
 	}
+}
+
+static std::vector<std::string> split_string(const std::string& input, char separator) {
+	std::vector<std::string> result;
+	std::string current;
+
+	for (char c : input) {
+		if (c == separator) {
+			if (!current.empty()) {
+				result.push_back(current);
+				current.clear();
+			}
+		}
+		else {
+			current += c;
+		}
+	}
+
+	if (!current.empty()) {
+		result.push_back(current);
+	}
+
+	return result;
+}
+void leonardo_value_bot::add_opening_position(const ChessBoard& board, const std::string& move_str)
+{
+	if (position_is_known_opening(board))
+	{
+		//get the vector and add the move
+		opening_positions[board].push_back(move_str);
+	}
+	else
+	{
+		//create a new vector and add the move
+		std::vector<std::string> moves;
+		moves.push_back(move_str);
+		opening_positions[board] = moves;
+	}
+}
+
+void leonardo_value_bot::load_openings()
+{
+	std::ifstream file("openings.txt");
+
+	if (!file)
+	{
+		std::cout << "opening file not found\n";
+		return;
+	}
+
+	std::string str;
+	while (std::getline(file, str))
+	{
+		ChessBoard board(STARTING_FEN);
+		std::vector<std::string> book_moves = split_string(str, ' ');
+
+		for (int i = 0; i < book_moves.size(); i++)
+		{
+			std::string move_str = book_moves[i];
+			add_opening_position(board, move_str);
+
+			UniqueMoveList moves = board.getAllLegalMoves();
+			bool move_found = false;
+			for (std::unique_ptr<Move>& curr : moves)
+			{
+				if (curr->getString() == move_str)
+				{
+					move_found = true;
+					board.makeMove(*curr);
+					break;
+				}
+			}
+			if (!move_found)
+			{
+				std::cout << "opening move not found\n";
+				break;
+			}
+		}
+	}
+	file.close();
+}
+
+int leonardo_value_bot::get_random_opening_move(const ChessBoard& board)
+{
+	UniqueMoveList legal_moves = board.getAllLegalMoves();
+
+	//random 
+	std::random_device rd;
+	std::mt19937 g(rd());
+
+	std::vector<std::string> opening_moves = opening_positions[board];
+	//random idx
+	std::uniform_int_distribution<> dis(0, opening_moves.size() - 1);
+	int idx = dis(g);
+
+	std::string book_move = opening_moves[idx];
+
+#ifdef PRINT_SEARCH_INFO
+	std::cout << "Opening position found!\n";
+#endif // PRINT_SEARCH_INFO
+
+	for (int i = 0; i < legal_moves.size(); i++)
+	{
+		if (legal_moves[i]->getString() == book_move)
+		{
+			return i;
+		}
+	}
+
+#ifdef PRINT_SEARCH_INFO
+	std::cout << "+-+-+-+-+-+-+-+-+\n";
+	std::cout << "Opening Position was found, but had no valid move!\n";
+	std::cout << "+-+-+-+-+-+-+-+-+\n";
+#endif // PRINT_SEARCH_INFO
+
+	return 0;
 }
 
 void leonardo_value_bot::thread_task(
@@ -615,27 +813,31 @@ void leonardo_value_bot::thread_task(
 	//if the best move is found, stop searching
 	float move_score = 0;
 	int i_depth = 1;
+	std::string best_moves_str = "";
 	while (std::chrono::high_resolution_clock::now() < start + std::chrono::milliseconds(ms_per_move))
 	{
 		bool search_finished = true;
+		std::string best_move_str_tmp = "";
 		float tmp_move_score =
 			get_move_score_recursively(
 				board,
 				i_depth - 1,
 				is_white_to_move,
-				BLACK_WIN_EVAL_VALUE,
-				WHITE_WIN_EVAL_VALUE,
+				-FLT_MAX,
+				FLT_MAX,
 				nodesSearched,
 				endPointsEvaluated,
 				max_capture_depth_reached,
 				input_board,
 				ms_per_move,
 				start,
-				search_finished);
+				search_finished,
+				best_move_str_tmp);
 
 		if (search_finished)
 		{
 			move_score = tmp_move_score;
+			best_moves_str = best_move_str_tmp;
 		}
 		i_depth++;
 	}
@@ -651,13 +853,32 @@ void leonardo_value_bot::thread_task(
 		+ ", Score: " + std::to_string(move_score * colorMult)
 		+ ", Max Capture Depth reached: " + std::to_string(max_capture_depth_reached)
 		+ ", Endstates Evaluated: " + std::to_string(endPointsEvaluated)
+		+ " evaluated combination: " + best_moves_str
 		+ "\n";
 #endif // PRINT_SEARCH_INFO
-		}
+}
+
+bool leonardo_value_bot::position_is_known_opening(const ChessBoard& board)
+{
+	return opening_positions.find(board) != opening_positions.end();
+}
 
 int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& legal_moves)
 {
+	if (position_is_known_opening(board))
+	{
+		return get_random_opening_move(board);
+	}
+
 	auto begin = std::chrono::high_resolution_clock::now();
+
+#ifdef PRINT_SEARCH_INFO
+	ChessBoard cpy = board.getCopyByValue();
+
+	float eval_before = get_simpel_eval(board) * (board.getCurrentTurnColor() == White ? 1 : -1);
+	std::cout << "eval before: " << eval_before << "\n";
+#endif // PRINT_SEARCH_INFO
+
 
 	int moveIdx = 0;
 	std::vector<float> move_scores(legal_moves.size());
@@ -668,14 +889,18 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 		ChessBoard boardCopy = board;
 		boardCopy.makeMove(*curr);
 
-		threads.push_back(std::thread(
-			&leonardo_value_bot::thread_task,
-			this,
-			moveIdx,
-			curr.get()->getString(),
-			std::ref(move_scores),
-			boardCopy
-		));
+		if (curr->getString() == "a5d5" || true) //DEBUG
+		{
+
+			threads.push_back(std::thread(
+				&leonardo_value_bot::thread_task,
+				this,
+				moveIdx,
+				curr.get()->getString(),
+				std::ref(move_scores),
+				boardCopy
+			));
+		}
 		moveIdx++;
 	}
 
@@ -702,13 +927,27 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 
 	long long duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
 
-	matrix input_board(leonardo_util::get_input_format());
 
 #ifdef PRINT_SEARCH_INFO
+	cpy.makeMove(*legal_moves[bestMoveIdx]);
+	float eval_after = get_simpel_eval(cpy) * (board.getCurrentTurnColor() == White ? 1 : -1);
+
+	float eval_diff = eval_after - eval_before;
+	std::cout << "eval after: " << eval_after << "\n";
+
 	std::cout << "done. took " << ms_to_str(duration) << "\n";
 	std::cout << "current position according to stockfish: " << stockfish_interface::eval(board.getFen(), 8) << "\n";
 	std::cout << "current position according to leonardo after searching: " << bestMoveScore << "\n";
-	std::cout << "leonardo static eval: " << get_eval(board, input_board) * (board.getCurrentTurnColor() == White ? 1 : -1) << "\n";
+	std::cout << "leonardo static eval: " << eval_after << "\n";
+	std::cout << "leardo immediate move eval: " << eval_diff << "\n";
+
+	//get_simpel_eval(board, true);
 #endif // DEBUG
 	return bestMoveIdx;
+}
+
+void leonardo_value_bot::print_eval(std::string fen)
+{
+	ChessBoard board(fen);
+	get_simpel_eval(board, true);
 }
