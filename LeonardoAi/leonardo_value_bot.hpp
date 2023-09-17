@@ -27,7 +27,7 @@ private:
 	float king_pos_mult;
 	float king_safety_mult;
 
-	bool some_print = false;
+	bool print_tree = false;
 
 	std::unordered_map<ChessBoard, std::vector<std::string>, chess_board_hasher> opening_positions;
 	bool openings_loaded;

@@ -455,7 +455,7 @@ float leonardo_value_bot::get_capture_move_score_recursively(
 	int i = 0;
 	for (std::unique_ptr<Move>& curr : possible_capture_moves)
 	{
-		ChessBoard copyBoard = board.getCopyByValue();
+		ChessBoard copyBoard = board;
 		copyBoard.makeMove(*curr);
 
 		nodes_searched++;
@@ -554,7 +554,7 @@ float leonardo_value_bot::get_move_score_recursively(
 		std::vector<std::unique_ptr<Move>> moves = board.getAllLegalMoves();
 
 		//CAN BE IMPROVED
-		if (board.getGameState() != Ongoing)
+		if (board.getGameState(moves) != Ongoing)
 		{
 			nodes_searched++;
 			end_states_searched++;
@@ -598,7 +598,7 @@ float leonardo_value_bot::get_move_score_recursively(
 			int idx = 0;
 			for (std::unique_ptr<Move>& curr : moves)
 			{
-				ChessBoard copyBoard = board.getCopyByValue();
+				ChessBoard copyBoard = board;
 				copyBoard.makeMove(*curr);
 				float val = get_eval(copyBoard, input_board);
 				move_scores.push_back(val);
@@ -625,7 +625,7 @@ float leonardo_value_bot::get_move_score_recursively(
 			{
 				int a = 0; //DEBUG
 			}
-			ChessBoard copyBoard = board.getCopyByValue();
+			ChessBoard copyBoard = board;
 			copyBoard.makeMove(*moves[move_indices[i]]);
 
 			nodes_searched++;
@@ -646,7 +646,7 @@ float leonardo_value_bot::get_move_score_recursively(
 				search_finished,
 				best_move,
 				prefix + "|");
-			if (some_print)
+			if (print_tree)
 			{
 				std::cout << prefix << " " << (moves[move_indices[i]].get()->getString()) << "      " << evaluation << "\n";
 			}
@@ -845,7 +845,7 @@ void leonardo_value_bot::thread_task(
 				search_finished,
 				best_move_str_tmp,
 				"");
-		if (some_print)
+		if (print_tree)
 		{
 			std::cout << "\n----------------------------- " << std::to_string(i_depth) + "\n";
 		}
@@ -888,7 +888,7 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 	auto begin = std::chrono::high_resolution_clock::now();
 
 #ifdef PRINT_SEARCH_INFO
-	ChessBoard cpy = board.getCopyByValue();
+	ChessBoard cpy = board;
 
 	float eval_before = get_simpel_eval(board) * (board.getCurrentTurnColor() == White ? 1 : -1);
 	std::cout << "eval before: " << eval_before << "\n";
@@ -901,7 +901,7 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 
 	for (const std::unique_ptr<Move>& curr : legal_moves)
 	{
-		ChessBoard boardCopy = board.getCopyByValue();
+		ChessBoard boardCopy = board;
 		boardCopy.makeMove(*curr);
 
 		if (curr->getString() == "b5e2" || true) //DEBUG
@@ -930,35 +930,10 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 	int bestMoveIdx = 0;
 	for (int i = 0; i < move_scores.size(); i++)
 	{
-		std::cout << legal_moves[i]->getString() << " " << move_scores[i] << "\n";
 		if (move_scores[i] > bestMoveScore)
 		{
-			std::cout << "new best move\n";
 			bestMoveScore = move_scores[i];
 			bestMoveIdx = i;
-		}
-	}
-	static bool first = true;
-	if (legal_moves[bestMoveIdx]->getString() == "b5e2")
-	{
-		if (first)
-		{
-			first = false;
-		}
-		else
-		{
-			//ms_per_move = 9000000;
-			ChessBoard boardCopy = board.getCopyByValue();
-			Move m(B5, E2);
-			boardCopy.makeMove(m);
-			std::cout << GAME_STATE_STRING[boardCopy.getGameState()] << "\n";
-			//some_print = true;
-			thread_task(
-				0,
-				"b5e2",
-				std::ref(move_scores),
-				boardCopy
-			);
 		}
 	}
 

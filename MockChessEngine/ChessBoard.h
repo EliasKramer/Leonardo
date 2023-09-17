@@ -104,11 +104,9 @@ protected:
 
 	char getPieceCharAt(Square pos) const;
 
-
 	friend bool operator ==(const ChessBoard& first, const ChessBoard& second);
 	friend bool operator !=(const ChessBoard& first, const ChessBoard& second);
 public:
-	ChessBoard operator=(const ChessBoard&);
 	ChessBoard(const std::string& given_fen_code);
 
 	std::string getString() const;
@@ -127,9 +125,7 @@ public:
 	//execute move
 	void makeMove(const Move& move);
 
-	//copy board by value
-	ChessBoard getCopyByValue() const;
-
+	GameState getGameState(const UniqueMoveList& pre_calculated_moves) const;
 	GameState getGameState() const;
 	GameDurationState getGameDurationState() const;
 

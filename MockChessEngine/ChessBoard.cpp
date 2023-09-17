@@ -658,13 +658,6 @@ char ChessBoard::getPieceCharAt(Square pos) const
 	return pieceChar;
 }
 
-ChessBoard ChessBoard::operator=(const ChessBoard&)
-{
-	std::cout << "INFO - operator = is called\n";
-	return getCopyByValue();
-}
-
-
 ChessBoard::ChessBoard(const std::string& given_fen_code)
 {
 	//set all castling rights to false at the beginning
@@ -981,35 +974,9 @@ void ChessBoard::makeMove(const Move& move)
 	_currentTurnColor = getOppositeColor(_currentTurnColor);
 }
 
-ChessBoard ChessBoard::getCopyByValue() const
+GameState ChessBoard::getGameState(const UniqueMoveList& pre_calculated_moves) const
 {
-	ChessBoard board(EMPTY_FEN);
-	board._board = _board;
-
-	for (int i = 0; i < 2; i++)
-	{
-		for (int j = 0; j < 2; j++)
-		{
-			board._canCastle[i][j] = _canCastle[i][j];
-		}
-	}
-
-	board._currentTurnColor = _currentTurnColor;
-
-	board._enPassantSquare = _enPassantSquare;
-
-	board._halfMoveClock = _halfMoveClock;
-
-	board._moveNumber = _moveNumber;
-
-	board._moveRepetitionTable = _moveRepetitionTable;
-
-	return board;
-}
-
-GameState ChessBoard::getGameState() const
-{
-	if (getAllLegalMoves().size() == 0)
+	if (pre_calculated_moves.size() == 0)
 	{
 		if (fieldIsUnderAttack(_board.KingPos[_currentTurnColor]))
 		{
@@ -1029,6 +996,11 @@ GameState ChessBoard::getGameState() const
 		return Draw;
 	}
 	return Ongoing;
+}
+
+GameState ChessBoard::getGameState() const
+{
+	return getGameState(getAllLegalMoves());
 }
 
 GameDurationState ChessBoard::getGameDurationState() const

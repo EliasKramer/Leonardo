@@ -176,7 +176,7 @@ static void play_game()
 			.0f,
 			.0f
 		),
-		"1rb1k1nr/1p3p1p/pNp5/3pN1B1/3PP2Q/P1P3P1/4qP1P/1R3RK1 w k - 9 23");
+		STARTING_FEN);
 
 	game.start();
 }

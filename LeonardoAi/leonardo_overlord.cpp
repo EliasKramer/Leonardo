@@ -95,7 +95,7 @@ float leonardo_overlord::search(
 	}
 	const Move& best_move = *legal_moves[best_move_idx].get();
 
-	ChessBoard new_game = game.getCopyByValue();
+	ChessBoard new_game = game;
 	new_game.makeMove(best_move);
 
 	float evaluation = search(new_game, given_policy_nnet, given_value_nnet, n, p, q, visited);

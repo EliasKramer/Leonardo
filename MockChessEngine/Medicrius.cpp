@@ -239,7 +239,7 @@ int Medicrius::getMoveScoreRecursively(
 		int bestEval = isMaximizingPlayer ? INT_MIN : INT_MAX;
 		for (std::unique_ptr<Move>& curr : moves)
 		{
-			ChessBoard copyBoard = board.getCopyByValue();
+			ChessBoard copyBoard = board;
 			copyBoard.makeMove(*curr);
 
 			nodesSearched++;
@@ -301,7 +301,7 @@ int Medicrius::getAllCaputureMoveScoreRecursively(
 
 	for (std::unique_ptr<Move>& curr : possibleCaptures)
 	{
-		ChessBoard copyBoard = board.getCopyByValue();
+		ChessBoard copyBoard = board;
 		copyBoard.makeMove(*curr);
 
 		nodesSearched++;
