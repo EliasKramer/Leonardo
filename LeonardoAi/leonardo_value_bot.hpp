@@ -17,7 +17,7 @@ private:
 
 	int max_capture_depth = 4;
 	float dropout = 0;
-	long ms_per_move = 300; //DEBUG
+	long ms_per_move = 3000; //DEBUG
 
 	float piece_value_mult;
 	float piece_pos_value_mult;
@@ -38,38 +38,21 @@ private:
 	float get_eval(const ChessBoard& board, matrix& input_board);
 	//float get_eval(const ChessBoard& board, matrix& input_board, float nnet_inf, float hard_infl);
 
-
-	float get_capture_move_score_recursively(
-		const ChessBoard& board,
-		int curr_depth,
-		bool is_maximizing_player,
-		float alpha,
-		float beta,
-		int& nodesSearched,
-		int& endStatesSearched,
-		int& maxDepthReached,
-		matrix& input_board,
-		long long allowed_time_ms,
-		std::chrono::steady_clock::time_point& start_time,
-		bool& search_finished,
-		std::string& best_moves_str
-	);
-
 	float get_move_score_recursively(
-		const ChessBoard& board,
-		int depth,
-		bool isMaximizingPlayer,
-		float alpha,
-		float beta,
-		int& nodesSearched,
-		int& endStatesSearched,
-		int& maxCaptureDepthReached,
-		matrix& input_board,
-		long long allowed_time_ms,
-		std::chrono::steady_clock::time_point& start_time,
-		bool& search_finished,
-		std::string& best_moves_str,
-		std::string prefix);
+		const ChessBoard& board, //1
+		int curr_depth, //2
+		int max_depth, //2
+		bool is_maximizing_player, //3
+		float alpha, //4
+		float beta, //5
+		int& nodes_searched, //6
+		int& end_states_searched, //7
+		matrix& input_board, //8
+		long long allowed_time_ms, //9
+		std::chrono::steady_clock::time_point& start_time, //10
+		bool& search_cancelled, //11
+		std::string& best_moves_str, //12
+		std::string prefix); //13
 
 	void thread_task(
 		int thread_id,

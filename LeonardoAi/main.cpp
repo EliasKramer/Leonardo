@@ -156,11 +156,11 @@ static void play_game()
 			nnet,
 			0, //max capture depth
 			0.0f, //dropout>
-			4.231605f,
-			1.500000f,
-			0.698990f,
-			0.0100000f,
-			0.736647f,
+			1,
+			0.01f,
+			0.0f,
+			0.00000f,
+			0.0f,
 			.0f,
 			.0f
 		),
@@ -168,11 +168,11 @@ static void play_game()
 			nnet,
 			0, //max capture depth
 			0, //dropout>
-			4.231605f,
-			1.500000f,
-			0.698990f,
-			0.0100000f,
-			0.736647f,
+			1,
+			0.01f,
+			0.0f,
+			0.00000f,
+			0.0f,
 			.0f,
 			.0f
 		),
