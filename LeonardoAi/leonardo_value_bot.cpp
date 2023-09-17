@@ -447,22 +447,20 @@ float leonardo_value_bot::get_move_score_recursively(
 	}
 
 	std::vector<std::unique_ptr<Move>> moves = board.getAllLegalMoves();
-
-	if (board.getGameState(moves) != Ongoing)
+	GameState gamestate = board.getGameState(moves);
+	if (gamestate != Ongoing)
 	{
 		nodes_searched++;
 		end_states_searched++;
-		//dont know if this works
-		return board.isKingInCheck() ?
-			(board.getCurrentTurnColor() == White ?
-				//when the depth is very high, the checkmate can be done earlier
-				//(when you search with depth 4, the function gets called with 3, 2, 1, 0 recursively)
-				//therefore a higher depth in the argument means actually low depth.
-				////finding a checkmate at a low depth is better, because it can be delivered earlier
-				GAME_STATE_EVALUATION[BlackWon] - curr_depth :
-				GAME_STATE_EVALUATION[WhiteWon] + curr_depth) :
-			//draw
+
+		int depth_left = max_depth - curr_depth;
+
+		float score =
+			gamestate == WhiteWon ? GAME_STATE_EVALUATION[WhiteWon] + depth_left :
+			gamestate == BlackWon ? GAME_STATE_EVALUATION[BlackWon] - depth_left :
 			draw_score[board.getCurrentTurnColor()];
+
+		return score;
 	}
 
 	float bestEval = is_maximizing_player ? -FLT_MAX : FLT_MAX;
