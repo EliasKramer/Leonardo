@@ -211,14 +211,7 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board, bool print)
 	{
 		if (state == Draw || state == Stalemate)
 		{
-			if (board.getCurrentTurnColor() == White)
-			{
-				return -10000; //disencourages stalemates
-			}
-			else
-			{
-				return 10000;
-			}
+			return draw_score[board.getCurrentTurnColor()];
 		}
 		else
 		{
@@ -457,12 +450,16 @@ float leonardo_value_bot::get_capture_move_score_recursively(
 
 	float best_eval = is_maximizing_player ? -FLT_MAX : FLT_MAX;
 
+	int best_idx = 0;
+	std::string best_move_str = "";
+	int i = 0;
 	for (std::unique_ptr<Move>& curr : possible_capture_moves)
 	{
 		ChessBoard copyBoard = board.getCopyByValue();
 		copyBoard.makeMove(*curr);
 
 		nodes_searched++;
+		std::string best_move = "";
 		float evaluation = get_capture_move_score_recursively(
 			copyBoard,
 			curr_depth + 1,
@@ -475,7 +472,7 @@ float leonardo_value_bot::get_capture_move_score_recursively(
 			input_board,
 			allowed_time_ms,
 			start_time, search_finished,
-			best_moves_str);
+			best_move);
 
 		if (is_maximizing_player)
 		{
@@ -495,7 +492,16 @@ float leonardo_value_bot::get_capture_move_score_recursively(
 				break;
 			}
 		}
+
+		if (best_eval == evaluation)
+		{
+			best_idx = i;
+			best_move_str = best_move;
+		}
+		i++;
 	}
+
+	best_moves_str = possible_capture_moves[best_idx].get()->getString() + " " + best_move_str;// "(d" + std::to_string(curr_depth) + ", val:" + std::to_string(bestEval) + ") " + best_move_str;
 
 	return best_eval;
 }
@@ -513,7 +519,8 @@ float leonardo_value_bot::get_move_score_recursively(
 	long long allowed_time_ms,
 	std::chrono::steady_clock::time_point& start_time,
 	bool& search_finished,
-	std::string& best_moves_str)
+	std::string& best_moves_str,
+	std::string prefix)
 {
 	//if time is up, return
 	if (std::chrono::steady_clock::now() > start_time + std::chrono::milliseconds(allowed_time_ms))
@@ -546,8 +553,8 @@ float leonardo_value_bot::get_move_score_recursively(
 	{
 		std::vector<std::unique_ptr<Move>> moves = board.getAllLegalMoves();
 
-		//no more moves
-		if (moves.size() == 0)
+		//CAN BE IMPROVED
+		if (board.getGameState() != Ongoing)
 		{
 			nodes_searched++;
 			end_states_searched++;
@@ -561,13 +568,11 @@ float leonardo_value_bot::get_move_score_recursively(
 					GAME_STATE_EVALUATION[BlackWon] - curr_depth :
 					GAME_STATE_EVALUATION[WhiteWon] + curr_depth) :
 				//draw
-				board.getCurrentTurnColor() == White ?
-				-10000 :
-				10000;
+				draw_score[board.getCurrentTurnColor()];
 		}
 
-		bool nnet_pruning = false;
-		//curr_depth == depth - 1 || //depth 2
+		bool nnet_pruning =
+			false;//	curr_depth == 3; //|| //depth 2
 		//curr_depth == depth - 2;//depth 3
 
 		float keep_branch_count;
@@ -616,7 +621,7 @@ float leonardo_value_bot::get_move_score_recursively(
 		std::string best_move_str = "";
 		for (int i = 0; i < branch_count; i++)
 		{
-			if (moves[move_indices[i]].get()->getString() == "c3d5")
+			if (moves[move_indices[i]].get()->getString() == "d4f6")
 			{
 				int a = 0; //DEBUG
 			}
@@ -639,8 +644,12 @@ float leonardo_value_bot::get_move_score_recursively(
 				allowed_time_ms,
 				start_time,
 				search_finished,
-				best_move);
-
+				best_move,
+				prefix + "|");
+			if (some_print)
+			{
+				std::cout << prefix << " " << (moves[move_indices[i]].get()->getString()) << "      " << evaluation << "\n";
+			}
 			if (is_maximizing_player)
 			{
 				bestEval = std::max(bestEval, evaluation);
@@ -667,7 +676,7 @@ float leonardo_value_bot::get_move_score_recursively(
 			}
 		}
 
-		best_moves_str = moves[best_idx].get()->getString() + "(d" + std::to_string(curr_depth) + ", val:" + std::to_string(bestEval) + ") " + best_move_str;
+		best_moves_str = moves[best_idx].get()->getString() + " " + best_move_str;// "(d" + std::to_string(curr_depth) + ", val:" + std::to_string(bestEval) + ") " + best_move_str;
 
 		return bestEval;
 	}
@@ -795,8 +804,10 @@ void leonardo_value_bot::thread_task(
 	std::vector<float>& scores,
 	ChessBoard board)
 {
+
 	bool is_white_to_move = board.getCurrentTurnColor() == White;
 	int colorMult = is_white_to_move ? -1 : 1;
+
 
 	int endPointsEvaluated = 0;
 	int nodesSearched = 0;
@@ -832,14 +843,18 @@ void leonardo_value_bot::thread_task(
 				ms_per_move,
 				start,
 				search_finished,
-				best_move_str_tmp);
-
+				best_move_str_tmp,
+				"");
+		if (some_print)
+		{
+			std::cout << "\n----------------------------- " << std::to_string(i_depth) + "\n";
+		}
 		if (search_finished)
 		{
 			move_score = tmp_move_score;
 			best_moves_str = best_move_str_tmp;
+			i_depth++;
 		}
-		i_depth++;
 	}
 
 	scores[thread_id] = move_score * colorMult;
@@ -847,7 +862,7 @@ void leonardo_value_bot::thread_task(
 #ifdef PRINT_SEARCH_INFO
 	std::cout
 		<< "Move: " + move_str
-		+ ", Depth reached: " + std::to_string(i_depth)
+		+ ", Depth finished: " + std::to_string(i_depth)
 		+ ", Thread: " + std::to_string(thread_id)
 		+ ", Nodes Searched: " + std::to_string(nodesSearched)
 		+ ", Score: " + std::to_string(move_score * colorMult)
@@ -886,12 +901,11 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 
 	for (const std::unique_ptr<Move>& curr : legal_moves)
 	{
-		ChessBoard boardCopy = board;
+		ChessBoard boardCopy = board.getCopyByValue();
 		boardCopy.makeMove(*curr);
 
-		if (curr->getString() == "a5d5" || true) //DEBUG
+		if (curr->getString() == "b5e2" || true) //DEBUG
 		{
-
 			threads.push_back(std::thread(
 				&leonardo_value_bot::thread_task,
 				this,
@@ -916,10 +930,35 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 	int bestMoveIdx = 0;
 	for (int i = 0; i < move_scores.size(); i++)
 	{
+		std::cout << legal_moves[i]->getString() << " " << move_scores[i] << "\n";
 		if (move_scores[i] > bestMoveScore)
 		{
+			std::cout << "new best move\n";
 			bestMoveScore = move_scores[i];
 			bestMoveIdx = i;
+		}
+	}
+	static bool first = true;
+	if (legal_moves[bestMoveIdx]->getString() == "b5e2")
+	{
+		if (first)
+		{
+			first = false;
+		}
+		else
+		{
+			//ms_per_move = 9000000;
+			ChessBoard boardCopy = board.getCopyByValue();
+			Move m(B5, E2);
+			boardCopy.makeMove(m);
+			std::cout << GAME_STATE_STRING[boardCopy.getGameState()] << "\n";
+			//some_print = true;
+			thread_task(
+				0,
+				"b5e2",
+				std::ref(move_scores),
+				boardCopy
+			);
 		}
 	}
 

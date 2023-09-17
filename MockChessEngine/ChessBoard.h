@@ -104,9 +104,11 @@ protected:
 
 	char getPieceCharAt(Square pos) const;
 
+
 	friend bool operator ==(const ChessBoard& first, const ChessBoard& second);
 	friend bool operator !=(const ChessBoard& first, const ChessBoard& second);
 public:
+	ChessBoard operator=(const ChessBoard&);
 	ChessBoard(const std::string& given_fen_code);
 
 	std::string getString() const;

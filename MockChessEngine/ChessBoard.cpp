@@ -658,6 +658,12 @@ char ChessBoard::getPieceCharAt(Square pos) const
 	return pieceChar;
 }
 
+ChessBoard ChessBoard::operator=(const ChessBoard&)
+{
+	std::cout << "INFO - operator = is called\n";
+	return getCopyByValue();
+}
+
 
 ChessBoard::ChessBoard(const std::string& given_fen_code)
 {

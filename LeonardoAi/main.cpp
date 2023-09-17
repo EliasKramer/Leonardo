@@ -147,7 +147,7 @@ static void brute_force_good_params()
 
 static void play_game()
 {
-	neural_network nnet;
+	neural_network nnet("C:\\Users\\Elias\\Desktop\\reasonable_best\\reasonable_epoch_2690200\\value.parameters");
 
 	ChessGame game(
 		//std::make_unique<HumanPlayer>(),
@@ -155,12 +155,12 @@ static void play_game()
 		std::make_unique<leonardo_value_bot>(
 			nnet,
 			0, //max capture depth
-			0, //dropout>
-			1.0f,
-			0.00000f,
-			0.0,
-			0.000000f,
-			0.0,
+			0.0f, //dropout>
+			4.231605f,
+			1.500000f,
+			0.698990f,
+			0.0100000f,
+			0.736647f,
 			.0f,
 			.0f
 		),
@@ -168,15 +168,15 @@ static void play_game()
 			nnet,
 			0, //max capture depth
 			0, //dropout>
-			1.0f,
-			0.00000f,
-			0.0,
-			0.000000f,
-			0.0,
+			4.231605f,
+			1.500000f,
+			0.698990f,
+			0.0100000f,
+			0.736647f,
 			.0f,
 			.0f
 		),
-		"r1b1nb1r/ppq1k1p1/1n6/3pP2p/5P1P/P1NBP3/1P4P1/R1BQK2R w KQ - 0 18");
+		"1rb1k1nr/1p3p1p/pNp5/3pN1B1/3PP2Q/P1P3P1/4qP1P/1R3RK1 w k - 9 23");
 
 	game.start();
 }

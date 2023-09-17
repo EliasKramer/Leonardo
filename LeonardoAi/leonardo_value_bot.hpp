@@ -12,6 +12,9 @@ class leonardo_value_bot : public Player
 private:
 	neural_network value_net;
 
+	//discencourage draw
+	const std::array<float, 2> draw_score = { -1000.0f, 1000.0f };
+
 	int max_capture_depth = 4;
 	float dropout = 0;
 	long ms_per_move = 300; //DEBUG
@@ -23,6 +26,8 @@ private:
 	float passed_pawn_mult;
 	float king_pos_mult;
 	float king_safety_mult;
+
+	bool some_print = false;
 
 	std::unordered_map<ChessBoard, std::vector<std::string>, chess_board_hasher> opening_positions;
 	bool openings_loaded;
@@ -63,7 +68,8 @@ private:
 		long long allowed_time_ms,
 		std::chrono::steady_clock::time_point& start_time,
 		bool& search_finished,
-		std::string& best_moves_str);
+		std::string& best_moves_str,
+		std::string prefix);
 
 	void thread_task(
 		int thread_id,
