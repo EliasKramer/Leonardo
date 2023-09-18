@@ -1,43 +1,5 @@
 #include "leonardo_value_bot.hpp"
 
-leonardo_value_bot::leonardo_value_bot(neural_network given_value_nnet)
-	: leonardo_value_bot(given_value_nnet, 4, 0, 0, 0, 0, 0, 0, 0, 0)
-{
-	throw std::runtime_error("not supported");
-}
-
-leonardo_value_bot::leonardo_value_bot(
-	neural_network given_value_nnet,
-	int max_capture_depth,
-	float dropout,
-	float piece_value_mult,
-	float piece_pos_value_mult,
-	float pawn_same_color_bonus_mult,
-	float pawn_self_protection_mult,
-	float passed_pawn_mult,
-	float king_pos_mult,
-	float king_safety_mult
-)
-	: Player("leonardo value bot"),
-	value_net(given_value_nnet),
-	max_capture_depth(max_capture_depth),
-	dropout(dropout),
-	piece_value_mult(piece_value_mult),
-	piece_pos_value_mult(piece_pos_value_mult),
-	pawn_same_color_bonus_mult(pawn_same_color_bonus_mult),
-	pawn_self_protection_mult(pawn_self_protection_mult),
-	passed_pawn_mult(passed_pawn_mult),
-	king_pos_mult(king_pos_mult),
-	king_safety_mult(king_safety_mult)
-{
-	if (given_value_nnet.is_in_gpu_mode())
-	{
-		std::cout << "not supported gpu mode\n";
-		return;
-	}
-	load_openings();
-}
-
 void leonardo_value_bot::reroll_params()
 {
 	//random number between 0 and 6
@@ -56,6 +18,24 @@ void leonardo_value_bot::reroll_params()
 	king_pos_mult = dis(gen);
 	king_safety_mult = dis(gen);
 }
+
+
+leonardo_value_bot::leonardo_value_bot(int ms_per_move, std::string name)
+	: Player(name),
+	ms_per_move(ms_per_move)
+{
+	value_net = neural_network("value.parameters");
+	if (value_net.is_in_gpu_mode())
+	{
+		std::cout << "not supported gpu mode\n";
+		return;
+	}
+	load_openings();
+}
+
+leonardo_value_bot::leonardo_value_bot(int ms_per_move)
+	: leonardo_value_bot(ms_per_move, "leonardo_value_bot")
+{}
 
 void leonardo_value_bot::mutate(float min, float max)
 {
@@ -403,17 +383,16 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board, bool print)
 
 float leonardo_value_bot::get_eval(const ChessBoard& board, matrix& input_board)
 {
-	//float hard_coded_eval = hard_coded_influence != 0 ? get_simpel_eval(board) : 0;
-	//float nnet_eval = nnet_influence != 0 ? get_nnet_eval(board, input_board) : 0;
+	float hard_coded_eval = get_simpel_eval(board);
+	float nnet_eval = nnet_influence != 0 ? get_nnet_eval(board, input_board) : 0;
 
 	//std::cout << "Hard coded eval: " << hard_coded_eval << " Nnet eval: " << nnet_eval << std::endl;
 
+	float eval =
+		hard_coded_eval +
+		nnet_eval * nnet_influence;
 
-	//float eval =
-		//hard_coded_eval * hard_coded_influence +
-		//nnet_eval * nnet_influence;
-
-	return get_simpel_eval(board);
+	return eval;
 }
 
 float leonardo_value_bot::get_move_score_recursively(
@@ -443,7 +422,7 @@ float leonardo_value_bot::get_move_score_recursively(
 	{
 		end_states_searched++;
 		nodes_searched++;
-		return get_simpel_eval(board);
+		return get_eval(board, input_board);
 	}
 
 	std::vector<std::unique_ptr<Move>> moves = board.getAllLegalMoves();
@@ -607,10 +586,8 @@ void leonardo_value_bot::load_openings()
 	file.close();
 }
 
-int leonardo_value_bot::get_random_opening_move(const ChessBoard& board)
+int leonardo_value_bot::get_random_opening_move(const ChessBoard& board, const UniqueMoveList& legal_moves)
 {
-	UniqueMoveList legal_moves = board.getAllLegalMoves();
-
 	//random 
 	std::random_device rd;
 	std::mt19937 g(rd());
@@ -728,7 +705,7 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 {
 	if (position_is_known_opening(board))
 	{
-		return get_random_opening_move(board);
+		return get_random_opening_move(board, legal_moves);
 	}
 
 	auto begin = std::chrono::high_resolution_clock::now();

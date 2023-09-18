@@ -9,23 +9,23 @@
 
 class leonardo_value_bot : public Player
 {
-private:
+protected:
 	neural_network value_net;
 
 	//discencourage draw
 	const std::array<float, 2> draw_score = { -1000.0f, 1000.0f };
 
-	int max_capture_depth = 4;
 	float dropout = 0;
-	long ms_per_move = 3000; //DEBUG
+	float nnet_influence = 0;
+	int ms_per_move = 1000;
 
-	float piece_value_mult;
-	float piece_pos_value_mult;
-	float pawn_same_color_bonus_mult;
-	float pawn_self_protection_mult;
-	float passed_pawn_mult;
-	float king_pos_mult;
-	float king_safety_mult;
+	float piece_value_mult = 1;
+	float piece_pos_value_mult = .1f;
+	float pawn_same_color_bonus_mult = 0;
+	float pawn_self_protection_mult = 0;
+	float passed_pawn_mult = 0;
+	float king_pos_mult = 0;
+	float king_safety_mult = 0;
 
 	bool print_tree = false;
 
@@ -63,22 +63,11 @@ private:
 	void add_opening_position(const ChessBoard& board, const std::string& move_str);
 	void load_openings();
 	bool position_is_known_opening(const ChessBoard& board);
-	int get_random_opening_move(const ChessBoard& board);
+	int get_random_opening_move(const ChessBoard& board, const UniqueMoveList& legal_moves);
 
+	leonardo_value_bot(int ms_per_move, std::string name);
 public:
-	leonardo_value_bot(neural_network given_value_nnet);
-	leonardo_value_bot(
-		neural_network given_value_nnet,
-		int max_capture_depth,
-		float dropout,
-		float piece_value_mult,
-		float piece_pos_value_mult,
-		float pawn_same_color_bonus_mult,
-		float pawn_self_protection_mult,
-		float passed_pawn_mult,
-		float king_pos_mult,
-		float king_safety_mult
-	);
+	leonardo_value_bot(int ms_per_move);
 
 	void mutate(float min, float max);
 	void reroll_params();

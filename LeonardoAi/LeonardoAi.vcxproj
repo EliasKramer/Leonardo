@@ -56,6 +56,7 @@
     <ClCompile Include="leonardo_overlord.cpp" />
     <ClCompile Include="leonardo_util.cpp" />
     <ClCompile Include="leonardo_value_bot.cpp" />
+    <ClCompile Include="leonardo_value_bot_1.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NeuroFox\convolutional_layer.cpp" />
     <ClCompile Include="NeuroFox\data_space.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="leonardo_overlord.hpp" />
     <ClInclude Include="leonardo_util.hpp" />
     <ClInclude Include="leonardo_value_bot.hpp" />
+    <ClInclude Include="leonardo_value_bot_1.hpp" />
     <ClInclude Include="NeuroFox\assert_throw.hpp" />
     <ClInclude Include="NeuroFox\convolutional_layer.hpp" />
     <ClInclude Include="NeuroFox\data_space.hpp" />

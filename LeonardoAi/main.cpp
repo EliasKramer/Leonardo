@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "leonardo_value_bot.hpp"
+#include "leonardo_value_bot_1.hpp"
 #include "../MockChessEngine/HumanPlayer.h"
 
 static void write_to_file(std::string filename, std::string content)
@@ -66,30 +67,12 @@ static void brute_force_good_params()
 
 	best_players.push_back(
 		std::make_unique<leonardo_value_bot>(
-			nnet,
-			4,
-			0,
-			1.231605f,
-			1.000000f,
-			2.698990f,
-			1.000000f,
-			0.736647f,
-			1.000000f,
-			2.038531f
+			1000
 		)
 	);
 
 	leonardo_value_bot adversary = leonardo_value_bot(
-		nnet,
-		4,
-		0,
-		1.231605f,
-		1.000000f,
-		2.698990f,
-		1.000000f,
-		0.736647f,
-		1.000000f,
-		2.038531f
+		1000
 	);
 
 	while (true)
@@ -147,34 +130,16 @@ static void brute_force_good_params()
 
 static void play_game()
 {
-	neural_network nnet("C:\\Users\\Elias\\Desktop\\reasonable_best\\reasonable_epoch_2690200\\value.parameters");
+	neural_network nnet("value.parameters");
 
 	ChessGame game(
 		//std::make_unique<HumanPlayer>(),
 		//std::make_unique<AlphaBetaPruningBot>(4),
-		std::make_unique<leonardo_value_bot>(
-			nnet,
-			0, //max capture depth
-			0.0f, //dropout>
-			1,
-			0.01f,
-			0.0f,
-			0.00000f,
-			0.0f,
-			.0f,
-			.0f
+		std::make_unique<leonardo_value_bot_1>(
+			3000
 		),
-		std::make_unique<leonardo_value_bot>(
-			nnet,
-			0, //max capture depth
-			0, //dropout>
-			1,
-			0.01f,
-			0.0f,
-			0.00000f,
-			0.0f,
-			.0f,
-			.0f
+		std::make_unique<leonardo_value_bot_1>(
+			3000
 		),
 		STARTING_FEN);
 
@@ -184,17 +149,7 @@ static void play_game()
 static void eval_pos(std::string fen)
 {
 	neural_network nnet;
-	leonardo_value_bot bot(
-		nnet,
-		0, //max capture depth
-		0, //dropout>
-		4.231605f,
-		1.500000f,
-		0.698990f,
-		0.0100000f,
-		0.736647f,
-		.0f,
-		.0f);
+	leonardo_value_bot bot(1000);
 
 	bot.print_eval(fen);
 }

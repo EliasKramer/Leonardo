@@ -997,7 +997,7 @@ void leonardo_overlord::train_on_dataset()
 				}
 
 				long long elapsed_global_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - global_timer_start).count();
-				long long remaining = remaining_time(elapsed_global_ms, game_idx, data_count);
+				long long remaining = 0;// remaining_time(elapsed_global_ms, game_idx, data_count);
 
 				std::cout << "elapsed: " << ms_to_str(elapsed_global_ms) << "\n"
 						<< "remaining: " << ms_to_str(remaining) << "\n";
