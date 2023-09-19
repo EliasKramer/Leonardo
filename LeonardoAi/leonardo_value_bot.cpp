@@ -31,6 +31,7 @@ leonardo_value_bot::leonardo_value_bot(int ms_per_move, std::string name)
 		return;
 	}
 	load_openings();
+	stockfish_interface::init();
 }
 
 leonardo_value_bot::leonardo_value_bot(int ms_per_move)
@@ -500,7 +501,7 @@ float leonardo_value_bot::get_move_score_recursively(
 		i++;
 	}
 
-	best_moves_str = moves[best_idx].get()->getString() + " " + best_move_str;// "(d" + std::to_string(curr_depth) + ", val:" + std::to_string(bestEval) + ") " + best_move_str;
+	best_moves_str = moves[best_idx].get()->getString() + " " + best_move_str;
 
 	return bestEval;
 
@@ -618,6 +619,18 @@ int leonardo_value_bot::get_random_opening_move(const ChessBoard& board, const U
 #endif // PRINT_SEARCH_INFO
 
 	return 0;
+}
+
+float leonardo_value_bot::sf_eval(const ChessBoard& board)
+{
+	return stockfish_interface::eval(board.getFen(), 4);
+}
+
+float leonardo_value_bot::sf_eval(const ChessBoard& board, const std::unique_ptr<Move>& move)
+{
+	ChessBoard new_board = board;
+	new_board.makeMove(*move);
+	return sf_eval(new_board) * -1;
 }
 
 void leonardo_value_bot::thread_task(

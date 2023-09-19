@@ -4,7 +4,7 @@
 
 vector3 leonardo_util::get_input_format()
 {
-	return vector3(8, 8, NUMBER_OF_DIFFERENT_PIECE_TYPES);
+	return vector3(8, 8, NUMBER_OF_DIFFERENT_PIECE_TYPES * 2);
 }
 
 vector3 leonardo_util::get_policy_output_format()
@@ -43,12 +43,13 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 
 				vector3 coord(x, flipped ? y : 7 - y, piece.getType());
 
-				//the own pieces are 1 the others are -1
-				float color_value = piece.getColor() == board.getCurrentTurnColor() ? 1.0f : -1.0f;
-
+				if (piece.getColor() == board.getCurrentTurnColor())
+				{
+					coord.z += NUMBER_OF_DIFFERENT_PIECE_TYPES;
+				}
 				m.set_at_host(
 					coord,
-					color_value
+					1
 				);
 			}
 		}

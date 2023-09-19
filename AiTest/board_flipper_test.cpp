@@ -23,7 +23,7 @@ namespace AiTest
 
 			Assert::IsTrue(matrix::are_equal(w_matrix, b_matrix));
 		}
-		
+
 		TEST_METHOD(start_position)
 		{
 			test_board(

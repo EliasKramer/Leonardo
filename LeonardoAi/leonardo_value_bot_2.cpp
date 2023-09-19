@@ -1,14 +1,40 @@
-#include "leonardo_value_bot_1.hpp"
+#include "leonardo_value_bot_2.hpp"
 
-bool leonardo_value_bot_1::time_up()
+bool leonardo_value_bot_2::time_up()
 {
 	auto current_time = std::chrono::steady_clock::now();
 	auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
 	return time_elapsed >= ms_per_move;
 }
+/*
+	function minimax(node, depth, alpha, beta, maximizingPlayer) is
+	if depth ==0 or node is a terminal node then
+	return static evaluation of node
 
-float leonardo_value_bot_1::recursive_eval(
+	if MaximizingPlayer then      // for Maximizer Player
+	   maxEva= -infinity
+	   for each child of node do
+	   eva= minimax(child, depth-1, alpha, beta, False)
+	  maxEva= max(maxEva, eva)
+	  alpha= max(alpha, maxEva)
+	   if beta<=alpha
+	 break
+	 return maxEva
+
+	else                         // for Minimizer player
+	   minEva= +infinity
+	   for each child of node do
+		eva= minimax(child, depth-1, alpha, beta, true)
+		minEva= min(minEva, eva)
+	   beta= min(beta, eva)
+		if beta<=alpha
+	  break
+	 return minEva
+*/
+float leonardo_value_bot_2::recursive_eval(
 	int depth,
+	float alpha,
+	float beta,
 	const ChessBoard& board,
 	bool is_maximizing)
 {
@@ -47,22 +73,28 @@ float leonardo_value_bot_1::recursive_eval(
 
 		float score = recursive_eval(
 			depth - 1,
+			alpha,
+			beta,
 			new_board,
 			!is_maximizing
 		);
 
 		if (is_maximizing)
 		{
-			if (score > best_score)
+			best_score = std::max(best_score, score);
+			alpha = std::max(alpha, score);
+			if (beta <= alpha)
 			{
-				best_score = score;
+				break;
 			}
 		}
 		else
 		{
-			if (score < best_score)
+			best_score = std::min(best_score, score);
+			beta = std::min(beta, score);
+			if (beta <= alpha)
 			{
-				best_score = score;
+				break;
 			}
 		}
 	}
@@ -70,7 +102,7 @@ float leonardo_value_bot_1::recursive_eval(
 	return best_score;
 }
 
-int leonardo_value_bot_1::get_best_move(const ChessBoard& board, const UniqueMoveList& legal_moves, int depth, bool is_maximizing)
+int leonardo_value_bot_2::get_best_move(const ChessBoard& board, const UniqueMoveList& legal_moves, int depth, bool is_maximizing)
 {
 	float best_eval = is_maximizing ? -FLT_MAX : FLT_MAX;
 	int best_move_index = 0;
@@ -80,7 +112,12 @@ int leonardo_value_bot_1::get_best_move(const ChessBoard& board, const UniqueMov
 		ChessBoard new_board = board;
 		new_board.makeMove(*m);
 
-		float eval = recursive_eval(depth, new_board, !is_maximizing);
+		float eval = recursive_eval(
+			depth, 
+			-FLT_MAX,
+			FLT_MAX,
+			new_board, 
+			!is_maximizing);
 
 		if (is_maximizing)
 		{
@@ -104,11 +141,11 @@ int leonardo_value_bot_1::get_best_move(const ChessBoard& board, const UniqueMov
 	return best_move_index;
 }
 
-leonardo_value_bot_1::leonardo_value_bot_1(int ms_per_move)
-	: leonardo_value_bot(ms_per_move, "simpel minimax")
+leonardo_value_bot_2::leonardo_value_bot_2(int ms_per_move)
+	: leonardo_value_bot(ms_per_move, "alpha beta pruning")
 {}
 
-int leonardo_value_bot_1::getMove(const ChessBoard& board, const UniqueMoveList& legal_moves)
+int leonardo_value_bot_2::getMove(const ChessBoard& board, const UniqueMoveList& legal_moves)
 {
 	search_cancelled = false;
 	start_time = std::chrono::steady_clock::now();

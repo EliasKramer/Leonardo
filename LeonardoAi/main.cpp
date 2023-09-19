@@ -12,6 +12,8 @@
 
 #include "leonardo_value_bot.hpp"
 #include "leonardo_value_bot_1.hpp"
+#include "leonardo_value_bot_2.hpp"
+#include "leonardo_value_bot_3.hpp"
 #include "../MockChessEngine/HumanPlayer.h"
 
 static void write_to_file(std::string filename, std::string content)
@@ -131,18 +133,11 @@ static void brute_force_good_params()
 static void play_game()
 {
 	neural_network nnet("value.parameters");
-
+	int time_to_move = 1000;
 	ChessGame game(
-		//std::make_unique<HumanPlayer>(),
-		//std::make_unique<AlphaBetaPruningBot>(4),
-		std::make_unique<leonardo_value_bot_1>(
-			3000
-		),
-		std::make_unique<leonardo_value_bot_1>(
-			3000
-		),
+		std::make_unique<leonardo_value_bot_3>(time_to_move),
+		std::make_unique<leonardo_value_bot_1>(time_to_move),
 		STARTING_FEN);
-
 	game.start();
 }
 
@@ -161,8 +156,10 @@ int main(int argc, char* argv[])
 	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
 	std::cout << "hab in die pawn pos werte rumgepuscht\n";
 
+	stockfish_interface::get_best_moves(KIWIPETE_FEN, 4);
+
 	//brute_force_good_params();
-	play_game();
+	//play_game();
 	//eval_pos("r1bqkb1r/pp3ppp/1n2p3/3pP3/7P/3B4/PP1NNPP1/R1BQK2R b KQkq - 0 10");
 
 	return 0;

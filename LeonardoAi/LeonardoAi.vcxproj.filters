@@ -210,6 +210,12 @@
     <ClCompile Include="leonardo_value_bot_1.cpp">
       <Filter>source\leonardo_value_bot</Filter>
     </ClCompile>
+    <ClCompile Include="leonardo_value_bot_2.cpp">
+      <Filter>source\leonardo_value_bot</Filter>
+    </ClCompile>
+    <ClCompile Include="leonardo_value_bot_3.cpp">
+      <Filter>source\leonardo_value_bot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NeuroFox\convolutional_layer.hpp">
@@ -423,6 +429,12 @@
       <Filter>header\leonardo_value_bot</Filter>
     </ClInclude>
     <ClInclude Include="leonardo_value_bot_1.hpp">
+      <Filter>header\leonardo_value_bot</Filter>
+    </ClInclude>
+    <ClInclude Include="leonardo_value_bot_2.hpp">
+      <Filter>header\leonardo_value_bot</Filter>
+    </ClInclude>
+    <ClInclude Include="leonardo_value_bot_3.hpp">
       <Filter>header\leonardo_value_bot</Filter>
     </ClInclude>
   </ItemGroup>

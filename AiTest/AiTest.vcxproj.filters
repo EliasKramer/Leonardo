@@ -5,114 +5,23 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="external">
+      <UniqueIdentifier>{e582f051-a2a2-4dad-8717-97c8c689d727}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\neurofox">
+      <UniqueIdentifier>{690cbf85-4e5f-4389-b152-c82391f8cd3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\mockengine">
+      <UniqueIdentifier>{d38aaf2f-d8ee-4e51-978c-dbaf7abc947a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\MockChessEngine\AlphaBetaPruningBot.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\BoardRepresentation.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\ChessBoard.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\ChessPiece.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\Constants.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\DataAndTypes.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\Game.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\HelpMethods.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\HumanPlayer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\Medicrius.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\Move.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\MoveCastle.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\MoveDoublePawn.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\MoveEnPassant.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\MovePromote.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\Player.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\RandomPlayer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\NeuroFox\convolutional_layer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\NeuroFox\data_space.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\NeuroFox\fully_connected_layer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\NeuroFox\layer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\NeuroFox\math_functions.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\NeuroFox\matrix.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\NeuroFox\neural_network.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\NeuroFox\pooling_layer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\NeuroFox\test_result.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\NeuroFox\util.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\NeuroFox\vector3.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="board_flipper_test.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\chess_arena.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\leonardo_overlord.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\leonardo_bot.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\LeonardoAi\leonardo_util.cpp">
-      <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="move_flipper.cpp">
       <Filter>Source Files</Filter>
@@ -123,120 +32,198 @@
     <ClCompile Include="value_net_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\convolutional_layer.cpp">
+      <Filter>external\neurofox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\data_space.cpp">
+      <Filter>external\neurofox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\fully_connected_layer.cpp">
+      <Filter>external\neurofox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\layer.cpp">
+      <Filter>external\neurofox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\math_functions.cpp">
+      <Filter>external\neurofox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\matrix.cpp">
+      <Filter>external\neurofox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\neural_network.cpp">
+      <Filter>external\neurofox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\pooling_layer.cpp">
+      <Filter>external\neurofox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\test_result.cpp">
+      <Filter>external\neurofox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\util.cpp">
+      <Filter>external\neurofox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\NeuroFox\vector3.cpp">
+      <Filter>external\neurofox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\BoardRepresentation.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\ChessBoard.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\ChessPiece.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\Constants.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\DataAndTypes.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\Game.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\HelpMethods.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\HumanPlayer.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\Medicrius.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\Move.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\MoveDoublePawn.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\MoveEnPassant.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\MovePromote.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
     <ClCompile Include="..\MockChessEngine\MyBitBoard.cpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\Player.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\RandomPlayer.cpp">
+      <Filter>external\mockengine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LeonardoAi\leonardo_util.cpp">
+      <Filter>external</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MockChessEngine\MoveCastle.cpp">
+      <Filter>external\mockengine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\MockChessEngine\AlphaBetaPruningBot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\BoardRepresentation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\ChessBoard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\ChessPiece.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\Constants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\DataAndTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\Game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\HelpMethods.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\HumanPlayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\Medicrius.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\Move.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\MoveCastle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\MoveDoublePawn.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\MoveEnPassant.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\MovePromote.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\Player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\RandomPlayer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\LeonardoAi\NeuroFox\assert_throw.hpp">
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\convolutional_layer.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\data_space.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\enum_space.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\fully_connected_layer.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LeonardoAi\NeuroFox\gpu_math.cuh">
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\layer.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\math_functions.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\matrix.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\neural_network.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\pooling_layer.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LeonardoAi\NeuroFox\smart_assert.hpp">
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\test_result.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\util.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
     </ClInclude>
     <ClInclude Include="..\LeonardoAi\NeuroFox\vector3.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
     </ClInclude>
-    <ClInclude Include="..\LeonardoAi\chess_arena.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\MockChessEngine\AlphaBetaPruningBot.h">
+      <Filter>external\mockengine</Filter>
     </ClInclude>
-    <ClInclude Include="..\LeonardoAi\leonardo_bot.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\MockChessEngine\ChessBoard.h">
+      <Filter>external\mockengine</Filter>
     </ClInclude>
-    <ClInclude Include="..\LeonardoAi\leonardo_overlord.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\MockChessEngine\ChessPiece.h">
+      <Filter>external\mockengine</Filter>
     </ClInclude>
-    <ClInclude Include="..\LeonardoAi\leonardo_util.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\MockChessEngine\Constants.h">
+      <Filter>external\mockengine</Filter>
     </ClInclude>
-    <ClInclude Include="..\LeonardoAi\NeuroFox\assert_throw.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\MockChessEngine\DataAndTypes.h">
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\Game.h">
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\HelpMethods.h">
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\HumanPlayer.h">
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\Medicrius.h">
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\Move.h">
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\MoveCastle.h">
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\MoveDoublePawn.h">
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\MoveEnPassant.h">
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\MovePromote.h">
+      <Filter>external\mockengine</Filter>
     </ClInclude>
     <ClInclude Include="..\MockChessEngine\MyBitBoard.h">
-      <Filter>Header Files</Filter>
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\Player.h">
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MockChessEngine\RandomPlayer.h">
+      <Filter>external\mockengine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LeonardoAi\leonardo_util.hpp">
+      <Filter>external</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\LeonardoAi\NeuroFox\gpu_math.cu">
-      <Filter>Header Files</Filter>
+      <Filter>external\neurofox</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

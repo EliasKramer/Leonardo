@@ -65,6 +65,9 @@ protected:
 	bool position_is_known_opening(const ChessBoard& board);
 	int get_random_opening_move(const ChessBoard& board, const UniqueMoveList& legal_moves);
 
+	float sf_eval(const ChessBoard& board);
+	float sf_eval(const ChessBoard& board, const std::unique_ptr<Move>& move);
+
 	leonardo_value_bot(int ms_per_move, std::string name);
 public:
 	leonardo_value_bot(int ms_per_move);

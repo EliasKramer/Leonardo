@@ -161,9 +161,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\LeonardoAi\chess_arena.cpp" />
-    <ClCompile Include="..\LeonardoAi\leonardo_bot.cpp" />
-    <ClCompile Include="..\LeonardoAi\leonardo_overlord.cpp" />
     <ClCompile Include="..\LeonardoAi\leonardo_util.cpp" />
     <ClCompile Include="..\LeonardoAi\NeuroFox\convolutional_layer.cpp" />
     <ClCompile Include="..\LeonardoAi\NeuroFox\data_space.cpp" />
@@ -176,7 +173,6 @@
     <ClCompile Include="..\LeonardoAi\NeuroFox\test_result.cpp" />
     <ClCompile Include="..\LeonardoAi\NeuroFox\util.cpp" />
     <ClCompile Include="..\LeonardoAi\NeuroFox\vector3.cpp" />
-    <ClCompile Include="..\MockChessEngine\AlphaBetaPruningBot.cpp" />
     <ClCompile Include="..\MockChessEngine\BoardRepresentation.cpp" />
     <ClCompile Include="..\MockChessEngine\ChessBoard.cpp" />
     <ClCompile Include="..\MockChessEngine\ChessPiece.cpp" />
@@ -206,27 +202,28 @@
     <ProjectReference Include="..\MockChessEngine\MockChessEngine.vcxproj">
       <Project>{944091fe-c183-4ddf-b910-12047d02ed20}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\StockFish\StockFish.vcxproj">
+      <Project>{b6a8644e-094e-480d-b2ac-2d5c26e0f08e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\LeonardoAi\chess_arena.hpp" />
-    <ClInclude Include="..\LeonardoAi\leonardo_bot.hpp" />
-    <ClInclude Include="..\LeonardoAi\leonardo_overlord.hpp" />
     <ClInclude Include="..\LeonardoAi\leonardo_util.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\assert_throw.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\convolutional_layer.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\data_space.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\enum_space.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\fully_connected_layer.hpp" />
+    <ClInclude Include="..\LeonardoAi\NeuroFox\gpu_math.cuh" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\layer.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\math_functions.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\matrix.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\neural_network.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\pooling_layer.hpp" />
+    <ClInclude Include="..\LeonardoAi\NeuroFox\smart_assert.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\test_result.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\util.hpp" />
     <ClInclude Include="..\LeonardoAi\NeuroFox\vector3.hpp" />
     <ClInclude Include="..\MockChessEngine\AlphaBetaPruningBot.h" />
-    <ClInclude Include="..\MockChessEngine\BoardRepresentation.h" />
     <ClInclude Include="..\MockChessEngine\ChessBoard.h" />
     <ClInclude Include="..\MockChessEngine\ChessPiece.h" />
     <ClInclude Include="..\MockChessEngine\Constants.h" />

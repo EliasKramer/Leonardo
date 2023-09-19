@@ -79,6 +79,7 @@ void ChessGame::start()
 
 	//print the history of moves
 	std::cout << "\n\nPress any key to show move log\n";
-	system("pause");
+	//wait for 2s
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 	std::cout << "Moves made:\n" << movesMade;
 }
