@@ -388,13 +388,13 @@ leonardo_overlord::leonardo_overlord(
 
 	
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
-	best_value_nnet.add_fully_connected_layer(96, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(24, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(24, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(12, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(12, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(6, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(6, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(96, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(24, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(24, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(12, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(12, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(6, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(6, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
 
@@ -403,22 +403,12 @@ leonardo_overlord::leonardo_overlord(
 	//best_value_nnet = neural_network("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\pre_calced_dataset_epoch_178200\\value.parameters");
 
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
-	/*
-	best_policy_nnet.add_fully_connected_layer(2048, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(2048, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(128, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(128, leaky_relu_fn);
-	*/
-	//best_policy_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	//best_policy_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	/*
-	*/
+	best_policy_nnet.add_fully_connected_layer(200, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(200, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(100, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(100, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(50, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(50, leaky_relu_fn);
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
 	best_policy_nnet.xavier_initialization();
 
@@ -548,19 +538,19 @@ static float get_curr_reward(const ChessBoard& board, const std::unique_ptr<Move
 		return -0.1f;
 	}
 }
-
-void leonardo_overlord::train_on_gm_games()
+	
+void leonardo_overlord::train_policy_on_gm_games()
 {
 	std::cout << "reading games file\n";
 	std::vector<std::string> games = read_file_lines("games.txt");
 	std::cout << "done. " << games.size() << " games loaded\n";
 	matrix input(leonardo_util::get_input_format());
-	matrix label(leonardo_util::get_value_nnet_output_format());
+	matrix label(leonardo_util::get_policy_output_format());
 
 	int batch_size = 100;
 	int ds_idx = 0;
 	std::unique_ptr<data_space> ds;
-	int start_idx = 16900;
+	int start_idx = 0;
 
 	int depth = 4;
 
@@ -570,32 +560,19 @@ void leonardo_overlord::train_on_gm_games()
 		{
 			if (g != start_idx)
 			{
-				std::cout << get_current_time_str() << "\n";
-				if (gpu_mode)
-					ds->copy_to_gpu();
-
-				new_value_nnet.sync_device_and_host();
-				best_value_nnet.sync_device_and_host();
-
 				std::cout << "testing\n";
-				test_result test_res = new_value_nnet.test_on_ds(*ds.get());
+				test_result test_res = new_policy_nnet.test_on_ds(*ds.get());
 				std::cout << test_res.to_string() << "\n";
 
 				auto start = std::chrono::high_resolution_clock::now();
 				std::cout << "learning on " << ds->get_item_count() << " positions \n";
-				new_value_nnet.learn_on_ds(*ds.get(), 1, 100, 0.0001, true);
+				new_policy_nnet.learn_on_ds(*ds.get(), 1, 3, 0.0001, true);
 				auto end = std::chrono::high_resolution_clock::now();
 				std::cout << "done. took " << ms_to_str(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()) << "\n";
 
-				new_value_nnet.sync_device_and_host();
-				best_value_nnet.sync_device_and_host();
+				best_policy_nnet.set_parameters(new_policy_nnet);
 
-				best_value_nnet.set_parameters(new_value_nnet);
-
-				new_value_nnet.sync_device_and_host();
-				best_value_nnet.sync_device_and_host();
-
-				save_best_to_file(g, true, false);
+				save_best_to_file(g, false, true);
 			}
 
 			ds_idx = 0;
@@ -608,7 +585,7 @@ void leonardo_overlord::train_on_gm_games()
 			ds = std::make_unique<data_space>(
 				batch_item_size,
 				leonardo_util::get_input_format(),
-				leonardo_util::get_value_nnet_output_format());
+				leonardo_util::get_policy_output_format());
 
 			std::cout << "start playing games. depth: " << depth << "\n";
 
@@ -651,24 +628,11 @@ void leonardo_overlord::train_on_gm_games()
 				{
 					//add to ds
 					leonardo_util::set_matrix_from_chessboard(board, input);
-					//leonardo_util::set_move_value(*moves[i].get(), label, 1.0f, board.getCurrentTurnColor());
-					//smart_assert(label.contains_non_zero_items());
+				
 					ds->set_data(input, ds_idx);
-					//ds->set_label(label, ds_idx);
-					//leonardo_util::set_move_value(*moves[i].get(), label, 0.0f, board.getCurrentTurnColor());
-					//ds_indices.push_back(ds_idx);
-					//rewards.push_back(get_curr_reward(board, moves[i], m == master_moves.size() - 1));
-					/*
-					if (rewards.size() != 1)
-					{
-						float curr_reward = rewards[rewards.size() - 1];
-						rewards[rewards.size() - 2] -= curr_reward;
-					}
-					*/
-					float stockfish_eval = stockfish_interface::eval(board.getFen(), depth);
+					
+					set_sf_policy_label_matrix(label, board, moves);
 
-					//std::cout << " - " << stockfish_eval << " - " << board.getFen() << " - " << moves[i].get()->getString()<<"\n";
-					label.set_at_flat_host(0, stockfish_eval);
 					ds->set_label(label, ds_idx);
 
 					board.makeMove(*moves[i].get());
@@ -1174,6 +1138,39 @@ void leonardo_overlord::train()
 		sum_elapsed_ms += elapsed_ms;
 		std::cout << "cycle took: " << ms_to_str(elapsed_ms) << " ";
 		std::cout << "average: " << ms_to_str(sum_elapsed_ms / (i + 1)) << "\n";
+	}
+}
+
+void leonardo_overlord::set_sf_policy_label_matrix(
+	matrix& label, 
+	const ChessBoard& game,
+	const UniqueMoveList& move_list)
+{
+	std::vector<stockfish_interface::sf_move> sf_moves = stockfish_interface::get_best_moves(game.getFen(), 4);
+	label.set_all(-360.01f);
+	
+	smart_assert(move_list.size() == sf_moves.size());
+	
+	for (size_t i = 0; i < move_list.size(); i++)
+	{
+		bool exists = false;
+		float move_value = 0;
+		for (int j = 0; j < sf_moves.size(); j++)
+		{
+			if (sf_moves[j].move_str_uci == move_list[i]->getString())
+			{
+				exists = true;
+				move_value = sf_moves[j].value;
+				break;
+			}
+		}
+		if (!exists)
+		{
+			std::cout << game.getFen() << " move not found: " << move_list[i]->getString() << std::endl;
+			continue;
+		}
+
+		leonardo_util::set_move_value(*move_list[i], label, move_value, game.getCurrentTurnColor());
 	}
 }
 

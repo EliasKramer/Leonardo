@@ -156,7 +156,10 @@ int main(int argc, char* argv[])
 	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
 	std::cout << "hab in die pawn pos werte rumgepuscht\n";
 
-	stockfish_interface::get_best_moves(KIWIPETE_FEN, 4);
+	//stockfish_interface::get_best_moves(KIWIPETE_FEN, 4);
+
+	leonardo_overlord overlord("policy_gm_training");
+	overlord.train_policy_on_gm_games();
 
 	//brute_force_good_params();
 	//play_game();
