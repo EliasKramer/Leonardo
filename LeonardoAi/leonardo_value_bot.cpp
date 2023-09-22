@@ -172,11 +172,7 @@ static int x_distance(Square s1, Square s2)
 	return abs(s1_file - s2_file);
 }
 
-float leonardo_value_bot::get_simpel_eval(const ChessBoard& board)
-{
-	return get_simpel_eval(board, false);
-}
-float leonardo_value_bot::get_simpel_eval(const ChessBoard& board, bool print)
+float leonardo_value_bot::get_simpel_eval(const ChessBoard& board, const UniqueMoveList& moves, bool print)
 {
 	BoardRepresentation boardRep = board.getBoardRepresentation();
 
@@ -184,7 +180,7 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board, bool print)
 	// - if white wins return highest possible number
 	// - if black wins return lowest possible number
 	// - stalemate and draw is 0
-	GameState state = board.getGameState();
+	GameState state = board.getGameState(moves);
 	float gameStatePoints = GAME_STATE_EVALUATION[state];
 	//if the game is still ongoing the value will be -1 and thus should be continued evaluating
 	if (gameStatePoints != -1)
@@ -383,7 +379,7 @@ float leonardo_value_bot::get_simpel_eval(const ChessBoard& board, bool print)
 
 float leonardo_value_bot::get_eval(const ChessBoard& board, matrix& input_board)
 {
-	float hard_coded_eval = get_simpel_eval(board);
+	float hard_coded_eval = get_simpel_eval(board, board.getAllLegalMoves(), false);
 	float nnet_eval = nnet_influence != 0 ? get_nnet_eval(board, input_board) : 0;
 
 	//std::cout << "Hard coded eval: " << hard_coded_eval << " Nnet eval: " << nnet_eval << std::endl;
@@ -397,6 +393,8 @@ float leonardo_value_bot::get_eval(const ChessBoard& board, matrix& input_board)
 
 float leonardo_value_bot::get_move_score_recursively(
 	const ChessBoard& board, //1
+	std::unordered_set<transposition_table_item, tt_item_hasher, tt_item_equal>& transposition_table,
+	int& transpositions,
 	int curr_depth, //2
 	int max_depth, //2
 	bool is_maximizing_player, //3
@@ -454,21 +452,38 @@ float leonardo_value_bot::get_move_score_recursively(
 		nodes_searched++;
 
 		std::string best_move = "";
-		float evaluation = get_move_score_recursively(
-			copyBoard,
-			curr_depth + 1,
-			max_depth,
-			!is_maximizing_player,
-			alpha,
-			beta,
-			nodes_searched,
-			end_states_searched,
-			input_board,
-			allowed_time_ms,
-			start_time,
-			search_cancelled,
-			best_move,
-			prefix + "|");
+		int real_depth = max_depth - curr_depth;
+		transposition_table_item tt_item = transposition_table_item(board, *m, -1, real_depth);
+
+		float evaluation;
+
+		auto it = transposition_table.find(tt_item);
+		if (it != transposition_table.end() && it->depth >= real_depth)
+		{
+			transpositions++;
+			evaluation = it->score;
+		}
+		else {
+			evaluation = get_move_score_recursively(
+				copyBoard,
+				transposition_table,
+				transpositions,
+				curr_depth + 1,
+				max_depth,
+				!is_maximizing_player,
+				alpha,
+				beta,
+				nodes_searched,
+				end_states_searched,
+				input_board,
+				allowed_time_ms,
+				start_time,
+				search_cancelled,
+				best_move,
+				prefix + "|");
+			tt_item.score = evaluation;
+			transposition_table.insert(tt_item);
+		}
 		if (print_tree)
 		{
 			std::cout << prefix << " " << (m->getString()) << "      " << evaluation << "\n";
@@ -637,22 +652,24 @@ void leonardo_value_bot::thread_task(
 	matrix input_board(leonardo_util::get_input_format());
 
 	auto start = std::chrono::high_resolution_clock::now();
-	//iterative deepening.
-	//save best moves
-	//sort them										!!!!!!!!!!!!!!important!!!!!!!!!!!
 
-	//search them first
-	//if the best move is found, stop searching
+	//transposition table
+	std::unordered_set<transposition_table_item, tt_item_hasher, tt_item_equal> transposition_table;
+
 	float move_score = 0;
 	int i_depth = 1;
+	int transpositions = 0;
 	std::string best_moves_str = "";
 	while (std::chrono::high_resolution_clock::now() < start + std::chrono::milliseconds(ms_per_move))
 	{
 		bool search_canceled = false;
 		std::string best_move_str_tmp = "";
+		int tmp_transpositions = 0;
 		float tmp_move_score =
 			get_move_score_recursively(
 				board, //1
+				transposition_table,
+				tmp_transpositions,
 				1,
 				i_depth, //2
 				is_white_to_move, //3
@@ -677,7 +694,10 @@ void leonardo_value_bot::thread_task(
 		{
 			move_score = tmp_move_score;
 			best_moves_str = best_move_str_tmp;
+			transpositions = tmp_transpositions;
 			i_depth++;
+
+			transposition_table.clear();
 		}
 	}
 
@@ -691,6 +711,7 @@ void leonardo_value_bot::thread_task(
 		+ ", Nodes Searched: " + std::to_string(nodesSearched)
 		+ ", Score: " + std::to_string(move_score * colorMult)
 		+ ", Endstates Evaluated: " + std::to_string(endPointsEvaluated)
+		+ ", Transpositions Found: " + std::to_string(transpositions)
 		+ " evaluated combination: " + best_moves_str
 		+ "\n";
 #endif // PRINT_SEARCH_INFO
@@ -713,7 +734,7 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 #ifdef PRINT_SEARCH_INFO
 	ChessBoard cpy = board;
 
-	float eval_before = get_simpel_eval(board) * (board.getCurrentTurnColor() == White ? 1 : -1);
+	float eval_before = get_simpel_eval(board, board.getAllLegalMoves(), false) * (board.getCurrentTurnColor() == White ? 1 : -1);
 	std::cout << "eval before: " << eval_before << "\n";
 #endif // PRINT_SEARCH_INFO
 
@@ -727,7 +748,7 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 		ChessBoard boardCopy = board;
 		boardCopy.makeMove(*curr);
 
-		if (curr->getString() == "b5c6" || true) //DEBUG
+		if (curr->getString() == "d5f4" || true) //DEBUG
 		{
 			threads.push_back(std::thread(
 				&leonardo_value_bot::thread_task,
@@ -767,7 +788,7 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 
 #ifdef PRINT_SEARCH_INFO
 	cpy.makeMove(*legal_moves[bestMoveIdx]);
-	float eval_after = get_simpel_eval(cpy) * (board.getCurrentTurnColor() == White ? 1 : -1);
+	float eval_after = get_simpel_eval(cpy, cpy.getAllLegalMoves(), false) * (board.getCurrentTurnColor() == White ? 1 : -1);
 
 	float eval_diff = eval_after - eval_before;
 	std::cout << "eval after: " << eval_after << "\n";
@@ -786,5 +807,20 @@ int leonardo_value_bot::getMove(const ChessBoard& board, const UniqueMoveList& l
 void leonardo_value_bot::print_eval(std::string fen)
 {
 	ChessBoard board(fen);
-	get_simpel_eval(board, true);
+	get_simpel_eval(board, board.getAllLegalMoves(), true);
+}
+
+size_t tt_item_hasher::operator()(const transposition_table_item& tt_item) const
+{
+	static chess_board_hasher hasher;
+	size_t move_hash = (size_t)tt_item.move.getStart() ^ (size_t)tt_item.move.getDestination();
+	return hasher(tt_item.board) ^ move_hash;
+}
+
+bool tt_item_equal::operator()(const transposition_table_item& tt_item1, const transposition_table_item& tt_item2) const
+{
+	//this could cause some issues if the move is promote or en passant
+	return
+		tt_item1.board == tt_item2.board &&
+		tt_item1.move == tt_item2.move;
 }

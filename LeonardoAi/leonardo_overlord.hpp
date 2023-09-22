@@ -22,7 +22,7 @@ private:
 
 	neural_network best_policy_nnet;
 	neural_network best_value_nnet;
-	
+
 	neural_network new_policy_nnet;
 	neural_network new_value_nnet;
 
@@ -42,7 +42,7 @@ private:
 
 	void policy(
 		long long epoch,
-		matrix& output_matrix, 
+		matrix& output_matrix,
 		neural_network& given_policy_nnet,
 		neural_network& given_value_nnet,
 		const ChessBoard& game);
@@ -87,7 +87,7 @@ private:
 		size_t& white_won,
 		size_t& draw,
 		std::mutex& trainings_mutex);
-public: 
+public:
 	void train_value_nnet();
 	void test_value_nnet();
 	const neural_network& get_best_network() const;

@@ -4,8 +4,35 @@
 #include "NeuroFox/neural_network.hpp"
 #include "leonardo_util.hpp"
 #include "stockfish_interface.hpp"
+#include <unordered_set>
 
 #define PRINT_SEARCH_INFO
+
+
+class transposition_table_item {
+public:
+	ChessBoard board;
+	Move move;
+	float score;
+	int depth;
+
+	transposition_table_item(
+		const ChessBoard& board,
+		Move move,
+		float score,
+		int depth
+	) : board(board), move(move), score(score), depth(depth) {}
+};
+
+class tt_item_hasher {
+public:
+	size_t operator()(const transposition_table_item& tt_item) const;
+};
+
+class tt_item_equal {
+public:
+	bool operator()(const transposition_table_item& tt_item1, const transposition_table_item& tt_item2) const;
+};
 
 class leonardo_value_bot : public Player
 {
@@ -33,13 +60,14 @@ protected:
 	bool openings_loaded;
 
 	float get_nnet_eval(const ChessBoard& board, matrix& input_board);
-	float get_simpel_eval(const ChessBoard& board);
-	float get_simpel_eval(const ChessBoard& board, bool print);
+	float get_simpel_eval(const ChessBoard& board, const UniqueMoveList& moves, bool print);
 	float get_eval(const ChessBoard& board, matrix& input_board);
 	//float get_eval(const ChessBoard& board, matrix& input_board, float nnet_inf, float hard_infl);
 
 	float get_move_score_recursively(
 		const ChessBoard& board, //1
+		std::unordered_set<transposition_table_item, tt_item_hasher, tt_item_equal>& transposition_table,
+		int& transpositions,
 		int curr_depth, //2
 		int max_depth, //2
 		bool is_maximizing_player, //3

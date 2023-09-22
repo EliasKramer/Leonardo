@@ -34,6 +34,7 @@ std::string Move::getString() const
 bool operator==(const Move& first, const Move& second)
 {
 	return
+
 		first._destination == second._destination &&
 		first._start == second._start;
 }

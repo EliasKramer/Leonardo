@@ -382,11 +382,11 @@ leonardo_overlord::leonardo_overlord(
 	std::filesystem::path p = std::filesystem::current_path();
 	std::cout << "looking for nnets in " << p << '\n';
 
-	//best_value_nnet = neural_network("value.parameters");
+	best_value_nnet = neural_network("value.parameters");
 	//best_policy_nnet = neural_network("policy.parameters");
 
 
-	
+	/*
 	best_value_nnet.set_input_format(leonardo_util::get_input_format());
 	best_value_nnet.add_fully_connected_layer(96, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(24, leaky_relu_fn);
@@ -397,6 +397,7 @@ leonardo_overlord::leonardo_overlord(
 	best_value_nnet.add_fully_connected_layer(6, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
+	*/
 
 	//best_value_nnet = neural_network("C:\\Users\\Elias\\Desktop\\4small_epoch\\4small_epoch_2652200\\value.parameters");
 
@@ -1065,6 +1066,9 @@ void leonardo_overlord::test_eval_on_single_match(const std::string& moves)
 
 	ChessBoard board(STARTING_FEN);
 	bool found_move = false;
+
+	int sign_relevant_data_count = 0;
+	int righ_sign_count = 0;
 	for (int m = 0; m < (int)master_moves.size(); m++)
 	{
 		std::vector<std::unique_ptr<Move>> moves = board.getAllLegalMoves();
@@ -1079,7 +1083,25 @@ void leonardo_overlord::test_eval_on_single_match(const std::string& moves)
 
 				float sf_eval = stockfish_interface::eval(board.getFen(), 10);
 
-				std::cout << "move " << master_moves[m] << " value_nnet_out " << value_nnet_out << " sf_eval " << sf_eval << "\n";
+				float diff = value_nnet_out - sf_eval;
+				std::cout << "move " << master_moves[m] 
+					<< "\t val_nnet: " << std::to_string(value_nnet_out) 
+					<< "\t sf_eval " << std::to_string(sf_eval)
+					<< "\t diff " << std::to_string(diff)
+					<< "\t\t";
+
+				bool sign_match = (value_nnet_out > 0 && sf_eval > 0) || (value_nnet_out < 0 && sf_eval < 0);
+				if (std::abs(sf_eval) > 3)
+				{
+					sign_relevant_data_count++;
+					std::cout << "relevant sign \t";
+					if (sign_match)
+					{
+						righ_sign_count++;
+						std::cout << "right sign";
+					}
+				}
+				std::cout << "\n";
 
 				board.makeMove(*moves[i].get());
 				found_move = true;
@@ -1092,6 +1114,11 @@ void leonardo_overlord::test_eval_on_single_match(const std::string& moves)
 			break;
 		}
 	}
+	std::cout << "\n----------------------\n";
+	std::cout << "sign_relevant_data_count: " << std::to_string(sign_relevant_data_count) << "\n";
+	std::cout << "righ_sign_count: " << std::to_string(righ_sign_count) << "\n";
+	float right_sign_percent = ((float)righ_sign_count / (float)sign_relevant_data_count) * 100;
+	std::cout << "right_sign_percent: " << std::to_string(right_sign_percent) << "\n";
 }
 
 void leonardo_overlord::train()
