@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++,cuda,visualstudio
 *.parameters
 *.nnue
+dataset_policy.txt
 games.txt
 ### C++ ###
 # Prerequisites

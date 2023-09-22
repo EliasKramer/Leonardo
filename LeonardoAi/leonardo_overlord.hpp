@@ -72,7 +72,8 @@ public:
 
 	void train();
 	void train_on_gm_games();
-	void create_dataset();
+	void create_dataset_value();
+	void create_dataset_policy();
 	void train_on_dataset();
 	void test_eval_on_single_match(const std::string& moves);
 

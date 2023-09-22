@@ -380,9 +380,9 @@ leonardo_overlord::leonardo_overlord(
 	std::cout << "initalizing overlord " << name << "\n";
 	//print curret directory
 	std::filesystem::path p = std::filesystem::current_path();
-	std::cout << "looking for nnets in " << p << '\n';
+	std::cout << "curr path " << p << '\n';
 
-	best_value_nnet = neural_network("value.parameters");
+	//best_value_nnet;// = neural_network("value.parameters");
 	//best_policy_nnet = neural_network("policy.parameters");
 
 
@@ -463,6 +463,17 @@ static void write_file_lines(const std::string& filename, std::vector<std::strin
 	for (std::string line : lines) {
 		file << line << std::endl;
 	}
+	file.close();
+}
+
+static void append_file_line(const std::string& file_name, const std::string& line)
+{
+	std::ofstream file(file_name, std::ios_base::app);
+	if (!file.is_open()) {
+		std::cerr << "Error: Could not open file '" << file_name << "'" << std::endl;
+		return;
+	}
+	file << line << std::endl;
 	file.close();
 }
 
@@ -758,7 +769,7 @@ static void create_dataset_thread(
 	}
 }
 
-void leonardo_overlord::create_dataset()
+void leonardo_overlord::create_dataset_value()
 {
 	std::vector<std::string> games = read_file_lines("games.txt");
 	std::vector<std::string> dataset = read_file_lines("dataset.txt");
@@ -857,6 +868,147 @@ void leonardo_overlord::create_dataset()
 
 		std::lock_guard<std::mutex> lock(dataset_mutex);
 		write_file_lines("dataset.txt", dataset);
+	}
+}
+
+static std::string flt_to_str(float f, unsigned int precision)
+{
+	std::stringstream ss;
+	ss << std::fixed << std::setprecision(precision) << f;
+	return ss.str();
+}
+
+
+void leonardo_overlord::create_dataset_policy()
+{
+	std::vector<std::string> games = read_file_lines("games.txt");
+	std::vector<std::string> dataset = read_file_lines("dataset_policy.txt");
+	std::vector<std::string> config = split_string(dataset[0], ' ');
+
+	int depth = std::stoi(config[1]);
+	int stop_point;
+	if (config.size() >= 4)
+	{
+		stop_point = std::stoi(config[3]);
+	}
+	else
+	{
+		stop_point = games.size();
+	}
+	std::cout << "depth: " << depth << "\n";
+	std::cout << "stop_point: " << stop_point << "\n";
+
+
+	if (depth < 2 || depth > 50)
+	{
+		std::cout << "depth should be between 4 and 50\n";
+		return;
+	}
+
+	if (stop_point > games.size())
+	{
+		std::cout << "stop_idx should be lower than the number of games (which is " << games.size() << ")\n";
+		return;
+	}
+
+	int start_point = 0;
+	if (dataset.size() == 1)
+	{
+		start_point = 0;
+	}
+	else
+	{
+		std::string last_line = dataset[dataset.size() - 1];
+		std::vector<std::string> last_line_split = split_string(last_line, ';');
+		start_point = std::stoi(last_line_split[0]);
+	}
+
+	std::cout << "start_point: " << start_point << "\n";
+
+	//game_idx;move_for_pos_a>move1,value1|move2,value2 move_for_pos_b|move1,value1|move1,value1
+
+	int total_games = stop_point - start_point;
+	auto start = std::chrono::high_resolution_clock::now();
+
+	for (int i = start_point + 1; i < stop_point; i++)
+	{
+		std::string& current_game_string = games[i];
+		std::string output_string = std::to_string(i) + ";";
+		std::vector<std::string> master_moves = split_string(current_game_string, ' ');
+		ChessBoard board(STARTING_FEN);
+		for (int mm_idx = 1; mm_idx < master_moves.size(); mm_idx++) //master move - a1a2
+		{
+			std::string move_value_str = "";
+			std::string& master_move = master_moves[mm_idx];
+			auto sf_moves = stockfish_interface::get_best_moves(board.getFen(), depth);
+
+			UniqueMoveList moves = board.getAllLegalMoves();
+			bool found_move = false;
+			for (int m = 0; m < moves.size(); m++) //move of the engine
+			{
+				const std::unique_ptr<Move>& move = moves[m];
+				std::string move_string = move->getString();
+
+				if (move_string == master_move)
+				{
+					output_string += move_string;
+					board.makeMove(*move);
+					found_move = true;
+				}
+
+				bool sf_found_move = false;
+				for (int sf_idx = 0; sf_idx < sf_moves.size(); sf_idx++) //sf move
+				{
+					auto sf_move = sf_moves[sf_idx];
+					std::string sf_move_string = sf_move.move_str_uci;
+					float sf_move_value = sf_move.value;
+					if (sf_move_string == move_string)
+					{
+						sf_found_move = true; 
+						
+						std::string val = flt_to_str(sf_move_value, 2);
+						if (val == "-320.01")
+						{
+							break;
+						}
+						move_value_str += sf_move_string + "," + val + "|";
+						break;
+					}
+				} //sf move
+				if (!sf_found_move)
+				{
+					std::cout << "sf move not found: " << move_string << "\n";
+					break;
+				}
+			} //move of the engine
+
+			if (!found_move)
+			{
+				std::cout << "move not found: " << master_move << "\n";
+				break;
+			}
+
+			output_string += ">" + move_value_str + " ";
+
+		} //master move - a1a2
+		append_file_line("dataset_policy.txt", output_string);
+
+		if (i % 10 == 0)
+		{
+			auto stop = std::chrono::high_resolution_clock::now();
+			long elapased_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
+			long progress = i - start_point;
+			long remaining_ms = remaining_time(elapased_ms, progress, stop_point - start_point);
+
+			long ms_per_data = elapased_ms / progress;
+
+			std::cout
+				<< get_current_time_str() << " "
+				<< i << "/" << stop_point << " "
+				<< "(ms per data): " << ms_per_data << " "
+				<< "elapsed: " << ms_to_str(elapased_ms) << " "
+				<< "remaining: " << ms_to_str(remaining_ms) << "\n";
+		}
 	}
 }
 
@@ -973,7 +1125,7 @@ void leonardo_overlord::train_on_dataset()
 				std::cout << (game_idx) << "/" << data_count << " " << get_current_time_str() << "\n";
 				std::cout << "learning on " << ds->get_item_count() << " positions\n";
 				auto start = std::chrono::high_resolution_clock::now();
-				new_value_nnet.learn_on_ds(*ds, 1,  100, 0.0001f, true);
+				new_value_nnet.learn_on_ds(*ds, 1, 100, 0.0001f, true);
 				auto end = std::chrono::high_resolution_clock::now();
 				long long elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 				std::cout << "learning took " << ms_to_str(elapsed_ms) << "\n";
@@ -1001,7 +1153,7 @@ void leonardo_overlord::train_on_dataset()
 				long long remaining = 0;// remaining_time(elapsed_global_ms, game_idx, data_count);
 
 				std::cout << "elapsed: " << ms_to_str(elapsed_global_ms) << "\n"
-						<< "remaining: " << ms_to_str(remaining) << "\n";
+					<< "remaining: " << ms_to_str(remaining) << "\n";
 				std::cout << "---------------------\n";
 				testing_counter++;
 			}
@@ -1084,8 +1236,8 @@ void leonardo_overlord::test_eval_on_single_match(const std::string& moves)
 				float sf_eval = stockfish_interface::eval(board.getFen(), 10);
 
 				float diff = value_nnet_out - sf_eval;
-				std::cout << "move " << master_moves[m] 
-					<< "\t val_nnet: " << std::to_string(value_nnet_out) 
+				std::cout << "move " << master_moves[m]
+					<< "\t val_nnet: " << std::to_string(value_nnet_out)
 					<< "\t sf_eval " << std::to_string(sf_eval)
 					<< "\t diff " << std::to_string(diff)
 					<< "\t\t";

@@ -180,12 +180,10 @@ int main(int argc, char* argv[])
 	//SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
 	std::cout << "hab in die pawn pos werte rumgepuscht\n";
-	std::cout << "no stockfish\n";
 
-	//brute_force_good_params();
-	play_game();
-	return 0;
 	leonardo_overlord overlord("ov");
+	overlord.create_dataset_policy();
+	return 0;
 	overlord.test_eval_on_single_match(
 		//"e2e4 c7c6 d2d4 d7d5 b1c3 d5e4 c3e4 b8d7 e4g5 d7f6 d4d5 d8a5 c2c3 c6d5 g1e2 e7e5 f2f4 c8g4 g5h3 e5e4 h3f2 g4h5 g2g4 f6g4 f2e4 d5e4 e2g1 g4h2 g1e2 h2f1 e1f1 h5f3 h1h3 f3g4 h3g3 a8d8 d1d8 a5d8 g3g4 d8d1 f1f2 g8f6 g4g3 f8c5 e2d4 d1c2 f2g1 c2d1 g1g2 e8g8 f4f5 f6d5 g3g7 g8h8 g7g5 h7h6 g5g3 c5d6 g3g7 h8g7 c1h6 g7h6 a1d1 d5e3 g2g1 e3d1 d4b5 d6c5 b5d4 d1b2 g1h2 b2d1 d4e2 c5d6 h2g1 h6g5 c3c4 d1e3 e2d4 d6e5 d4b3 e3c4 a2a3 c4a3 g1g2 a3c4 b3c5 c4d6 c5d7 f8e8 d7e5 e8e5 f5f6 e5e8 g2g1 e4e3 g1g2 e3e2 g2g3 e2e1q g3h3 e1e2 h3g3 a7a6 g3h3 a6a5 h3g3 a5a4 g3h3 a4a3 h3g3 a3a2 g3h3 a2a1q h3g3 b7b6 g3h3 b6b5 h3g3 b5b4 g3h3 b4b3 h3g3 b3b2 g3h3 b2b1q h3g3 d6f5 g3h3 f5g7 h3g3 g7h5 g3h3 h5g3 h3g3 e8f8 g3h3 f8g8 h3g3 g8g7 f6g7 a1a3"
 		//"e2e4 g8h6 e4e5 h8g8 f1a6 g7g5 b1c3 h6g4 a6b7 d7d5 e5e6 g8h8 g1h3 f8h6 d2d3 a7a6 d1g4 h6f8 c3b1 c7c5 b1c3 f7e6 g4g3 d8d7 h1g1 f8g7 g3d6 a8a7 f2f3 h8f8 h3f2 h7h5 d6b6 f8h8 b7c6 g7e5 f2e4 e5d6 b6b5 d5d4 c3a4 d6h2 e1d2 g5g4 b5a6 e8f7 e4c3 h2c7 a4c5 g4f3 c6a4 b8a6 g2f3 c7d6 g1g7 f7g7 c5e6 d7e6 a4b5 h8g8 c3e4 d6h2 e4g3 g8h8 b5c6 g7g6 a2a3 h2g1 b2b3 a7a8 a1b1 g6h6 c6e8 g1f2 g3h1 f2g3 f3f4 a6b8 h1g3 h5h4 e8a4 e6g6 d2e1 c8h3 e1d2 g6g7 g3e2 h3g2 b1a1 h8f8 c1b2 g7g8 a1c1 g8b3 e2c3 b3b7 a4b3 b7d5 b3c4 b8a6 c3a2 d5e5 c2c3 a6b8 f4e5 a8a3 d2c2 g2e4 b2a1 h6g6 c4f7 g6h6 f7b3 f8f4 c1b1 h6g6 a1b2 f4f2 c2d1 e4f3 d1c1 e7e6 b3c4 f2d2 c4e6 d2g2 e6c8 b8a6 c3d4 a6c7 b1a1 a3a4 c8f5 g6g7 f5d7 f3c6 b2c3 g2e2 e5e6 e2e1 c1c2 a4a6 a1d1 e1e4 c2b1 c6d7 c3e1 a6a3 b1b2 a3c3 d1d2 e4e3 d2c2 e3e5 b2c1 d7a4 c1b2 c3c2 b2a3 c2c1 e1f2 c1d1 a3b4 a4b3 f2e1 d1c1 e1h4 c7e8 d4e5 c1c2 b4b3 c2c7 h4f2 c7c1 f2h4 c1d1 a2b4 g7f8 b3a2 e8d6 h4e7 f8e8 b4a6 e8e7 a2b2 e7d8 b2c3 d1f1 c3c2 d6b5 c2b2 f1e1 e6e7 d8e8 a6c5 e1e3 b2c2 e3d3 c5a4 d3d4 c2b2 d4a4 b2c2 b5a7 e5e6 a4b4 c2c1 b4b1 c1c2 b1d1 c2b2 e8e7 b2c2 e7f6 c2c3 d1e1 c3c4 f6f5 e6e7 e1e2 e7e8n e2h2 e8c7 a7c8 c4c5 c8a7 c7a6 a7c6 c5d5 c6d8 d5c5 f5g5 c5c4 d8f7 c4c5 f7d8 a6b4 g5h6 b4a6 h2f2 a6b4 f2c2 c5d6 c2c1 b4c2 c1c2 d6d7 c2a2 d7d6 a2a5 d6c7 h6h5 c7d7 h5h6 d7e8 h6h7 e8f8 h7h8 f8e7 a5c5 e7e8 h8h7 e8e7 c5c6 e7d8 h7g6 d8e8 g6g5 e8d7 c6c2 d7e6 c2c4 e6d5 c4c3 d5e6 c3c6 e6f7 c6d6 f7f8 d6f6 f8g8 g5h5 g8h7 f6f1 h7g7 h5h4 g7h6 f1f3 h6g6 f3f7 g6f7"
