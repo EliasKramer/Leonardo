@@ -1,8 +1,9 @@
 #include "leonardo_overlord.hpp"
 #include <cmath>
+#include <algorithm>
 void leonardo_overlord::save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet)
 {
-	std::cout << "\nsaving best network to file " << epoch << "\n";
+	std::cout << "saving best network to file " << epoch << "\n";
 	//check if folder exists
 	if (!std::filesystem::exists("models"))
 	{
@@ -23,7 +24,7 @@ void leonardo_overlord::save_best_to_file(size_t epoch, bool value_nnet, bool po
 		std::string value_nnet_path = folder_name + "/value.parameters";
 		best_value_nnet.save_to_file(value_nnet_path);
 	}
-	std::cout << "\nsaved best network to file\n";
+	std::cout << "saved best network to file\n\n";
 }
 float leonardo_overlord::search(
 	const ChessBoard& game,
@@ -404,23 +405,13 @@ leonardo_overlord::leonardo_overlord(
 	//best_value_nnet = neural_network("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\pre_calced_dataset_epoch_178200\\value.parameters");
 
 	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
-	/*
-	best_policy_nnet.add_fully_connected_layer(2048, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(2048, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(128, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(128, leaky_relu_fn);
-	*/
-	//best_policy_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	//best_policy_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	/*
-	*/
-	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(100, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(100, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(75, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(50, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(50, leaky_relu_fn);
+	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), identity_fn);
+	
 	best_policy_nnet.xavier_initialization();
 
 	new_policy_nnet = neural_network(best_policy_nnet);
@@ -964,8 +955,8 @@ void leonardo_overlord::create_dataset_policy()
 					float sf_move_value = sf_move.value;
 					if (sf_move_string == move_string)
 					{
-						sf_found_move = true; 
-						
+						sf_found_move = true;
+
 						std::string val = flt_to_str(sf_move_value, 2);
 						if (val == "-320.01")
 						{
@@ -1009,6 +1000,197 @@ void leonardo_overlord::create_dataset_policy()
 				<< "elapsed: " << ms_to_str(elapased_ms) << " "
 				<< "remaining: " << ms_to_str(remaining_ms) << "\n";
 		}
+	}
+}
+
+static void set_policy_ouput(matrix& label, std::string& str, const ChessBoard& board)
+{
+	//move1,value1|move2,value2
+
+	std::vector<std::string> moves_str = split_string(str, '|');
+
+	//TODO - maybe another default value? 
+	const float default_value = -320.01f;
+
+	label.set_all(default_value);
+
+	UniqueMoveList moves = board.getAllLegalMoves();
+	for (int i = 0; i < moves_str.size(); i++)
+	{
+		std::vector<std::string> move_str = split_string(moves_str[i], ',');
+
+		std::string move_uci_str = move_str[0];
+		float value = std::stof(move_str[1]);
+
+		bool move_found = false;
+		for (const std::unique_ptr<Move>& move : moves)
+		{
+			std::string move_string = move->getString();
+			if (move_string == move_uci_str)
+			{
+				leonardo_util::set_move_value(*move, label, value, board.getCurrentTurnColor());
+				move_found = true;
+				break;
+			}
+		}
+		if (!move_found)
+		{
+			std::cout << "move not found: " << move_uci_str << "\n";
+		}
+	}
+}
+
+static bool make_uci_move(ChessBoard& board, std::string& uci_move)
+{
+	UniqueMoveList moves = board.getAllLegalMoves();
+	for (const std::unique_ptr<Move>& move : moves)
+	{
+		std::string move_string = move->getString();
+		if (move_string == uci_move)
+		{
+			board.makeMove(*move);
+			return true;
+		}
+	}
+	return false;
+}
+
+static void fill_dataset(
+	int start_point,
+	int stop_point,
+	std::vector<std::string>& dataset,
+	data_space& ds,
+	matrix& input,
+	matrix& label
+)
+{
+	if (stop_point > dataset.size())
+	{
+		std::cout << "-------------------------------------\n";
+		std::cout << "IMPORTANT stop_point > dataset.size()\n";
+		std::cout << "-------------------------------------\n";
+		stop_point = dataset.size();
+	}
+
+	int ds_iterator = 0;
+	for (int i = start_point; i < stop_point; i++)
+	{
+		//game_idx;move_for_pos_a>move1,value1|move2,value2 move_for_pos_b|move1,value1|move1,value1
+		std::string curr_data_point = dataset[i];
+		std::vector<std::string> data_point_vector = split_string(curr_data_point, ';');
+		if (data_point_vector.size() != 2)
+		{
+			std::cout << i << " data had no ';' to split the string in exactly 2\n";
+			break;
+		}
+		//game_idx
+		std::string game_idx_str = data_point_vector[0];
+		//move_for_pos_a>move1,value1|move2,value2 move_for_pos_b>move1,value1|move1,value1
+		std::string short_data_point = data_point_vector[1];
+		std::vector<std::string> detailed_move_vec = split_string(short_data_point, ' ');
+
+		ChessBoard board(STARTING_FEN);
+
+		//move_for_pos_a>move1,value1|move2,value2
+		for (int j = 0; j < detailed_move_vec.size(); j++)
+		{
+			std::string detailed_move = detailed_move_vec[j];
+			std::vector<std::string> det_move_split_vec = split_string(detailed_move, '>');
+			if (det_move_split_vec.size() != 2)
+			{
+				std::cout << i << " detailed_move had no '>' to split the string in exactly 2\n";
+				break;
+			}
+			std::string uci_move_string = det_move_split_vec[0];
+			std::string move_value_str = det_move_split_vec[1];
+
+			leonardo_util::set_matrix_from_chessboard(board, input);
+			set_policy_ouput(label, move_value_str, board);
+
+			if (ds_iterator >= ds.get_item_count())
+			{
+				std::cout << "ds_iterator >= ds.get_item_count()\n";
+				break;
+			}
+
+			ds.set_data(input, ds_iterator);
+			ds.set_label(label, ds_iterator);
+			ds_iterator++;
+
+			bool move_made = make_uci_move(board, uci_move_string);
+			if (!move_made)
+			{
+				std::cout << i << " move not made: " << uci_move_string << "\n";
+				break;
+			}
+		}
+	}
+}
+
+static int count_chars_in_str(const std::string& string, const char searched_char)
+{
+	return std::ranges::count(string, searched_char);
+}
+void leonardo_overlord::train_on_policy_dataset()
+{
+	if (gpu_mode)
+	{
+		std::cout << "gpu mode not supported\n";
+		return;
+	}
+
+	std::vector<std::string> dataset = read_file_lines("dataset_policy.txt");
+
+	matrix label(leonardo_util::get_policy_output_format());
+	matrix input(leonardo_util::get_input_format());
+
+	int pseudo_batch_size = 10;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	for (int i = 0; i < dataset.size(); i += pseudo_batch_size)
+	{
+		int data_count = 0;
+		for (int j = i; j < i + pseudo_batch_size; j++)
+		{
+			data_count += count_chars_in_str(dataset[j], ' ');
+		}
+
+		data_space ds(
+			data_count,
+			leonardo_util::get_input_format(),
+			leonardo_util::get_policy_output_format());
+
+		fill_dataset(
+			i,
+			i + pseudo_batch_size,
+			dataset,
+			ds,
+			input,
+			label);
+
+
+		if (i % 100 == 0)
+		{
+			test_result test_res = new_policy_nnet.test_on_ds(ds);
+			std::cout << test_res.to_string() << "\n";
+
+			best_policy_nnet.set_parameters(new_policy_nnet);
+			save_best_to_file(i, false, true);
+
+			auto stop = std::chrono::high_resolution_clock::now();
+			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
+
+			std::cout
+				<< i + pseudo_batch_size << "/" << dataset.size() << " "
+				<< get_current_time_str() << " "
+				<< "elapsed: " << ms_to_str(duration) << " "
+				<< "remaining: " << ms_to_str(remaining_time(duration, i, dataset.size())) << "\n";
+		}
+
+		new_policy_nnet.learn_on_ds(
+			ds, 1, 1, 0.0001f, true
+		);
 	}
 }
 

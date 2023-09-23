@@ -68,6 +68,7 @@
     <ClCompile Include="NeuroFox\matrix.cpp" />
     <ClCompile Include="NeuroFox\neural_network.cpp" />
     <ClCompile Include="NeuroFox\pooling_layer.cpp" />
+    <ClCompile Include="NeuroFox\softmax_layer.cpp" />
     <ClCompile Include="NeuroFox\test_result.cpp" />
     <ClCompile Include="NeuroFox\util.cpp" />
     <ClCompile Include="NeuroFox\vector3.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="NeuroFox\matrix.hpp" />
     <ClInclude Include="NeuroFox\neural_network.hpp" />
     <ClInclude Include="NeuroFox\pooling_layer.hpp" />
+    <ClInclude Include="NeuroFox\softmax_layer.hpp" />
     <ClInclude Include="NeuroFox\test_result.hpp" />
     <ClInclude Include="NeuroFox\util.hpp" />
     <ClInclude Include="NeuroFox\vector3.hpp" />

@@ -176,13 +176,13 @@ static int move_count(ChessBoard& board, int depth, int& nodes, int& end_states)
 
 int main(int argc, char* argv[])
 {
-	stockfish_interface::init();
-	//SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+	//stockfish_interface::init();
+	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
 	std::cout << "hab in die pawn pos werte rumgepuscht\n";
 
-	leonardo_overlord overlord("ov");
-	overlord.create_dataset_policy();
+	leonardo_overlord overlord("policy_engine_hard_max");
+	overlord.train_on_policy_dataset();
 	return 0;
 	overlord.test_eval_on_single_match(
 		//"e2e4 c7c6 d2d4 d7d5 b1c3 d5e4 c3e4 b8d7 e4g5 d7f6 d4d5 d8a5 c2c3 c6d5 g1e2 e7e5 f2f4 c8g4 g5h3 e5e4 h3f2 g4h5 g2g4 f6g4 f2e4 d5e4 e2g1 g4h2 g1e2 h2f1 e1f1 h5f3 h1h3 f3g4 h3g3 a8d8 d1d8 a5d8 g3g4 d8d1 f1f2 g8f6 g4g3 f8c5 e2d4 d1c2 f2g1 c2d1 g1g2 e8g8 f4f5 f6d5 g3g7 g8h8 g7g5 h7h6 g5g3 c5d6 g3g7 h8g7 c1h6 g7h6 a1d1 d5e3 g2g1 e3d1 d4b5 d6c5 b5d4 d1b2 g1h2 b2d1 d4e2 c5d6 h2g1 h6g5 c3c4 d1e3 e2d4 d6e5 d4b3 e3c4 a2a3 c4a3 g1g2 a3c4 b3c5 c4d6 c5d7 f8e8 d7e5 e8e5 f5f6 e5e8 g2g1 e4e3 g1g2 e3e2 g2g3 e2e1q g3h3 e1e2 h3g3 a7a6 g3h3 a6a5 h3g3 a5a4 g3h3 a4a3 h3g3 a3a2 g3h3 a2a1q h3g3 b7b6 g3h3 b6b5 h3g3 b5b4 g3h3 b4b3 h3g3 b3b2 g3h3 b2b1q h3g3 d6f5 g3h3 f5g7 h3g3 g7h5 g3h3 h5g3 h3g3 e8f8 g3h3 f8g8 h3g3 g8g7 f6g7 a1a3"

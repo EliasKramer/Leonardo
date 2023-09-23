@@ -216,6 +216,9 @@
     <ClCompile Include="leonardo_value_bot_4.cpp">
       <Filter>source\leonardo_value_bot</Filter>
     </ClCompile>
+    <ClCompile Include="NeuroFox\softmax_layer.cpp">
+      <Filter>source\nnet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NeuroFox\convolutional_layer.hpp">
@@ -436,6 +439,9 @@
     </ClInclude>
     <ClInclude Include="leonardo_value_bot_4.hpp">
       <Filter>header\leonardo_value_bot</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\softmax_layer.hpp">
+      <Filter>header\nnet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
