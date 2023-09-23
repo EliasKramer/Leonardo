@@ -411,7 +411,8 @@ leonardo_overlord::leonardo_overlord(
 	best_policy_nnet.add_fully_connected_layer(50, leaky_relu_fn);
 	best_policy_nnet.add_fully_connected_layer(50, leaky_relu_fn);
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), identity_fn);
-	
+	best_policy_nnet.add_softmax_layer();
+
 	best_policy_nnet.xavier_initialization();
 
 	new_policy_nnet = neural_network(best_policy_nnet);
@@ -1010,11 +1011,14 @@ static void set_policy_ouput(matrix& label, std::string& str, const ChessBoard& 
 	std::vector<std::string> moves_str = split_string(str, '|');
 
 	//TODO - maybe another default value? 
-	const float default_value = -320.01f;
+	const float default_value = 0;
 
 	label.set_all(default_value);
 
 	UniqueMoveList moves = board.getAllLegalMoves();
+
+	int best_move_idx = 0;
+	float best_move_value = -FLT_MAX;
 	for (int i = 0; i < moves_str.size(); i++)
 	{
 		std::vector<std::string> move_str = split_string(moves_str[i], ',');
@@ -1028,7 +1032,12 @@ static void set_policy_ouput(matrix& label, std::string& str, const ChessBoard& 
 			std::string move_string = move->getString();
 			if (move_string == move_uci_str)
 			{
-				leonardo_util::set_move_value(*move, label, value, board.getCurrentTurnColor());
+				if (value > best_move_value)
+				{
+					best_move_idx = i;
+					best_move_value = value;
+				}
+
 				move_found = true;
 				break;
 			}
@@ -1038,6 +1047,7 @@ static void set_policy_ouput(matrix& label, std::string& str, const ChessBoard& 
 			std::cout << "move not found: " << move_uci_str << "\n";
 		}
 	}
+	leonardo_util::set_move_value(*moves[best_move_idx], label, 1, board.getCurrentTurnColor());
 }
 
 static bool make_uci_move(ChessBoard& board, std::string& uci_move)

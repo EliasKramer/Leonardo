@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
 	std::cout << "this version has a test function for the ds test, that only works on matrices with a very specific format" << std::endl;
 	std::cout << "hab in die pawn pos werte rumgepuscht\n";
 
-	leonardo_overlord overlord("policy_engine_hard_max");
+	leonardo_overlord overlord("policy_engine_soft_max");
 	overlord.train_on_policy_dataset();
 	return 0;
 	overlord.test_eval_on_single_match(
