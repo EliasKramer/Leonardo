@@ -162,11 +162,11 @@
     <ClCompile Include="chess_game.cpp">
       <Filter>source\chess_util</Filter>
     </ClCompile>
-    <ClCompile Include="chess_player.cpp">
-      <Filter>source\chess_util</Filter>
-    </ClCompile>
     <ClCompile Include="random_player.cpp">
       <Filter>source\chess_util</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\softmax_layer.cpp">
+      <Filter>source\nnet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -340,6 +340,9 @@
     </ClInclude>
     <ClInclude Include="random_player.hpp">
       <Filter>header\chess_util</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\softmax_layer.hpp">
+      <Filter>header\nnet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
