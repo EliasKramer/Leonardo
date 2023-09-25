@@ -4,6 +4,6 @@
 class random_player : public chess_player
 {
 public:
-	Stockfish::Move get_move(Stockfish::Position& pos) override;
+	Move get_move(Position& pos) override;
 };
 

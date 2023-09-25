@@ -1,18 +1,15 @@
 #include "random_player.hpp"
 
-Stockfish::Move random_player::get_move(Stockfish::Position& pos)
+Move random_player::get_move(Position& pos)
 {
-	return Stockfish::Move::MOVE_NONE;
-	/*
 	if (pos.turn() == WHITE)
 	{
-		MoveList<WHITE> list(pos);
-		return list.begin()[rand() % list.size()];
+		MoveList<WHITE> moves(pos);
+		return *moves.begin();// *(moves.begin() + rand() % moves.size());
 	}
-	else
-	{
-		MoveList<BLACK> list(pos);
-		return list.begin()[rand() % list.size()];
+	else {
+
+		MoveList<BLACK> moves(pos);
+		return *moves.begin();// *(moves.begin() + rand() % moves.size());
 	}
-	*/
 }

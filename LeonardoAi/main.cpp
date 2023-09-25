@@ -47,8 +47,8 @@ int main()
 
 	stockfish_interface::eval("r1bqkb1r/pp3ppp/1n2p3/3pP3/7P/3B4/PP1NNPP1/R1BQK2R b KQkq - 0 10", 4);
 
-	random_player player1;
-	random_player player2;
+	random_player* player1 = new random_player;
+	random_player* player2 = new random_player;
 
 	chess_game game(
 		player1,
@@ -56,6 +56,7 @@ int main()
 	);
 
 	game.play();
+
 
 	std::cout << "Hello World!\n";
 }
