@@ -1,4 +1,5 @@
 #pragma once
+/*
 #include "NeuroFox/neural_network.hpp"
 #include <memory>
 #include <thread>
@@ -97,4 +98,4 @@ public:
 	void train_value_nnet();
 	void test_value_nnet();
 	const neural_network& get_best_network() const;
-};
+};*/

@@ -1,5 +1,5 @@
+/*
 #include "leonardo_value_bot.hpp"
-
 void leonardo_value_bot::reroll_params()
 {
 	//random number between 0 and 6
@@ -800,4 +800,4 @@ void leonardo_value_bot::print_eval(std::string fen)
 {
 	ChessBoard board(fen);
 	get_simpel_eval(board, true);
-}
+}*/

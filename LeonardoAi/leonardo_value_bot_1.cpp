@@ -1,3 +1,4 @@
+/*
 #include "leonardo_value_bot_1.hpp"
 
 bool leonardo_value_bot_1::time_up()
@@ -145,4 +146,4 @@ int leonardo_value_bot_1::getMove(const ChessBoard& board, const UniqueMoveList&
 
 
 	return best_move_idx;
-}
+}*/

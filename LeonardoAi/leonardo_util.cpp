@@ -1,3 +1,4 @@
+/*
 #include "leonardo_util.hpp"
 #include <float.h>
 #include <algorithm>
@@ -227,7 +228,7 @@ void leonardo_util::set_value_nnet_output(matrix& output, const ChessBoard& game
 	{
 		output.set_at_flat_host(0, 0.5f);
 		output.set_at_flat_host(1, 0.5f);
-	}*/
+	}
 	output.set_at_flat_host(0,
 		(state == GameState::WhiteWon && color == White) ||
 		(state == GameState::BlackWon && color == Black) ? 50.0f :
@@ -334,3 +335,4 @@ void leonardo_util::update_thread(
 		std::this_thread::sleep_for(std::chrono::milliseconds(tick_in_ms));
 	}
 }
+*/

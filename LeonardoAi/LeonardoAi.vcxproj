@@ -11,24 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\MockChessEngine\AlphaBetaPruningBot.cpp" />
-    <ClCompile Include="..\MockChessEngine\BoardRepresentation.cpp" />
-    <ClCompile Include="..\MockChessEngine\ChessBoard.cpp" />
-    <ClCompile Include="..\MockChessEngine\ChessPiece.cpp" />
-    <ClCompile Include="..\MockChessEngine\Constants.cpp" />
-    <ClCompile Include="..\MockChessEngine\DataAndTypes.cpp" />
-    <ClCompile Include="..\MockChessEngine\Game.cpp" />
-    <ClCompile Include="..\MockChessEngine\HelpMethods.cpp" />
-    <ClCompile Include="..\MockChessEngine\HumanPlayer.cpp" />
-    <ClCompile Include="..\MockChessEngine\Medicrius.cpp" />
-    <ClCompile Include="..\MockChessEngine\Move.cpp" />
-    <ClCompile Include="..\MockChessEngine\MoveCastle.cpp" />
-    <ClCompile Include="..\MockChessEngine\MoveDoublePawn.cpp" />
-    <ClCompile Include="..\MockChessEngine\MoveEnPassant.cpp" />
-    <ClCompile Include="..\MockChessEngine\MovePromote.cpp" />
-    <ClCompile Include="..\MockChessEngine\MyBitBoard.cpp" />
-    <ClCompile Include="..\MockChessEngine\Player.cpp" />
-    <ClCompile Include="..\MockChessEngine\RandomPlayer.cpp" />
     <ClCompile Include="..\StockFish\benchmark.cpp" />
     <ClCompile Include="..\StockFish\bitbase.cpp" />
     <ClCompile Include="..\StockFish\bitboard.cpp" />
@@ -51,7 +33,8 @@
     <ClCompile Include="..\StockFish\tune.cpp" />
     <ClCompile Include="..\StockFish\uci.cpp" />
     <ClCompile Include="..\StockFish\ucioption.cpp" />
-    <ClCompile Include="chess_arena.cpp" />
+    <ClCompile Include="chess_game.cpp" />
+    <ClCompile Include="chess_player.cpp" />
     <ClCompile Include="leonardo_policy_bot.cpp" />
     <ClCompile Include="leonardo_overlord.cpp" />
     <ClCompile Include="leonardo_util.cpp" />
@@ -71,27 +54,10 @@
     <ClCompile Include="NeuroFox\test_result.cpp" />
     <ClCompile Include="NeuroFox\util.cpp" />
     <ClCompile Include="NeuroFox\vector3.cpp" />
+    <ClCompile Include="random_player.cpp" />
     <ClCompile Include="stockfish_interface.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\MockChessEngine\AlphaBetaPruningBot.h" />
-    <ClInclude Include="..\MockChessEngine\BoardRepresentation.h" />
-    <ClInclude Include="..\MockChessEngine\ChessBoard.h" />
-    <ClInclude Include="..\MockChessEngine\ChessPiece.h" />
-    <ClInclude Include="..\MockChessEngine\Constants.h" />
-    <ClInclude Include="..\MockChessEngine\DataAndTypes.h" />
-    <ClInclude Include="..\MockChessEngine\Game.h" />
-    <ClInclude Include="..\MockChessEngine\HelpMethods.h" />
-    <ClInclude Include="..\MockChessEngine\HumanPlayer.h" />
-    <ClInclude Include="..\MockChessEngine\Medicrius.h" />
-    <ClInclude Include="..\MockChessEngine\Move.h" />
-    <ClInclude Include="..\MockChessEngine\MoveCastle.h" />
-    <ClInclude Include="..\MockChessEngine\MoveDoublePawn.h" />
-    <ClInclude Include="..\MockChessEngine\MoveEnPassant.h" />
-    <ClInclude Include="..\MockChessEngine\MovePromote.h" />
-    <ClInclude Include="..\MockChessEngine\MyBitBoard.h" />
-    <ClInclude Include="..\MockChessEngine\Player.h" />
-    <ClInclude Include="..\MockChessEngine\RandomPlayer.h" />
     <ClInclude Include="..\StockFish\benchmark.h" />
     <ClInclude Include="..\StockFish\bitboard.h" />
     <ClInclude Include="..\StockFish\endgame.h" />
@@ -124,7 +90,8 @@
     <ClInclude Include="..\StockFish\tune.h" />
     <ClInclude Include="..\StockFish\types.h" />
     <ClInclude Include="..\StockFish\uci.h" />
-    <ClInclude Include="chess_arena.hpp" />
+    <ClInclude Include="chess_game.hpp" />
+    <ClInclude Include="chess_player.hpp" />
     <ClInclude Include="leonardo_policy_bot.hpp" />
     <ClInclude Include="leonardo_overlord.hpp" />
     <ClInclude Include="leonardo_util.hpp" />
@@ -146,15 +113,13 @@
     <ClInclude Include="NeuroFox\test_result.hpp" />
     <ClInclude Include="NeuroFox\util.hpp" />
     <ClInclude Include="NeuroFox\vector3.hpp" />
+    <ClInclude Include="random_player.hpp" />
     <ClInclude Include="stockfish_interface.hpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="NeuroFox\gpu_math.cu" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MockChessEngine\MockChessEngine.vcxproj">
-      <Project>{944091fe-c183-4ddf-b910-12047d02ed20}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\StockFish\StockFish.vcxproj">
       <Project>{b6a8644e-094e-480d-b2ac-2d5c26e0f08e}</Project>
     </ProjectReference>

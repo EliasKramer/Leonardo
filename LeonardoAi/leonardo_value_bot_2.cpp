@@ -1,3 +1,4 @@
+/*
 #include "leonardo_value_bot_2.hpp"
 
 bool leonardo_value_bot_2::time_up()
@@ -30,7 +31,7 @@ bool leonardo_value_bot_2::time_up()
 		if beta<=alpha
 	  break
 	 return minEva
-*/
+
 float leonardo_value_bot_2::recursive_eval(
 	int depth,
 	float alpha,
@@ -182,4 +183,4 @@ int leonardo_value_bot_2::getMove(const ChessBoard& board, const UniqueMoveList&
 
 
 	return best_move_idx;
-}
+}*/

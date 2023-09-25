@@ -1,3 +1,4 @@
+/*
 #include "leonardo_overlord.hpp"
 #include <cmath>
 void leonardo_overlord::save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet)
@@ -521,6 +522,7 @@ static float get_curr_reward(const ChessBoard& board, const std::unique_ptr<Move
 		{
 			return 0;
 		}*/
+/*
 	}
 
 	BoardRepresentation rep = board.getBoardRepresentation();
@@ -1260,7 +1262,7 @@ void leonardo_overlord::train_value_nnet_thread_fn(
 					std::cout << "\nt-id: " << id << " game " << game_idx << " done move idx: " << move_idx << "\n" << GAME_STATE_STRING[game.getGameState()] << "\n";
 					std::cout << "p1 is white " << player1_plays_white << "\n";
 					std::cout << game.getFen() << "\n";
-					*/
+					*//*
 					game_state == WhiteWon ? white_won_sum++ : game_state == BlackWon ? black_won_sum++ : draw_sum++;
 
 					player1_plays_white = !player1_plays_white;
@@ -1453,4 +1455,4 @@ void leonardo_overlord::test_value_nnet()
 const neural_network& leonardo_overlord::get_best_network() const
 {
 	return best_policy_nnet;
-}
+}*/

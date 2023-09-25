@@ -1,5 +1,5 @@
 #pragma once
-
+/*
 #include "../MockChessEngine/Player.h"
 #include "NeuroFox/neural_network.hpp"
 #include "leonardo_util.hpp"
@@ -24,3 +24,4 @@ public:
 	int getMove(const ChessBoard& board, const UniqueMoveList& legal_moves) override;
 };
 
+*/

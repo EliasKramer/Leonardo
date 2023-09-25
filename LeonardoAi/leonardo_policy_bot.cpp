@@ -1,3 +1,4 @@
+/*
 #include "leonardo_policy_bot.hpp"
 
 leonardo_policy_bot::leonardo_policy_bot(
@@ -30,4 +31,4 @@ int leonardo_policy_bot::getMove(const ChessBoard& board, const UniqueMoveList& 
 		playstyle == e_playstyle_t::distributed_random ?
 		leonardo_util::get_random_best_move(nn.get_output(), legal_moves, board.getCurrentTurnColor()) :
 		throw std::exception("unknown playstyle");
-}
+}*/
