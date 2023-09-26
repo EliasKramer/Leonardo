@@ -31,8 +31,8 @@
     <Filter Include="source\chess_util">
       <UniqueIdentifier>{1d4b3147-67db-47c8-a698-e0224e043625}</UniqueIdentifier>
     </Filter>
-    <Filter Include="surge">
-      <UniqueIdentifier>{26056a20-7c18-43ee-bf38-6821b86bbde4}</UniqueIdentifier>
+    <Filter Include="engine">
+      <UniqueIdentifier>{aa19eaa6-6dee-4584-82fe-6e4f533d44da}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -170,15 +170,6 @@
     </ClCompile>
     <ClCompile Include="NeuroFox\softmax_layer.cpp">
       <Filter>source\nnet</Filter>
-    </ClCompile>
-    <ClCompile Include="..\TmpEngine\position_surge.cpp">
-      <Filter>surge</Filter>
-    </ClCompile>
-    <ClCompile Include="..\TmpEngine\tables_surge.cpp">
-      <Filter>surge</Filter>
-    </ClCompile>
-    <ClCompile Include="..\TmpEngine\types_surge.cpp">
-      <Filter>surge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -356,14 +347,8 @@
     <ClInclude Include="NeuroFox\softmax_layer.hpp">
       <Filter>header\nnet</Filter>
     </ClInclude>
-    <ClInclude Include="..\TmpEngine\position_surge.h">
-      <Filter>surge</Filter>
-    </ClInclude>
-    <ClInclude Include="..\TmpEngine\tables_surge.h">
-      <Filter>surge</Filter>
-    </ClInclude>
-    <ClInclude Include="..\TmpEngine\types_surge.h">
-      <Filter>surge</Filter>
+    <ClInclude Include="chess.hpp">
+      <Filter>engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

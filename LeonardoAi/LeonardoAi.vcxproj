@@ -33,9 +33,6 @@
     <ClCompile Include="..\StockFish\tune.cpp" />
     <ClCompile Include="..\StockFish\uci.cpp" />
     <ClCompile Include="..\StockFish\ucioption.cpp" />
-    <ClCompile Include="..\TmpEngine\position_surge.cpp" />
-    <ClCompile Include="..\TmpEngine\tables_surge.cpp" />
-    <ClCompile Include="..\TmpEngine\types_surge.cpp" />
     <ClCompile Include="chess_game.cpp" />
     <ClCompile Include="leonardo_policy_bot.cpp" />
     <ClCompile Include="leonardo_overlord.cpp" />
@@ -93,9 +90,7 @@
     <ClInclude Include="..\StockFish\tune.h" />
     <ClInclude Include="..\StockFish\types.h" />
     <ClInclude Include="..\StockFish\uci.h" />
-    <ClInclude Include="..\TmpEngine\position_surge.h" />
-    <ClInclude Include="..\TmpEngine\tables_surge.h" />
-    <ClInclude Include="..\TmpEngine\types_surge.h" />
+    <ClInclude Include="chess.hpp" />
     <ClInclude Include="chess_game.hpp" />
     <ClInclude Include="chess_player.hpp" />
     <ClInclude Include="leonardo_policy_bot.hpp" />

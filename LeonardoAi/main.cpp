@@ -40,6 +40,27 @@ int main(int argc, char* argv[])
 #include "stockfish_interface.hpp"
 #include "chess_game.hpp"
 #include "random_player.hpp"
+#include "chess.hpp"
+
+uint64_t perft(chess::Board& board, int depth) {
+	chess::Movelist moves;
+	chess::movegen::legalmoves(moves, board);
+
+	if (depth == 1) {
+		return moves.size();
+	}
+
+	uint64_t nodes = 0;
+
+	for (int i = 0; i < moves.size(); i++) {
+		const auto move = moves[i];
+		board.makeMove(move);
+		nodes += perft(board, depth - 1);
+		board.unmakeMove(move);
+	}
+
+	return nodes;
+}
 
 int main()
 {

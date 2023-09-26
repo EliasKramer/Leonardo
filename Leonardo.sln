@@ -13,8 +13,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StockFish", "StockFish\Stoc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AiTest", "AiTest\AiTest.vcxproj", "{F9EFC263-A435-4FFA-B3E9-2B28DF918B29}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TmpEngine", "TmpEngine\TmpEngine.vcxproj", "{9AC3FDEA-4AE7-425A-BE10-C8E26F7FD333}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -63,14 +61,6 @@ Global
 		{F9EFC263-A435-4FFA-B3E9-2B28DF918B29}.Release|x64.Build.0 = Release|x64
 		{F9EFC263-A435-4FFA-B3E9-2B28DF918B29}.Release|x86.ActiveCfg = Release|Win32
 		{F9EFC263-A435-4FFA-B3E9-2B28DF918B29}.Release|x86.Build.0 = Release|Win32
-		{9AC3FDEA-4AE7-425A-BE10-C8E26F7FD333}.Debug|x64.ActiveCfg = Debug|x64
-		{9AC3FDEA-4AE7-425A-BE10-C8E26F7FD333}.Debug|x64.Build.0 = Debug|x64
-		{9AC3FDEA-4AE7-425A-BE10-C8E26F7FD333}.Debug|x86.ActiveCfg = Debug|Win32
-		{9AC3FDEA-4AE7-425A-BE10-C8E26F7FD333}.Debug|x86.Build.0 = Debug|Win32
-		{9AC3FDEA-4AE7-425A-BE10-C8E26F7FD333}.Release|x64.ActiveCfg = Release|x64
-		{9AC3FDEA-4AE7-425A-BE10-C8E26F7FD333}.Release|x64.Build.0 = Release|x64
-		{9AC3FDEA-4AE7-425A-BE10-C8E26F7FD333}.Release|x86.ActiveCfg = Release|Win32
-		{9AC3FDEA-4AE7-425A-BE10-C8E26F7FD333}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

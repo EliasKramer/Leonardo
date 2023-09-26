@@ -1,10 +1,8 @@
 #pragma once
-#include "../TmpEngine/position_surge.h"
-#include "../TmpEngine/tables_surge.h"
-#include "../TmpEngine/types_surge.h"
+#include "chess.hpp"
 
 class chess_player
 {
 public:
-	virtual Move get_move(Position& pos) = 0;
+	virtual chess::Move get_move(chess::Board& pos) = 0;
 };

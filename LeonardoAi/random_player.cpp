@@ -1,15 +1,11 @@
 #include "random_player.hpp"
 
-Move random_player::get_move(Position& pos)
+chess::Move random_player::get_move(chess::Board& pos)
 {
-	if (pos.turn() == WHITE)
-	{
-		MoveList<WHITE> moves(pos);
-		return *moves.begin();// *(moves.begin() + rand() % moves.size());
-	}
-	else {
+	chess::Movelist moves;
+	chess::movegen::legalmoves(moves, pos);
 
-		MoveList<BLACK> moves(pos);
-		return *moves.begin();// *(moves.begin() + rand() % moves.size());
-	}
+	int random_idx = rand() % moves.size();
+
+	return moves[random_idx];
 }

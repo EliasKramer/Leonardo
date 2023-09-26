@@ -4,6 +4,6 @@
 class random_player : public chess_player
 {
 public:
-	Move get_move(Position& pos) override;
+	chess::Move get_move(chess::Board& pos) override;
 };
 
