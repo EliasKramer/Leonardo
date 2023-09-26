@@ -40,6 +40,9 @@ int main(int argc, char* argv[])
 #include "stockfish_interface.hpp"
 #include "chess_game.hpp"
 #include "random_player.hpp"
+#include "minimax_player.hpp"
+#include "abp_player.hpp"
+#include "human_player.hpp"
 #include "chess.hpp"
 
 uint64_t perft(chess::Board& board, int depth) {
@@ -66,14 +69,14 @@ int main()
 {
 	stockfish_interface::init();
 
-	stockfish_interface::eval("r1bqkb1r/pp3ppp/1n2p3/3pP3/7P/3B4/PP1NNPP1/R1BQK2R b KQkq - 0 10", 4);
+	//stockfish_interface::eval("r1bqkb1r/pp3ppp/1n2p3/3pP3/7P/3B4/PP1NNPP1/R1BQK2R b KQkq - 0 10", 4);
 
-	random_player* player1 = new random_player;
-	random_player* player2 = new random_player;
+	abp_player player1(4); //4
+	abp_player player2(6); //5
 
 	chess_game game(
-		player1,
-		player2
+		&player1,
+		&player2
 	);
 
 	game.play();

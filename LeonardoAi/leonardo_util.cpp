@@ -1,11 +1,16 @@
-/*
 #include "leonardo_util.hpp"
 #include <float.h>
 #include <algorithm>
 
 vector3 leonardo_util::get_input_format()
 {
-	return vector3(8, 8, NUMBER_OF_DIFFERENT_PIECE_TYPES * 2);
+	//pawn
+	//knight
+	//bishop
+	//rook
+	//queen
+	//king
+	return vector3(8, 8, 6);
 }
 
 vector3 leonardo_util::get_policy_output_format()
@@ -21,14 +26,16 @@ vector3 leonardo_util::get_value_nnet_output_format()
 	return vector3(1, 1, 1);
 }
 
-void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& m)
+void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix& m)
 {
 	smart_assert(m.host_data_is_updated());
 	smart_assert(matrix::equal_format(m.get_format(), leonardo_util::get_input_format()));
 
-	BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
+	//BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
 
-	bool flipped = board.getCurrentTurnColor() == Black;
+	bool flipped = board.sideToMove() == chess::Color::BLACK;
+
+	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
 
 	m.set_all(0);
 
@@ -36,27 +43,23 @@ void leonardo_util::set_matrix_from_chessboard(const ChessBoard& board, matrix& 
 	{
 		for (int x = 0; x < 8; x++)
 		{
-			Square square = (Square)vector3(x, y).get_index(vector3(8, 8, 1));
-
-			if (bitboardsOverlap(all_pieces, BB_SQUARE[square]))
+			int square = vector3(x, y).get_index(vector3(8, 8, 1));
+			chess::Piece curr_piece = board.at<chess::Piece>(chess::Square(square));
+			if (curr_piece != chess::Piece::NONE)
 			{
-				ChessPiece piece = board.getBoardRepresentation().getPieceAt(square);
+				chess::PieceType curr_type = board.at<chess::PieceType>(chess::Square(square));
 
-				vector3 coord(x, flipped ? y : 7 - y, piece.getType());
+				vector3 coord(x, flipped ? y : 7 - y, (int)curr_type);
 
-				if (piece.getColor() == board.getCurrentTurnColor())
-				{
-					coord.z += NUMBER_OF_DIFFERENT_PIECE_TYPES;
-				}
 				m.set_at_host(
 					coord,
-					1
+					(black_bb & (chess::Bitboard(1) << square)) != 0 ? -1 : 1
 				);
 			}
 		}
 	}
 }
-
+/*
 int leonardo_util::square_to_flat_idx(Square s, ChessColor color_to_move)
 {
 	const vector3 board_dimensions(8, 8, 1);

@@ -33,7 +33,9 @@
     <ClCompile Include="..\StockFish\tune.cpp" />
     <ClCompile Include="..\StockFish\uci.cpp" />
     <ClCompile Include="..\StockFish\ucioption.cpp" />
+    <ClCompile Include="abp_player.cpp" />
     <ClCompile Include="chess_game.cpp" />
+    <ClCompile Include="human_player.cpp" />
     <ClCompile Include="leonardo_policy_bot.cpp" />
     <ClCompile Include="leonardo_overlord.cpp" />
     <ClCompile Include="leonardo_util.cpp" />
@@ -42,6 +44,7 @@
     <ClCompile Include="leonardo_value_bot_2.cpp" />
     <ClCompile Include="leonardo_value_bot_3.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="minimax_player.cpp" />
     <ClCompile Include="NeuroFox\convolutional_layer.cpp" />
     <ClCompile Include="NeuroFox\data_space.cpp" />
     <ClCompile Include="NeuroFox\fully_connected_layer.cpp" />
@@ -90,9 +93,11 @@
     <ClInclude Include="..\StockFish\tune.h" />
     <ClInclude Include="..\StockFish\types.h" />
     <ClInclude Include="..\StockFish\uci.h" />
+    <ClInclude Include="abp_player.hpp" />
     <ClInclude Include="chess.hpp" />
     <ClInclude Include="chess_game.hpp" />
     <ClInclude Include="chess_player.hpp" />
+    <ClInclude Include="human_player.hpp" />
     <ClInclude Include="leonardo_policy_bot.hpp" />
     <ClInclude Include="leonardo_overlord.hpp" />
     <ClInclude Include="leonardo_util.hpp" />
@@ -100,6 +105,7 @@
     <ClInclude Include="leonardo_value_bot_1.hpp" />
     <ClInclude Include="leonardo_value_bot_2.hpp" />
     <ClInclude Include="leonardo_value_bot_3.hpp" />
+    <ClInclude Include="minimax_player.hpp" />
     <ClInclude Include="NeuroFox\assert_throw.hpp" />
     <ClInclude Include="NeuroFox\convolutional_layer.hpp" />
     <ClInclude Include="NeuroFox\data_space.hpp" />

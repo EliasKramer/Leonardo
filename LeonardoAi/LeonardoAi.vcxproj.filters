@@ -34,6 +34,12 @@
     <Filter Include="engine">
       <UniqueIdentifier>{aa19eaa6-6dee-4584-82fe-6e4f533d44da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="header\chess_util\player">
+      <UniqueIdentifier>{75eb45de-cb1d-4437-a2e2-e8fac0fcff19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\chess_util\player">
+      <UniqueIdentifier>{ffcc816e-44c6-4c1c-9d8d-60bbbf78df9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NeuroFox\convolutional_layer.cpp">
@@ -165,11 +171,20 @@
     <ClCompile Include="chess_game.cpp">
       <Filter>source\chess_util</Filter>
     </ClCompile>
-    <ClCompile Include="random_player.cpp">
-      <Filter>source\chess_util</Filter>
-    </ClCompile>
     <ClCompile Include="NeuroFox\softmax_layer.cpp">
       <Filter>source\nnet</Filter>
+    </ClCompile>
+    <ClCompile Include="random_player.cpp">
+      <Filter>source\chess_util\player</Filter>
+    </ClCompile>
+    <ClCompile Include="minimax_player.cpp">
+      <Filter>source\chess_util\player</Filter>
+    </ClCompile>
+    <ClCompile Include="human_player.cpp">
+      <Filter>source\chess_util\player</Filter>
+    </ClCompile>
+    <ClCompile Include="abp_player.cpp">
+      <Filter>source\chess_util\player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -341,14 +356,23 @@
     <ClInclude Include="chess_player.hpp">
       <Filter>header\chess_util</Filter>
     </ClInclude>
-    <ClInclude Include="random_player.hpp">
-      <Filter>header\chess_util</Filter>
-    </ClInclude>
     <ClInclude Include="NeuroFox\softmax_layer.hpp">
       <Filter>header\nnet</Filter>
     </ClInclude>
     <ClInclude Include="chess.hpp">
       <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="random_player.hpp">
+      <Filter>header\chess_util\player</Filter>
+    </ClInclude>
+    <ClInclude Include="minimax_player.hpp">
+      <Filter>header\chess_util\player</Filter>
+    </ClInclude>
+    <ClInclude Include="human_player.hpp">
+      <Filter>header\chess_util\player</Filter>
+    </ClInclude>
+    <ClInclude Include="abp_player.hpp">
+      <Filter>header\chess_util\player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
