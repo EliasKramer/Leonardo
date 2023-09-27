@@ -59,6 +59,30 @@ void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix
 		}
 	}
 }
+
+std::vector<std::string> leonardo_util::split_string(const std::string& input, char separator)
+{
+	std::vector<std::string> result;
+	std::string current;
+
+	for (char c : input) {
+		if (c == separator) {
+			if (!current.empty()) {
+				result.push_back(current);
+				current.clear();
+			}
+		}
+		else {
+			current += c;
+		}
+	}
+
+	if (!current.empty()) {
+		result.push_back(current);
+	}
+
+	return result;
+}
 /*
 int leonardo_util::square_to_flat_idx(Square s, ChessColor color_to_move)
 {

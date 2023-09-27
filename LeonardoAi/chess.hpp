@@ -30,7 +30,8 @@ VERSION: 0.2.0
 
 #ifndef CHESS_HPP
 #define CHESS_HPP
-
+#include <string>
+const std::string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 #include <algorithm>
 #include <array>
 #include <bitset>

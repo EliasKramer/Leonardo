@@ -3,8 +3,6 @@
 #include <iostream>
 #include <thread>
 
-const std::string STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
 chess_game::chess_game(chess_player* white_player, chess_player* black_player)
 	: white_player(white_player), black_player(black_player)
 {
@@ -20,7 +18,7 @@ const std::string OUTCOME_STR[6] = {
 };
 void chess_game::play()
 {
-	chess::Board board = chess::Board(STARTING_FEN);
+	chess::Board board = chess::Board(DEFAULT_FEN);
 	bool white_to_move = true;
 
 	std::string moves_str = "";
@@ -30,12 +28,30 @@ void chess_game::play()
 		std::cout << board << std::endl;
 
 		auto start = std::chrono::high_resolution_clock::now();
-		chess::Move move = 
-			white_to_move ? white_player->get_move(board) : black_player->get_move(board);
-
-
+		chess::Move move = white_to_move ? 
+			white_player->get_move(board) : 
+			black_player->get_move(board);
 		auto end = std::chrono::high_resolution_clock::now();
-		long ms_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+		chess::Movelist moves;
+		chess::movegen::legalmoves(moves, board);
+
+		bool move_found = false;
+		for (chess::Move curr : moves)
+		{
+			if (curr == move)
+			{
+				move_found = true;
+				break;
+			}
+		}
+		if (!move_found)
+		{
+			std::cout << "illegal move " << chess::uci::moveToUci(move) << std::endl;
+			break;
+		}
+
+		long long ms_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 		std::cout << chess::uci::moveToUci(move) << " took " << ms_elapsed << "ms" << std::endl;
 
 		moves_str += chess::uci::moveToUci(move) + "\n";

@@ -14,6 +14,9 @@ namespace leonardo_util
 		vector3 get_value_nnet_output_format();
 
 		void set_matrix_from_chessboard(const chess::Board& board, matrix& input);
+
+		std::vector<std::string> split_string(const std::string& input, char separator);
+
 		/*
 		
 		int square_to_flat_idx(Square s, ChessColor color_to_move);

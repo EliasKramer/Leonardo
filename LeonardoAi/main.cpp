@@ -72,7 +72,7 @@ int main()
 	//stockfish_interface::eval("r1bqkb1r/pp3ppp/1n2p3/3pP3/7P/3B4/PP1NNPP1/R1BQK2R b KQkq - 0 10", 4);
 
 	abp_player player1(4); //4
-	abp_player player2(6); //5
+	abp_player player2(5); //5
 
 	chess_game game(
 		&player1,
