@@ -1,30 +1,36 @@
 #pragma once
-#include "leonardo_value_bot.hpp"
 
-class leonardo_value_bot_1 : public leonardo_value_bot
+#include "chess_player.hpp"
+#include "NeuroFox/neural_network.hpp"
+
+class leonardo_value_bot_1 : public chess_player
 {
 private:
-	bool search_cancelled = false;
-	std::chrono::steady_clock::time_point start_time;
+	int end_depth;
 
-	bool time_up();
+	std::vector<std::pair<size_t, chess::Move>> openings;
+
+	neural_network value_nnet;
+	matrix input_matrix;
+
+	void load_openings();
+
+	float eval(chess::Board& board, int depth);
 
 	float recursive_eval(
 		int depth,
-		const ChessBoard& board,
-		bool is_maximizing
-	);
+		int depth_addition,
+		chess::Board& board,
+		float alpha,
+		float beta);
 
-	int get_best_move(
-		const ChessBoard& board,
-		const UniqueMoveList& legal_moves,
-		int depth,
-		bool is_maximizing
-	);
+	int get_opening_move(size_t hash);
 
+	void sort_move_list(chess::Movelist& moves, chess::Board& board);
 public:
-	leonardo_value_bot_1(int ms_per_move);
+	leonardo_value_bot_1();
+	leonardo_value_bot_1(int end_depth);
 
-	//get move is without alpha beta pruning
-	int getMove(const ChessBoard& board, const UniqueMoveList& legal_moves) override;
+	chess::Move get_move(chess::Board& board) override;
 };
+

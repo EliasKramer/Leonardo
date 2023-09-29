@@ -17,6 +17,7 @@ namespace leonardo_util
 
 		std::vector<std::string> split_string(const std::string& input, char separator);
 
+		float get_value_nnet_output(matrix& output);
 		/*
 		
 		int square_to_flat_idx(Square s, ChessColor color_to_move);
@@ -30,7 +31,6 @@ namespace leonardo_util
 
 		void set_value_nnet_output(matrix& output, const ChessBoard& game, ChessColor color);
 
-		float get_value_nnet_output(matrix& output);
 
 		matrix& matrix_map_get(
 			std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,

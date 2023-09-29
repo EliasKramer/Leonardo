@@ -25,6 +25,7 @@ void chess_game::play()
 
 	while (board.isGameOver().first == chess::GameResultReason::NONE)
 	{
+		std::cout << (board.sideToMove() == chess::Color::WHITE ? "white" : "black") << " to move\n";
 		std::cout << board << std::endl;
 
 		auto start = std::chrono::high_resolution_clock::now();
@@ -36,6 +37,11 @@ void chess_game::play()
 		chess::Movelist moves;
 		chess::movegen::legalmoves(moves, board);
 
+		if (move == chess::Move::NULL_MOVE || move == chess::Move::NO_MOVE)
+		{
+			std::cout << "no move\n";
+			break;
+		}
 		bool move_found = false;
 		for (chess::Move curr : moves)
 		{
@@ -59,6 +65,7 @@ void chess_game::play()
 		board.makeMove(move);
 
 		white_to_move = !white_to_move;
+		std::cout << "------------------------\n";
 	}
 
 	std::cout << "game over" << std::endl;

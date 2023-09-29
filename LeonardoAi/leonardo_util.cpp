@@ -60,6 +60,24 @@ void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix
 	}
 }
 
+float leonardo_util::get_value_nnet_output(matrix& output)
+{
+	if (!output.host_data_is_updated())
+	{
+		int x = 0;
+	}
+	smart_assert(output.host_data_is_updated());
+	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output_format()));
+
+	//not necessary?
+	//output.sync_device_and_host();
+
+	//float own_score = output.get_at_flat_host(0);
+	//float enemy_score = output.get_at_flat_host(1);
+
+	return output.get_at_flat_host(0);// own_score - enemy_score;
+}
+
 std::vector<std::string> leonardo_util::split_string(const std::string& input, char separator)
 {
 	std::vector<std::string> result;
@@ -265,23 +283,6 @@ void leonardo_util::set_value_nnet_output(matrix& output, const ChessBoard& game
 	output.sync_device_and_host();
 }
 
-float leonardo_util::get_value_nnet_output(matrix& output)
-{
-	if (!output.host_data_is_updated())
-	{
-		int x = 0;
-	}
-	smart_assert(output.host_data_is_updated());
-	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output_format()));
-
-	//not necessary?
-	//output.sync_device_and_host();
-
-	//float own_score = output.get_at_flat_host(0);
-	//float enemy_score = output.get_at_flat_host(1);
-
-	return output.get_at_flat_host(0);// own_score - enemy_score;
-}
 
 matrix& leonardo_util::matrix_map_get(
 	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
