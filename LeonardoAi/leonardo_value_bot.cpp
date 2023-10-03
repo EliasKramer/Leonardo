@@ -127,13 +127,13 @@ float leonardo_value_bot::eval(chess::Board& board, int depth)
 		switch (res.second)
 		{
 		case chess::GameResult::WIN:
-			val = 100000 + depth;
+			val = 100000 - depth;
 			break;
 		case chess::GameResult::LOSE:
-			val = -100000 - depth;
+			val = -100000 + depth;
 			break;
 		case chess::GameResult::DRAW:
-			val = -1000.0f - depth;
+			val = -1000.0f + depth;
 			break;
 		}
 		if (board.sideToMove() == chess::Color::BLACK)
@@ -166,34 +166,39 @@ float leonardo_value_bot::eval(chess::Board& board, int depth)
 		}
 	}
 
-	float regular_score = score / 100;
+	score /= 100;
 
-	leonardo_util::set_matrix_from_chessboard(board, input_matrix);
-	value_nnet.forward_propagation(input_matrix);
-	float nn_score = leonardo_util::get_value_nnet_output(value_nnet.get_output());
+	float nnet_eval = 0;
 
-	if (board.sideToMove() == chess::Color::BLACK)
+	if (std::abs(score) < 1.0f)
 	{
-		nn_score *= -1;
+		nnet_eval = leonardo_util::get_value_nnet_eval(value_nnet, input_matrix, board, false);
+		if (board.sideToMove() == chess::Color::BLACK)
+			nnet_eval = -nnet_eval;
 	}
 
-	return regular_score + (nn_score * 0.1f);
+	return score + (nnet_eval * .05f);
 }
 
-float leonardo_value_bot::eval(chess::Board& board)
+static bool should_sort(int curr_depth)
 {
-	return eval(board, 0);
+	return curr_depth == 1;
 }
 
 float leonardo_value_bot::recursive_eval(
 	int depth,
+	int depth_addition,
 	chess::Board& board,
-	bool maximizing,
 	float alpha,
 	float beta)
 {
-	if (depth == 0)
-		return eval(board);
+	if (depth >= (end_depth + depth_addition))
+		return eval(board, depth);
+
+	if (depth >= end_depth)
+		depth_addition -= 1;
+
+	bool maximizing = board.sideToMove() == chess::Color::WHITE;
 	float best_score = maximizing ? -FLT_MAX : FLT_MAX;
 	chess::Movelist moves;
 	chess::movegen::legalmoves(moves, board);
@@ -203,10 +208,13 @@ float leonardo_value_bot::recursive_eval(
 		return eval(board, depth);
 	}
 
+	int i = 0;
 	for (chess::Move move : moves)
 	{
 		board.makeMove(move);
-		float score = recursive_eval(depth - 1, board, !maximizing, alpha, beta);
+		int depth_bonus = 0;
+
+		float score = recursive_eval(depth + 1, depth_addition + depth_bonus, board, alpha, beta);
 		board.unmakeMove(move);
 		if (maximizing)
 		{
@@ -220,6 +228,7 @@ float leonardo_value_bot::recursive_eval(
 		}
 		if (beta <= alpha)
 			break;
+		i++;
 	}
 
 	return best_score;
@@ -248,7 +257,7 @@ void leonardo_value_bot::load_openings()
 			chess::movegen::legalmoves(moves, board);
 
 			bool move_found = false;
-			for (chess::Move curr : moves)
+			for (chess::Move& curr : moves)
 			{
 				if (chess::uci::moveToUci(curr) == move_str)
 				{
@@ -292,13 +301,28 @@ leonardo_value_bot::leonardo_value_bot()
 	: leonardo_value_bot(5)
 {}
 
-leonardo_value_bot::leonardo_value_bot(int start_depth)
-	: start_depth(start_depth)
+leonardo_value_bot::leonardo_value_bot(int end_depth)
+	: end_depth(end_depth)
 {
 	load_openings();
 	value_nnet = neural_network("value.parameters");
 	input_matrix = matrix(leonardo_util::get_input_format());
 }
+
+void leonardo_value_bot::sort_move_list(chess::Movelist& moves, chess::Board& board)
+{
+	for (chess::Move& move : moves)
+	{
+		board.makeMove(move);
+		float score = leonardo_util::get_value_nnet_eval(value_nnet, input_matrix, board, true);
+		//score *= -1; // because the value nnet is seeing it from the other side's perspective
+		move.setScore(score);
+		board.unmakeMove(move);
+	}
+
+	moves.sort();
+}
+
 
 chess::Move leonardo_value_bot::get_move(chess::Board& board)
 {
@@ -312,22 +336,61 @@ chess::Move leonardo_value_bot::get_move(chess::Board& board)
 	chess::Move best_move = chess::Move::NULL_MOVE;
 	bool black = board.sideToMove() == chess::Color::BLACK;
 	bool white = board.sideToMove() == chess::Color::WHITE;
-	float best_score = -1000000.0f;
+	float best_score = -FLT_MAX;
 	chess::Movelist moves;
 	chess::movegen::legalmoves(moves, board);
-	for (chess::Move move : moves)
+
+	auto sf_moves = stockfish_interface::get_best_moves(board.getFen(), 3);
+
+	sort_move_list(moves, board);
+
+	float alpha = -FLT_MAX;
+	float beta = FLT_MAX;
+	int i = 0;
+	for (chess::Move& move : moves)
 	{
+
+		bool maximizing = board.sideToMove() == chess::Color::WHITE;
 		board.makeMove(move);
-		float score = recursive_eval(start_depth - 1, board, board.sideToMove() == chess::Color::WHITE, -FLT_MAX, FLT_MAX);
-		if (board.sideToMove() == chess::Color::WHITE)
-			score *= -1;
+		float score = recursive_eval(
+			1,
+			0,
+			board,
+			alpha,
+			beta);
 		board.unmakeMove(move);
-		std::cout << chess::uci::moveToUci(move) << " " << score << "\n";
+		if (board.sideToMove() == chess::Color::BLACK)
+			score *= -1;
+
+		int sf_idx = 0;
+		stockfish_interface::sf_move sf_move = sf_moves[0];
+		for (int j = 0; j < sf_moves.size(); j++)
+		{
+			if (chess::uci::moveToUci(move) == sf_moves[j].move_str_uci)
+			{
+				sf_idx = j;
+				sf_move = sf_moves[j];
+				break;
+			}
+		}
+
+		//move.setScore(score);
+
+		std::cout
+			<< chess::uci::moveToUci(move) << " "
+			<< score * (maximizing ? 1 : -1) 
+			<< " preeval: " << move.score()
+			<< " sf: " << sf_move.value
+			<< " sf idx: " << sf_idx
+			<< "\n";
+		// this displays the relative eval
+
 		if (score > best_score)
 		{
 			best_score = score;
 			best_move = move;
 		}
+		i++;
 	}
 
 	return best_move;

@@ -1474,6 +1474,7 @@ class Board {
     /// over. If you are writing you should not use this function.
     /// @return
     [[nodiscard]] std::pair<GameResultReason, GameResult> isGameOver() const;
+    [[nodiscard]] std::pair<GameResultReason, GameResult> isGameOver(Movelist& movelist) const;
 
     /// @brief Checks if a square is attacked by the given color.
     /// @param square
@@ -1823,6 +1824,32 @@ inline bool Board::isInsufficientMaterial() const {
     }
 
     return false;
+}
+
+inline std::pair<GameResultReason, GameResult> Board::isGameOver(Movelist& movelist) const {
+    if (isHalfMoveDraw()) {
+        const Board& board = *this;
+
+        if (movelist.empty() && inCheck()) {
+            return { GameResultReason::CHECKMATE, GameResult::LOSE };
+        }
+
+        return { GameResultReason::FIFTY_MOVE_RULE, GameResult::DRAW };
+    }
+
+    if (isInsufficientMaterial())
+        return { GameResultReason::INSUFFICIENT_MATERIAL, GameResult::DRAW };
+
+    if (isRepetition()) return { GameResultReason::THREEFOLD_REPETITION, GameResult::DRAW };
+
+    const Board& board = *this;
+
+    if (movelist.empty()) {
+        if (inCheck()) return { GameResultReason::CHECKMATE, GameResult::LOSE };
+        return { GameResultReason::STALEMATE, GameResult::DRAW };
+    }
+
+    return { GameResultReason::NONE, GameResult::NONE };
 }
 
 inline std::pair<GameResultReason, GameResult> Board::isGameOver() const {

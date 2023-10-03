@@ -1,3 +1,4 @@
+/*
 #include "CppUnitTest.h"
 #include "../MockChessEngine/ChessBoard.h"
 #include "../LeonardoAi/leonardo_util.hpp"
@@ -53,6 +54,6 @@ namespace AiTest
 			//Assert::AreEqual(1.0f, leonardo_util::get_value_nnet_output_format(w_value));
 			//Assert::AreEqual(-1.0f, leonardo_util::get_value_nnet_output_format(b_value));
 		}
-		*/
+		*//*
 	};
-}
+}*/

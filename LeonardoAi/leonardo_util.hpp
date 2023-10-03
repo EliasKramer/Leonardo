@@ -2,6 +2,7 @@
 #include "chess.hpp"
 #include "NeuroFox/vector3.hpp"
 #include "NeuroFox/matrix.hpp"
+#include "NeuroFox/neural_network.hpp"
 #include <unordered_map>
 #include <vector>
 #include <memory>
@@ -13,11 +14,19 @@ namespace leonardo_util
 		vector3 get_policy_output_format();
 		vector3 get_value_nnet_output_format();
 
+		void set_matrix_from_chessboard(const chess::Board& board, matrix& input, chess::Color col);
 		void set_matrix_from_chessboard(const chess::Board& board, matrix& input);
 
 		std::vector<std::string> split_string(const std::string& input, char separator);
 
 		float get_value_nnet_output(matrix& output);
+
+		float get_value_nnet_eval(
+			neural_network& value_nnet, 
+			matrix& input, 
+			chess::Board& board,
+			bool double_eval
+		);
 		/*
 		
 		int square_to_flat_idx(Square s, ChessColor color_to_move);

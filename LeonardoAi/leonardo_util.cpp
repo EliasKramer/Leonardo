@@ -26,16 +26,16 @@ vector3 leonardo_util::get_value_nnet_output_format()
 	return vector3(1, 1, 1);
 }
 
-void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix& m)
+void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix& m, chess::Color col)
 {
 	smart_assert(m.host_data_is_updated());
 	smart_assert(matrix::equal_format(m.get_format(), leonardo_util::get_input_format()));
 
 	//BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
 
-	bool flipped = board.sideToMove() == chess::Color::BLACK;
+	bool flipped = col == chess::Color::BLACK;
 
-	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
+	chess::Bitboard our_pieces = board.us(col);
 
 	m.set_all(0);
 
@@ -53,11 +53,17 @@ void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix
 
 				m.set_at_host(
 					coord,
-					(black_bb & (chess::Bitboard(1) << square)) != 0 ? -1 : 1
+					//curr pos overlaps with curr pieces
+					(our_pieces & (chess::Bitboard(1) << square)) != 0 ? 1 : -1
 				);
 			}
 		}
 	}
+}
+
+void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix& m)
+{
+	set_matrix_from_chessboard(board, m, board.sideToMove());
 }
 
 float leonardo_util::get_value_nnet_output(matrix& output)
@@ -76,6 +82,32 @@ float leonardo_util::get_value_nnet_output(matrix& output)
 	//float enemy_score = output.get_at_flat_host(1);
 
 	return output.get_at_flat_host(0);// own_score - enemy_score;
+}
+
+float leonardo_util::get_value_nnet_eval(
+	neural_network& value_nnet,
+	matrix& input,
+	chess::Board& board,
+	bool double_eval)
+{
+	smart_assert(vector3::are_equal(input.get_format(), get_input_format()));
+
+	set_matrix_from_chessboard(board, input, board.sideToMove());
+	value_nnet.forward_propagation(input);
+	matrix& output = value_nnet.get_output();
+	float our_value = get_value_nnet_output(output);
+
+	float their_value = 0;
+
+	if (double_eval)
+	{
+		set_matrix_from_chessboard(board, input, ~board.sideToMove());
+		value_nnet.forward_propagation(input);
+		output = value_nnet.get_output();
+		their_value = get_value_nnet_output(output);
+	}
+
+	return our_value - their_value;
 }
 
 std::vector<std::string> leonardo_util::split_string(const std::string& input, char separator)

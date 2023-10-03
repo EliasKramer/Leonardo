@@ -1,6 +1,6 @@
 #include "leonardo_value_bot_1.hpp"
 #include "leonardo_util.hpp"
-
+#include "stockfish_interface.hpp"
 //PAWN, KNIGHT, BISHOP, ROOK, QUEEN
 const float PIECE_EVAL[5] = { 100.0f, 320.0f, 330.0f, 500.0f, 900.0f };
 
@@ -118,9 +118,17 @@ const float POSITION_VALUE[2][5][64]
 
 float leonardo_value_bot_1::eval(chess::Board& board, int depth)
 {
+	return eval(board, depth, nullptr);
+}
+
+float leonardo_value_bot_1::eval(chess::Board& board, int depth, chess::Movelist* move_list)
+{
 	float score = 0.0f;
 
-	std::pair<chess::GameResultReason, chess::GameResult> res = board.isGameOver();
+	std::pair<chess::GameResultReason, chess::GameResult> res =
+		move_list == nullptr ?
+		board.isGameOver() :
+		board.isGameOver(*move_list);
 	if (res.first != chess::GameResultReason::NONE)
 	{
 		float val = 0.0f;
@@ -169,23 +177,24 @@ float leonardo_value_bot_1::eval(chess::Board& board, int depth)
 	return score;
 }
 
-static bool should_sort(int curr_depth)
-{
-	return curr_depth == 1 || curr_depth == 2;
-}
-
 float leonardo_value_bot_1::recursive_eval(
 	int depth,
 	int depth_addition,
+	int max_depth_addition,
+	int end_depth,
 	chess::Board& board,
 	float alpha,
-	float beta)
+	float beta,
+	int& depth_reached,
+	bool should_sort
+)
 {
-	if (depth >= (end_depth + depth_addition))
-		return eval(board, depth);
+	depth_reached = std::max(depth_reached, depth + depth_addition);
 
-	if (depth >= end_depth)
-		depth_addition -= 1;
+	if ((depth + depth_addition) >= (end_depth + max_depth_addition))
+	{
+		return eval(board, depth + depth_addition);
+	}
 
 	bool maximizing = board.sideToMove() == chess::Color::WHITE;
 	float best_score = maximizing ? -FLT_MAX : FLT_MAX;
@@ -194,13 +203,16 @@ float leonardo_value_bot_1::recursive_eval(
 
 	if (moves.size() == 0 || board.isRepetition())
 	{
-		return eval(board, depth);
+		return eval(board, depth + depth_addition, &moves);
 	}
 
-	bool moves_sorted = should_sort(depth);
+	bool moves_sorted = 
+		should_sort && 
+		max_depth_addition != 0 &&
+		depth + depth_addition < end_depth;
 	if (moves_sorted)
 	{
-		sort_move_list(moves, board);
+		sort_move_list(moves, board, false);
 	}
 
 	int i = 0;
@@ -209,7 +221,49 @@ float leonardo_value_bot_1::recursive_eval(
 		board.makeMove(move);
 		int depth_bonus = 0;
 
-		float score = recursive_eval(depth + 1, depth_addition + depth_bonus, board, alpha, beta);
+		int new_depth = 0;
+		int new_depth_addition = 0;
+
+		if (depth >= end_depth)
+		{
+			new_depth = depth + 1;
+			new_depth_addition = 0;
+		}
+		else
+		{
+			new_depth = 0;
+			new_depth_addition = depth_addition + 1;
+		}
+
+		int new_max_depth_addition = max_depth_addition;
+		if (moves_sorted)
+		{
+			if (i < 2)
+				depth_bonus = 0;
+			else if (i < 2)
+				depth_bonus = 0;
+			else if (i < 6)
+				depth_bonus = -1;
+			else if (i < 8)
+				depth_bonus = -2;
+			else
+				depth_bonus = -max_depth_addition;
+
+			new_max_depth_addition += depth_bonus;
+			if (new_max_depth_addition < 0)
+				new_max_depth_addition = 0;
+		}
+
+		float score = recursive_eval(
+			new_depth,
+			new_depth_addition,
+			new_max_depth_addition,
+			end_depth,
+			board,
+			alpha,
+			beta,
+			depth_reached,
+			should_sort);
 		board.unmakeMove(move);
 		if (maximizing)
 		{
@@ -292,6 +346,39 @@ int leonardo_value_bot_1::get_opening_move(size_t hash)
 
 	return indices[dis(gen)];
 }
+void leonardo_value_bot_1::pre_sort_move_list(
+	chess::Movelist& moves,
+	chess::Board& board)
+{
+	float alpha = -FLT_MAX;
+	float beta = FLT_MAX;
+
+	for (chess::Move& move : moves)
+	{
+		int depth_reached = 0;
+		bool maximizing = board.sideToMove() == chess::Color::WHITE;
+		board.makeMove(move);
+		float score = recursive_eval(
+			1,
+			0,
+			0,
+			3, //d
+			board,
+			alpha,
+			beta,
+			depth_reached,
+			false
+		);
+		board.unmakeMove(move);
+
+		if (board.sideToMove() == chess::Color::BLACK)
+			score *= -1;
+
+		move.setScore(score);
+	}
+
+	sort_move_list(moves, board, true);
+}
 leonardo_value_bot_1::leonardo_value_bot_1()
 	: leonardo_value_bot_1(5)
 {}
@@ -304,32 +391,50 @@ leonardo_value_bot_1::leonardo_value_bot_1(int end_depth)
 	input_matrix = matrix(leonardo_util::get_input_format());
 }
 
-void leonardo_value_bot_1::sort_move_list(chess::Movelist& moves, chess::Board& board)
+void leonardo_value_bot_1::sort_move_list(chess::Movelist& moves, chess::Board& board, bool precise)
 {
-	for (chess::Move move : moves)
+	for (chess::Move& move : moves)
 	{
 		board.makeMove(move);
-		bool black = board.sideToMove() == chess::Color::BLACK;
-		leonardo_util::set_matrix_from_chessboard(board, input_matrix);
-		value_nnet.forward_propagation(input_matrix);
-		float score = -leonardo_util::get_value_nnet_output(value_nnet.get_output());
-		/*
-		float eval_score = eval(board, 1);
-		if (black)
-		{
-			eval_score *= -1;
-		}*/
 
-		move.setScore(score);
+		//white to move - black is good here so white is bad - high negative score
+		//black to move - white is good here so white is good - high positive score
+		float eval_score = eval(board, 0, &moves);
+		if(board.sideToMove() == chess::Color::BLACK)
+			eval_score = -eval_score;
+
+		float score = -leonardo_util::get_value_nnet_eval(value_nnet, input_matrix, board, precise);
+		//score += eval_score / 100 ;
+		move.setScore((move.score() / 100) + (eval_score / 100) + score);
 		board.unmakeMove(move);
 	}
 
 	moves.sort();
 }
 
+static int get_depth_bonus(int move_idx, int move_count)
+{
+	static const std::vector<int> bonus = {
+		3,3,3,2,2,2,2,2,2
+	};
+
+	if (move_idx < 0 || move_idx >= move_count)
+		return 0;
+
+	//move count is 30
+	//move_idx is 0-29
+	//move_idx / move_count is 0-1
+	//move_idx / move_count * 3 is 0-3
+	int chosen_idx = ((float)(move_idx) / (float)move_count) * (float)bonus.size();
+	chosen_idx = std::clamp(chosen_idx, 0, (int)bonus.size() - 1);
+
+	return bonus[chosen_idx];
+}
 
 chess::Move leonardo_value_bot_1::get_move(chess::Board& board)
 {
+	std::vector<stockfish_interface::sf_move> sf_moves = stockfish_interface::get_best_moves(board.getFen(), 4);
+
 	int opening_move_idx = get_opening_move(board.hash());
 	if (opening_move_idx != -1)
 	{
@@ -341,42 +446,76 @@ chess::Move leonardo_value_bot_1::get_move(chess::Board& board)
 	bool black = board.sideToMove() == chess::Color::BLACK;
 	bool white = board.sideToMove() == chess::Color::WHITE;
 	float best_score = -FLT_MAX;
+	int best_move_sf_rank = -1;
 	chess::Movelist moves;
 	chess::movegen::legalmoves(moves, board);
 
-	sort_move_list(moves, board);
+	pre_sort_move_list(moves, board);
 
 	float alpha = -FLT_MAX;
 	float beta = FLT_MAX;
 	int i = 0;
 	for (chess::Move& move : moves)
 	{
-		int depth_bonus = 0;
-		if (i == 0 || i == 1)
-		{
-			depth_bonus = 2;
-		}
+		int depth_bonus = get_depth_bonus(i, moves.size());
+		int depth_reached = 0;
 		bool maximizing = board.sideToMove() == chess::Color::WHITE;
 		board.makeMove(move);
 		float score = recursive_eval(
 			1,
+			0,
 			depth_bonus,
+			end_depth,
 			board,
 			alpha,
-			beta);
+			beta,
+			depth_reached,
+			true
+		);
 		board.unmakeMove(move);
+
+
+		int sf_idx = 0;
+		stockfish_interface::sf_move sf_move = sf_moves[0];
+		for (int j = 0; j < sf_moves.size(); j++)
+		{
+			if (chess::uci::moveToUci(move) == sf_moves[j].move_str_uci)
+			{
+				sf_idx = j;
+				sf_move = sf_moves[j];
+				break;
+			}
+		}
+
 		if (board.sideToMove() == chess::Color::BLACK)
 			score *= -1;
-		std::cout << chess::uci::moveToUci(move) << " "
-			<< score * (maximizing ? 1 : -1) << "\n"; // this displays the relative eval
+		std::cout
+			<< chess::uci::moveToUci(move) << " "
+			<< score * (maximizing ? 1 : -1)
+			<< " preeval:" << move.score()
+			<< " depth bonus: " << depth_bonus
+			<< " depth reached: " << depth_reached
+			<< " sf eval: " << sf_move.value
+			<< " sf idx: " << sf_idx
+			<< "\n";
+		// this displays the relative eval
 
 		if (score > best_score)
 		{
 			best_score = score;
 			best_move = move;
+			best_move_sf_rank = sf_idx;
 		}
 		i++;
 	}
+	auto stop = std::chrono::high_resolution_clock::now();
 
+	float sf_score_for_move = sf_moves[best_move_sf_rank].value;
+	float best_possible_sf_move_score = sf_moves[0].value;
+	std::cout << "leonardos choice: " << chess::uci::moveToUci(best_move) << "\n";
+	std::cout << "leonardos choice in sf's rank: " << best_move_sf_rank << "\n";
+	std::cout << "best possible move score: " << best_possible_sf_move_score << "\n";
+	std::cout << "sf score for move: " << sf_score_for_move << "\n";
+	std::cout << "best move score (according to leonardo): " << best_score << "\n";
 	return best_move;
 }

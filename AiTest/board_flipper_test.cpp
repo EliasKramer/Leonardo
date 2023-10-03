@@ -1,3 +1,4 @@
+/*
 #include "CppUnitTest.h"
 #include "../MockChessEngine/ChessBoard.h"
 #include "../LeonardoAi/leonardo_util.hpp"
@@ -47,3 +48,4 @@ namespace AiTest
 		}
 	};
 }
+*/

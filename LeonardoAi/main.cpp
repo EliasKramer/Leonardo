@@ -8,6 +8,7 @@
 #include "chess.hpp"
 #include "leonardo_value_bot.hpp"
 #include "leonardo_value_bot_1.hpp"
+#include "leonardo_overlord.hpp"
 
 uint64_t perft(chess::Board& board, int depth) {
 	chess::Movelist moves;
@@ -31,9 +32,7 @@ uint64_t perft(chess::Board& board, int depth) {
 
 int main()
 {
-	//stockfish_interface::init();
-
-	//stockfish_interface::eval("r1bqkb1r/pp3ppp/1n2p3/3pP3/7P/3B4/PP1NNPP1/R1BQK2R b KQkq - 0 10", 4);
+	stockfish_interface::init();
 
 	leonardo_value_bot_1 player1(4); //4
 	abp_player player2(5); //5
