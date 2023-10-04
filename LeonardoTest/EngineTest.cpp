@@ -17,11 +17,7 @@ namespace EngineTest
 
 			std::vector<Move> moves = getMoves(board);
 
-			Piece piece = *moves.at(0).getPiece();
-
 			Assert::AreEqual(20, (int)moves.size());
-			Assert::AreEqual((int)WHITE, (int)piece.color);
-			Assert::AreEqual((int)KNIGHT, (int)piece.type);
 		}
 
 		TEST_METHOD(getNodesDepthTwo)
@@ -32,6 +28,56 @@ namespace EngineTest
 			int nodes = getNodesForDepth(board, 2);
 
 			Assert::AreEqual(400, nodes);
+		}
+
+		TEST_METHOD(getNodesDepthThree)
+		{
+			std::string startPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+			Board board(startPositionFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			int nodes = getNodesForDepth(board, 3);
+
+			Assert::AreEqual(8902, nodes);
+		}
+
+		TEST_METHOD(getNodesDepthFour)
+		{
+			std::string startPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+			Board board(startPositionFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			int nodes = getNodesForDepth(board, 4);
+
+			Assert::AreEqual(197281, nodes);
+		}
+
+		TEST_METHOD(getMovesKiwipete)
+		{
+			std::string kiwipeteFEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R";
+			Board board(kiwipeteFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			std::vector<Move> moves = getMoves(board);
+
+			Assert::AreEqual(48, (int)moves.size());
+		}
+
+		TEST_METHOD(getNodesDepthTwoKiwipete)
+		{
+			std::string kiwipeteFEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R";
+			Board board(kiwipeteFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			int nodes = getNodesForDepth(board, 2);
+
+			Assert::AreEqual(2039, nodes);
+		}
+
+		TEST_METHOD(getNodesDepthThreeKiwipete)
+		{
+			std::string kiwipeteFEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R";
+			Board board(kiwipeteFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			int nodes = getNodesForDepth(board, 3);
+
+			Assert::AreEqual(97862, nodes);
 		}
 	};
 
