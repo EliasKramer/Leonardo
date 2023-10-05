@@ -1,6 +1,6 @@
 #include "leonardo_value_bot_1.hpp"
 #include "leonardo_util.hpp"
-#include "stockfish_interface.hpp"
+
 //PAWN, KNIGHT, BISHOP, ROOK, QUEEN
 const float PIECE_EVAL[5] = { 100.0f, 320.0f, 330.0f, 500.0f, 900.0f };
 
@@ -186,7 +186,9 @@ float leonardo_value_bot_1::recursive_eval(
 	float alpha,
 	float beta,
 	int& depth_reached,
-	bool should_sort
+	bool should_sort,
+	neural_network& value_nnet,
+	matrix& input_matrix
 )
 {
 	depth_reached = std::max(depth_reached, depth + depth_addition);
@@ -206,13 +208,13 @@ float leonardo_value_bot_1::recursive_eval(
 		return eval(board, depth + depth_addition, &moves);
 	}
 
-	bool moves_sorted = 
-		should_sort && 
+	bool moves_sorted =
+		should_sort &&
 		max_depth_addition != 0 &&
 		depth + depth_addition < end_depth;
 	if (moves_sorted)
 	{
-		sort_move_list(moves, board, false);
+		sort_move_list(moves, board, false, value_nnet, input_matrix);
 	}
 
 	int i = 0;
@@ -236,13 +238,12 @@ float leonardo_value_bot_1::recursive_eval(
 		}
 
 		int new_max_depth_addition = max_depth_addition;
+
 		if (moves_sorted)
 		{
-			if (i < 2)
+			if (i < 3)
 				depth_bonus = 0;
-			else if (i < 2)
-				depth_bonus = 0;
-			else if (i < 6)
+			else if (i < 7)
 				depth_bonus = -1;
 			else if (i < 8)
 				depth_bonus = -2;
@@ -263,7 +264,9 @@ float leonardo_value_bot_1::recursive_eval(
 			alpha,
 			beta,
 			depth_reached,
-			should_sort);
+			should_sort,
+			value_nnet,
+			input_matrix);
 		board.unmakeMove(move);
 		if (maximizing)
 		{
@@ -367,7 +370,9 @@ void leonardo_value_bot_1::pre_sort_move_list(
 			alpha,
 			beta,
 			depth_reached,
-			false
+			true,
+			base_value_nnet,
+			base_input_matrix
 		);
 		board.unmakeMove(move);
 
@@ -377,7 +382,7 @@ void leonardo_value_bot_1::pre_sort_move_list(
 		move.setScore(score);
 	}
 
-	sort_move_list(moves, board, true);
+	sort_move_list(moves, board, true, base_value_nnet, base_input_matrix);
 }
 leonardo_value_bot_1::leonardo_value_bot_1()
 	: leonardo_value_bot_1(5)
@@ -387,11 +392,17 @@ leonardo_value_bot_1::leonardo_value_bot_1(int end_depth)
 	: end_depth(end_depth)
 {
 	load_openings();
-	value_nnet = neural_network("value.parameters");
-	input_matrix = matrix(leonardo_util::get_input_format());
+	base_value_nnet = neural_network("value.parameters");
+	base_input_matrix = matrix(leonardo_util::get_input_format());
 }
 
-void leonardo_value_bot_1::sort_move_list(chess::Movelist& moves, chess::Board& board, bool precise)
+void leonardo_value_bot_1::sort_move_list(
+	chess::Movelist& moves,
+	chess::Board& board,
+	bool precise,
+	neural_network& value_nnet,
+	matrix& input_matrix
+)
 {
 	for (chess::Move& move : moves)
 	{
@@ -400,7 +411,7 @@ void leonardo_value_bot_1::sort_move_list(chess::Movelist& moves, chess::Board& 
 		//white to move - black is good here so white is bad - high negative score
 		//black to move - white is good here so white is good - high positive score
 		float eval_score = eval(board, 0, &moves);
-		if(board.sideToMove() == chess::Color::BLACK)
+		if (board.sideToMove() == chess::Color::BLACK)
 			eval_score = -eval_score;
 
 		float score = -leonardo_util::get_value_nnet_eval(value_nnet, input_matrix, board, precise);
@@ -412,10 +423,75 @@ void leonardo_value_bot_1::sort_move_list(chess::Movelist& moves, chess::Board& 
 	moves.sort();
 }
 
+void leonardo_value_bot_1::thread_task(
+	int t_idx,
+	chess::Movelist& moves,
+	std::mutex& print_mutex,
+	int idx_start_incl,
+	int idx_end_excl,
+	int depth_addition,
+	std::vector<float>& results,
+	chess::Board board,
+	std::vector<stockfish_interface::sf_move>& sf_moves)
+{
+	neural_network value_nnet = base_value_nnet;
+	matrix input_matrix = base_input_matrix;
+
+	for (int idx = idx_start_incl; idx < idx_end_excl; idx++)
+	{
+		board.makeMove(moves[idx]);
+
+		int depth_reached = 0;
+		float alpha = -FLT_MAX;
+		float beta = FLT_MAX;
+		float score = recursive_eval(
+			1,
+			0,
+			depth_addition,
+			end_depth,
+			board,
+			alpha,
+			beta,
+			depth_reached,
+			true,
+			value_nnet,
+			input_matrix
+		);
+		if (board.sideToMove() == chess::Color::WHITE)
+			score *= -1;
+		results[idx] = score;
+
+		int sf_idx = 0;
+		stockfish_interface::sf_move sf_move = sf_moves[0];
+		for (int j = 0; j < sf_moves.size(); j++)
+		{
+			if (chess::uci::moveToUci(moves[idx]) == sf_moves[j].move_str_uci)
+			{
+				sf_idx = j;
+				sf_move = sf_moves[j];
+				break;
+			}
+		}
+
+		std::lock_guard<std::mutex> lock(print_mutex);
+		std::cout
+			<< chess::uci::moveToUci(moves[idx]) << " "
+			<< std::setfill(' ') << std::setw(6) << score
+			<< "\t t_idx: " << t_idx
+			<< "\t preeval:" << std::setprecision(2) << moves[idx].score()
+			<< "\t depth bonus: " << depth_addition
+			<< " depth reached: " << depth_reached
+			<< " sf eval: " << std::setprecision(2) << sf_move.value
+			<< "\t sf idx: " << sf_idx
+			<< "\n";
+		board.unmakeMove(moves[idx]);
+	}
+}
+
 static int get_depth_bonus(int move_idx, int move_count)
 {
 	static const std::vector<int> bonus = {
-		3,3,3,2,2,2,2,2,2
+		3,2,2,2,1,1,1,1,0,0,0,0
 	};
 
 	if (move_idx < 0 || move_idx >= move_count)
@@ -454,61 +530,94 @@ chess::Move leonardo_value_bot_1::get_move(chess::Board& board)
 
 	float alpha = -FLT_MAX;
 	float beta = FLT_MAX;
-	int i = 0;
+
+	std::vector<float> scores;
+	std::vector<std::thread> threads;
+	std::mutex print_mutex;
+
+	int x = 0;
+	int last_idx_in_thread = 0;
+	int t_capacity = 2;
 	for (chess::Move& move : moves)
 	{
-		int depth_bonus = get_depth_bonus(i, moves.size());
-		int depth_reached = 0;
-		bool maximizing = board.sideToMove() == chess::Color::WHITE;
-		board.makeMove(move);
-		float score = recursive_eval(
-			1,
-			0,
-			depth_bonus,
-			end_depth,
-			board,
-			alpha,
-			beta,
-			depth_reached,
-			true
+		int depth_bonus = get_depth_bonus(x, moves.size());
+		scores.push_back(0);
+		if ((x - last_idx_in_thread + 1) % t_capacity == 0)
+		{
+			threads.push_back(
+				std::thread(
+					&leonardo_value_bot_1::thread_task,
+					this,
+					threads.size(),
+					std::ref(moves),
+					std::ref(print_mutex),
+					last_idx_in_thread,
+					x,
+					depth_bonus,
+					std::ref(scores),
+					board,
+					std::ref(sf_moves)
+				)
+			);
+			std::lock_guard<std::mutex> lock(print_mutex);
+			std::cout << "starting thread " << threads.size() << "\n";
+			std::cout << "from " << last_idx_in_thread << " to " << x << "\n";
+			t_capacity = t_capacity + 2;
+			last_idx_in_thread = x;
+		}
+		x++;
+	}
+
+	if (last_idx_in_thread != moves.size() - 1)
+	{
+		int depth_bonus = get_depth_bonus(x, moves.size());
+
+		threads.push_back(
+			std::thread(
+				&leonardo_value_bot_1::thread_task,
+				this,
+				threads.size(),
+				std::ref(moves),
+				std::ref(print_mutex),
+				last_idx_in_thread,
+				moves.size() - 1,
+				depth_bonus,
+				std::ref(scores),
+				board,
+				std::ref(sf_moves)
+			)
 		);
-		board.unmakeMove(move);
+	}
 
+	for (auto& thread : threads)
+	{
+		if (thread.joinable())
+		{
+			thread.join();
+		}
+	}
 
+	for (int i = 0; i < moves.size(); i++)
+	{
 		int sf_idx = 0;
 		stockfish_interface::sf_move sf_move = sf_moves[0];
 		for (int j = 0; j < sf_moves.size(); j++)
 		{
-			if (chess::uci::moveToUci(move) == sf_moves[j].move_str_uci)
+			if (chess::uci::moveToUci(moves[i]) == sf_moves[j].move_str_uci)
 			{
 				sf_idx = j;
 				sf_move = sf_moves[j];
 				break;
 			}
 		}
-
-		if (board.sideToMove() == chess::Color::BLACK)
-			score *= -1;
-		std::cout
-			<< chess::uci::moveToUci(move) << " "
-			<< score * (maximizing ? 1 : -1)
-			<< " preeval:" << move.score()
-			<< " depth bonus: " << depth_bonus
-			<< " depth reached: " << depth_reached
-			<< " sf eval: " << sf_move.value
-			<< " sf idx: " << sf_idx
-			<< "\n";
-		// this displays the relative eval
-
-		if (score > best_score)
+		if (scores[i] > best_score)
 		{
-			best_score = score;
-			best_move = move;
+			best_score = scores[i];
+			best_move = moves[i];
 			best_move_sf_rank = sf_idx;
 		}
 		i++;
 	}
-	auto stop = std::chrono::high_resolution_clock::now();
 
 	float sf_score_for_move = sf_moves[best_move_sf_rank].value;
 	float best_possible_sf_move_score = sf_moves[0].value;

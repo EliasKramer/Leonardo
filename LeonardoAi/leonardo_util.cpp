@@ -13,6 +13,11 @@ vector3 leonardo_util::get_input_format()
 	return vector3(8, 8, 6);
 }
 
+vector3 leonardo_util::get_input_format_one_hot()
+{
+	return vector3(8, 8, 12);
+}
+
 vector3 leonardo_util::get_policy_output_format()
 {
 	//z0 is the start field of the move
@@ -48,8 +53,8 @@ void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix
 			if (curr_piece != chess::Piece::NONE)
 			{
 				chess::PieceType curr_type = board.at<chess::PieceType>(chess::Square(square));
-
 				vector3 coord(x, flipped ? y : 7 - y, (int)curr_type);
+
 
 				m.set_at_host(
 					coord,
@@ -64,6 +69,52 @@ void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix
 void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix& m)
 {
 	set_matrix_from_chessboard(board, m, board.sideToMove());
+}
+
+void leonardo_util::set_matrix_from_chessboard_one_hot(const chess::Board& board, matrix& m, chess::Color col)
+{
+	smart_assert(m.host_data_is_updated());
+	smart_assert(matrix::equal_format(m.get_format(), leonardo_util::get_input_format_one_hot()));
+
+	//BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
+
+	bool flipped = col == chess::Color::BLACK;
+
+	chess::Bitboard our_pieces = board.us(col);
+
+	m.set_all(0);
+
+	for (int y = 0; y < 8; y++)
+	{
+		for (int x = 0; x < 8; x++)
+		{
+			int square = vector3(x, y).get_index(vector3(8, 8, 1));
+			chess::Piece curr_piece = board.at<chess::Piece>(chess::Square(square));
+			if (curr_piece != chess::Piece::NONE)
+			{
+				chess::PieceType curr_type = board.at<chess::PieceType>(chess::Square(square));
+
+				bool is_us = (our_pieces & (chess::Bitboard(1) << square)) != 0;
+
+				vector3 coord(
+					x, 
+					flipped ? y : 7 - y, 
+					is_us ? (int)curr_type : (int)curr_type + 6
+				);
+
+
+				m.set_at_host(
+					coord,
+					1
+				);
+			}
+		}
+	}
+}
+
+void leonardo_util::set_matrix_from_chessboard_one_hot(const chess::Board& board, matrix& input)
+{
+	set_matrix_from_chessboard_one_hot(board, input, board.sideToMove());
 }
 
 float leonardo_util::get_value_nnet_output(matrix& output)
@@ -108,6 +159,35 @@ float leonardo_util::get_value_nnet_eval(
 	}
 
 	return our_value - their_value;
+}
+
+
+vector3 leonardo_util::get_pawn_input_format()
+{
+	return vector3(8, 8, 1);
+}
+
+void leonardo_util::set_board_matrix(matrix& m, int z_idx, int val, chess::Bitboard bb, bool flip)
+{
+	smart_assert(m.host_data_is_updated());
+	smart_assert(m.get_format().x == 8);
+	smart_assert(m.get_format().y == 8);
+	
+	while (bb)
+	{
+		const unsigned int sq = chess::builtin::poplsb(bb);
+		const chess::Bitboard curr_bb = chess::Bitboard(1) << sq;
+		
+		const int x = sq % 8;
+		int y = sq / 8;
+
+		if (flip)
+		{
+			y = 7 - y;
+		}
+
+		m.set_at_host(vector3(x, y, z_idx), val);
+	}
 }
 
 std::vector<std::string> leonardo_util::split_string(const std::string& input, char separator)
