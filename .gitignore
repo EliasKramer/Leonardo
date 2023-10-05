@@ -3,6 +3,7 @@
 *.parameters
 *.nnue
 games.txt
+dataset.txt
 ### C++ ###
 # Prerequisites
 *.d

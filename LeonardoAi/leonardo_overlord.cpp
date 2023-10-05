@@ -413,7 +413,7 @@ leonardo_overlord::leonardo_overlord(
 	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
 	best_policy_nnet.xavier_initialization();
 
-	best_value_nnet = neural_network("value.parameters");
+	//best_value_nnet = neural_network("value.parameters");
 
 	new_policy_nnet = neural_network(best_policy_nnet);
 	new_value_nnet = neural_network(best_value_nnet);
@@ -426,7 +426,6 @@ leonardo_overlord::leonardo_overlord(
 		new_value_nnet.enable_gpu_mode();
 	}
 }
-/*
 static std::vector<std::string> read_file_lines(const std::string& filename) {
 	std::vector<std::string> lines;
 	std::ifstream file(filename);
@@ -445,19 +444,6 @@ static std::vector<std::string> read_file_lines(const std::string& filename) {
 	return lines;
 }
 
-static void write_file_lines(const std::string& filename, std::vector<std::string> lines)
-{
-	std::ofstream file(filename);
-	if (!file.is_open()) {
-		std::cerr << "Error: Could not open file '" << filename << "'" << std::endl;
-		return;
-	}
-	for (std::string line : lines) {
-		file << line << std::endl;
-	}
-	file.close();
-}
-*/
 static std::vector<std::string> split_string(const std::string& input, char separator) {
 	std::vector<std::string> result;
 	std::string current;
@@ -480,6 +466,150 @@ static std::vector<std::string> split_string(const std::string& input, char sepa
 
 	return result;
 }
+static void convert_dataset(
+	std::vector<std::string>& lines,
+	std::vector <std::vector<std::string>>& game_moves,
+	std::vector <std::vector<float>>& game_values)
+{
+	for (int i = 0; i < lines.size(); i += 2)
+	{
+		std::string line_m = lines[i];
+		std::string line_v = lines[i + 1];
+		auto m_vec = split_string(line_m, ';');
+		auto v_vec = split_string(line_v, ';');
+
+		if (m_vec.size() != 2)
+		{
+			std::cout << "error in dataset line " << i << " master moves size is not 2\n";
+			continue;
+		}
+		if (m_vec.size() != v_vec.size())
+		{
+			std::cout << "error in dataset line " << i << " sizes are not equal\n";
+			return;
+		}
+		if (m_vec[0] != v_vec[0])
+		{
+			std::cout << "error in dataset line " << i << " master moves are not equal\n";
+			continue;
+		}
+
+		auto moves = split_string(m_vec[1], ' ');
+		auto values_s = split_string(v_vec[1], ' ');
+
+		if (moves.size() != values_s.size())
+		{
+			std::cout << "error in dataset line " << i << " sizes are not equal\n";
+			continue;
+		}
+
+		game_moves.push_back(moves);
+		std::vector<float> values;
+		for (auto v : values_s)
+		{
+			float value = std::stof(v);
+			value = std::clamp(value, -20.0f, 20.0f);
+			values.push_back(value);
+		}
+		game_values.push_back(values);
+	}
+}
+
+void leonardo_overlord::train_value_nnet()
+{
+	std::vector<std::string> lines = read_file_lines("dataset.txt");
+	std::vector <std::vector<std::string>> game_moves;
+	std::vector <std::vector<float>> game_values;
+
+	convert_dataset(lines, game_moves, game_values);
+	lines.clear();
+
+
+	if (game_moves.size() != game_values.size())
+	{
+		std::cout << "error in dataset\n";
+		return;
+	}
+
+	const int games_per_training = 1000;
+
+	matrix input(leonardo_util::get_input_format());
+	matrix label(leonardo_util::get_value_nnet_output_format());
+
+	std::vector<matrix> inputs;
+	std::vector<matrix> labels;
+	for (int i = 0; i < game_moves.size(); i++)
+	{
+
+		std::vector<std::string>& moves_uci = game_moves[i];
+		std::vector<float>& values = game_values[i];
+
+		chess::Board board = chess::Board(DEFAULT_FEN);
+
+		for (int j = 0; j < moves_uci.size(); j++)
+		{
+			std::string uci_move = moves_uci[j];
+			float value = values[j];
+
+			chess::Movelist moves;
+			chess::movegen::legalmoves(moves, board);
+			bool move_found = false;
+			for (int m = 0; m < moves.size(); m++)
+			{
+				chess::Move move = moves[m];
+				if (uci_move == chess::uci::moveToUci(move))
+				{
+					board.makeMove(move);
+					leonardo_util::set_matrix_from_chessboard(board, input);
+					inputs.push_back(input);
+
+					matrix label(leonardo_util::get_value_nnet_output_format());
+					label.set_at_flat_host(0, value);
+					labels.push_back(label);
+					move_found = true;
+					break;
+				}
+			}
+			if (!move_found)
+			{
+				std::cout << "error in dataset line " << i << " move not found\n";
+			}
+		}
+
+		if ((i + 1) % games_per_training == 0)
+		{
+			data_space ds(
+				leonardo_util::get_input_format(),
+				leonardo_util::get_value_nnet_output_format(),
+				inputs,
+				labels);
+
+			test_result res = best_value_nnet.test_on_ds(ds);
+			std::cout << res.to_string() << "\n";
+			best_value_nnet.learn_on_ds(ds, 1, 1, 0.0001f, false);
+
+			inputs.clear();
+			labels.clear();
+
+			save_best_to_file(i, true, false);
+		}
+	}
+}
+/*
+
+static void write_file_lines(const std::string& filename, std::vector<std::string> lines)
+{
+	std::ofstream file(filename);
+	if (!file.is_open()) {
+		std::cerr << "Error: Could not open file '" << filename << "'" << std::endl;
+		return;
+	}
+	for (std::string line : lines) {
+		file << line << std::endl;
+	}
+	file.close();
+}
+*/
 /*
 static void train_new_on_move(neural_network& policy_nnet, const ChessBoard& board, const std::unique_ptr<Move>& move)
 {
@@ -1289,7 +1419,7 @@ void leonardo_overlord::test_value_nnet_single(std::string& game)
 
 				nn_eval = nn_eval * nn_eval * nn_eval;
 
-				std::cout 
+				std::cout
 					<< "sf_eval: " << sf_eval << "\t nn_eval: " << nn_eval
 					<< "\t diff: " << std::abs(sf_eval - nn_eval) << std::endl;
 

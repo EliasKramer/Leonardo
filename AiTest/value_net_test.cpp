@@ -1,6 +1,5 @@
-/*
 #include "CppUnitTest.h"
-#include "../MockChessEngine/ChessBoard.h"
+#include "../LeonardoAi/chess.hpp"
 #include "../LeonardoAi/leonardo_util.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -9,11 +8,11 @@ namespace AiTest
 	TEST_CLASS(value_net_test)
 	{
 	public:
-		/*
+		
 		TEST_METHOD(fools_mate_white)
 		{
 			//checkmate for white
-			ChessBoard board("rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3");
+			chess::Board board = chess::Board("rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3");
 			matrix w_value(leonardo_util::get_value_nnet_output_format());
 			matrix b_value(leonardo_util::get_value_nnet_output_format());
 
@@ -34,7 +33,7 @@ namespace AiTest
 		TEST_METHOD(fools_mate_black)
 		{
 			//checkmate for white
-			ChessBoard board("rnbqkbnr/ppppp2p/5p2/6pQ/8/P3P3/1PPP1PPP/RNB1KBNR b KQkq - 1 3");
+			chess::Board board("rnbqkbnr/ppppp2p/5p2/6pQ/8/P3P3/1PPP1PPP/RNB1KBNR b KQkq - 1 3");
 			matrix w_value(leonardo_util::get_value_nnet_output_format());
 			matrix b_value(leonardo_util::get_value_nnet_output_format());
 
@@ -54,6 +53,6 @@ namespace AiTest
 			//Assert::AreEqual(1.0f, leonardo_util::get_value_nnet_output_format(w_value));
 			//Assert::AreEqual(-1.0f, leonardo_util::get_value_nnet_output_format(b_value));
 		}
-		*//*
+		
 	};
-}*/
+}
