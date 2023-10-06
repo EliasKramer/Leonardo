@@ -1,0 +1,5 @@
+C:/Users/Elias/Desktop/all/coding/c_c++/Leonardo/CMakeLeonardo/out/build/x64-release/CMakeFiles/edit_cache.dir
+C:/Users/Elias/Desktop/all/coding/c_c++/Leonardo/CMakeLeonardo/out/build/x64-release/CMakeFiles/rebuild_cache.dir
+C:/Users/Elias/Desktop/all/coding/c_c++/Leonardo/CMakeLeonardo/out/build/x64-release/CMakeLeonardo/CMakeFiles/CMakeLeonardo.dir
+C:/Users/Elias/Desktop/all/coding/c_c++/Leonardo/CMakeLeonardo/out/build/x64-release/CMakeLeonardo/CMakeFiles/edit_cache.dir
+C:/Users/Elias/Desktop/all/coding/c_c++/Leonardo/CMakeLeonardo/out/build/x64-release/CMakeLeonardo/CMakeFiles/rebuild_cache.dir

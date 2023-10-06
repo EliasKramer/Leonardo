@@ -7,17 +7,38 @@
     <Filter Include="source">
       <UniqueIdentifier>{924db23e-7e3e-4b34-af6c-d02877302192}</UniqueIdentifier>
     </Filter>
-    <Filter Include="header\chess">
-      <UniqueIdentifier>{56533dc7-8779-4079-9865-c1ff683259c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\chess">
-      <UniqueIdentifier>{42ffdad0-ef07-45cf-ba82-ea0014250b8b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\nnet">
       <UniqueIdentifier>{c6128192-9445-4907-ac30-455d3ac1e238}</UniqueIdentifier>
     </Filter>
     <Filter Include="header\nnet">
       <UniqueIdentifier>{6d3863ff-9832-452b-9ffb-4e9f12a90b17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\sf">
+      <UniqueIdentifier>{73b6557f-780d-4162-beb5-b98f720aff5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sf">
+      <UniqueIdentifier>{abe71d9b-5af9-4a31-bdd5-389e6f46d8b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\leonardo_value_bot">
+      <UniqueIdentifier>{92ec8588-1412-4099-97e0-50452c615434}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\leonardo_value_bot">
+      <UniqueIdentifier>{8334a3bb-34eb-4e79-905d-15ebda54241c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\chess_util">
+      <UniqueIdentifier>{1c51a7a6-755f-41ec-b2b1-1e30b4db1011}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\chess_util">
+      <UniqueIdentifier>{1d4b3147-67db-47c8-a698-e0224e043625}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="engine">
+      <UniqueIdentifier>{aa19eaa6-6dee-4584-82fe-6e4f533d44da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\chess_util\player">
+      <UniqueIdentifier>{75eb45de-cb1d-4437-a2e2-e8fac0fcff19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\chess_util\player">
+      <UniqueIdentifier>{ffcc816e-44c6-4c1c-9d8d-60bbbf78df9a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -57,64 +78,7 @@
     <ClCompile Include="leonardo_overlord.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="chess_arena.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\RandomPlayer.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\Player.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\MovePromote.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\MoveEnPassant.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\MoveDoublePawn.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\MoveCastle.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\Move.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\HumanPlayer.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\HelpMethods.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\Game.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\DataAndTypes.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\BoardRepresentation.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\ChessBoard.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\ChessPiece.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\Constants.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\BitBoard.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\AlphaBetaPruningBot.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MockChessEngine\Medicrius.cpp">
-      <Filter>source\chess</Filter>
-    </ClCompile>
-    <ClCompile Include="leonardo_bot.cpp">
+    <ClCompile Include="leonardo_policy_bot.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="leonardo_util.cpp">
@@ -122,6 +86,105 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\benchmark.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\bitbase.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\bitboard.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\endgame.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\evaluate.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\material.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\misc.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\movegen.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\movepick.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\pawns.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\position.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\psqt.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\search.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\thread.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\timeman.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\tt.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\tune.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\uci.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\ucioption.cpp">
+      <Filter>header\sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\nnue\evaluate_nnue.cpp">
+      <Filter>sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\nnue\features\half_ka_v2_hm.cpp">
+      <Filter>sf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StockFish\syzygy\tbprobe.cpp">
+      <Filter>sf</Filter>
+    </ClCompile>
+    <ClCompile Include="stockfish_interface.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="leonardo_value_bot.cpp">
+      <Filter>source\leonardo_value_bot</Filter>
+    </ClCompile>
+    <ClCompile Include="leonardo_value_bot_1.cpp">
+      <Filter>source\leonardo_value_bot</Filter>
+    </ClCompile>
+    <ClCompile Include="leonardo_value_bot_2.cpp">
+      <Filter>source\leonardo_value_bot</Filter>
+    </ClCompile>
+    <ClCompile Include="leonardo_value_bot_3.cpp">
+      <Filter>source\leonardo_value_bot</Filter>
+    </ClCompile>
+    <ClCompile Include="chess_game.cpp">
+      <Filter>source\chess_util</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuroFox\softmax_layer.cpp">
+      <Filter>source\nnet</Filter>
+    </ClCompile>
+    <ClCompile Include="random_player.cpp">
+      <Filter>source\chess_util\player</Filter>
+    </ClCompile>
+    <ClCompile Include="minimax_player.cpp">
+      <Filter>source\chess_util\player</Filter>
+    </ClCompile>
+    <ClCompile Include="human_player.cpp">
+      <Filter>source\chess_util\player</Filter>
+    </ClCompile>
+    <ClCompile Include="abp_player.cpp">
+      <Filter>source\chess_util\player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -167,64 +230,7 @@
     <ClInclude Include="leonardo_overlord.hpp">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="chess_arena.hpp">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\BitBoard.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\BoardRepresentation.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\ChessBoard.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\ChessPiece.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\Constants.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\DataAndTypes.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\Game.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\HelpMethods.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\HumanPlayer.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\Move.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\MoveCastle.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\MoveDoublePawn.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\MoveEnPassant.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\MovePromote.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\Player.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\RandomPlayer.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\AlphaBetaPruningBot.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="..\MockChessEngine\Medicrius.h">
-      <Filter>header\chess</Filter>
-    </ClInclude>
-    <ClInclude Include="leonardo_bot.hpp">
+    <ClInclude Include="leonardo_policy_bot.hpp">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="leonardo_util.hpp">
@@ -233,10 +239,150 @@
     <ClInclude Include="NeuroFox\assert_throw.hpp">
       <Filter>header\nnet</Filter>
     </ClInclude>
+    <ClInclude Include="..\StockFish\benchmark.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\bitboard.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\endgame.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\evaluate.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\material.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\misc.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\movegen.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\movepick.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\pawns.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\position.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\psqt.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\search.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\thread.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\thread_win32_osx.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\timeman.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\tt.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\tune.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\types.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\uci.h">
+      <Filter>header\sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\layers\affine_transform.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\layers\affine_transform_sparse_input.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\layers\clipped_relu.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\evaluate_nnue.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\features\half_ka_v2_hm.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\incbin\incbin.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\nnue_architecture.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\nnue_accumulator.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\nnue_common.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\nnue_feature_transformer.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\layers\simd.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\nnue\layers\sqr_clipped_relu.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StockFish\syzygy\tbprobe.h">
+      <Filter>sf</Filter>
+    </ClInclude>
+    <ClInclude Include="stockfish_interface.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="leonardo_value_bot.hpp">
+      <Filter>header\leonardo_value_bot</Filter>
+    </ClInclude>
+    <ClInclude Include="leonardo_value_bot_1.hpp">
+      <Filter>header\leonardo_value_bot</Filter>
+    </ClInclude>
+    <ClInclude Include="leonardo_value_bot_2.hpp">
+      <Filter>header\leonardo_value_bot</Filter>
+    </ClInclude>
+    <ClInclude Include="leonardo_value_bot_3.hpp">
+      <Filter>header\leonardo_value_bot</Filter>
+    </ClInclude>
+    <ClInclude Include="chess_game.hpp">
+      <Filter>header\chess_util</Filter>
+    </ClInclude>
+    <ClInclude Include="chess_player.hpp">
+      <Filter>header\chess_util</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroFox\softmax_layer.hpp">
+      <Filter>header\nnet</Filter>
+    </ClInclude>
+    <ClInclude Include="chess.hpp">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="random_player.hpp">
+      <Filter>header\chess_util\player</Filter>
+    </ClInclude>
+    <ClInclude Include="minimax_player.hpp">
+      <Filter>header\chess_util\player</Filter>
+    </ClInclude>
+    <ClInclude Include="human_player.hpp">
+      <Filter>header\chess_util\player</Filter>
+    </ClInclude>
+    <ClInclude Include="abp_player.hpp">
+      <Filter>header\chess_util\player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="NeuroFox\gpu_math.cu">
       <Filter>source\nnet</Filter>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\StockFish\Makefile">
+      <Filter>header\sf</Filter>
+    </None>
   </ItemGroup>
 </Project>

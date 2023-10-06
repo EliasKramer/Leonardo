@@ -1,44 +1,112 @@
+#include <iostream>
+#include "stockfish_interface.hpp"
+#include "chess_game.hpp"
+#include "random_player.hpp"
+#include "minimax_player.hpp"
+#include "abp_player.hpp"
+#include "human_player.hpp"
+#include "chess.hpp"
+#include "leonardo_value_bot.hpp"
+#include "leonardo_value_bot_1.hpp"
 #include "leonardo_overlord.hpp"
-#include "../MockChessEngine/AlphaBetaPruningBot.h"
-#include "../MockChessEngine/RandomPlayer.h"
-#include <windows.h>
-#include <signal.h>
-#include "../MockChessEngine/Game.h"
 
+uint64_t perft(chess::Board& board, int depth) {
+	chess::Movelist moves;
+	chess::movegen::legalmoves(moves, board);
+
+	if (depth == 1) {
+		return moves.size();
+	}
+
+	uint64_t nodes = 0;
+
+	for (int i = 0; i < moves.size(); i++) {
+		const auto move = moves[i];
+		board.makeMove(move);
+		nodes += perft(board, depth - 1);
+		board.unmakeMove(move);
+	}
+
+	return nodes;
+}
+
+void some_encoding()
+{
+	neural_network nnet;
+	nnet.set_input_format(leonardo_util::get_input_format_one_hot());
+	//nnet.add_fully_connected_layer(200, leaky_relu_fn);
+	nnet.add_fully_connected_layer(leonardo_util::get_input_format_one_hot(), identity_fn);
+	nnet.xavier_initialization();
+
+	chess::Board board = chess::Board(DEFAULT_FEN);
+	matrix input(leonardo_util::get_input_format_one_hot());
+
+	std::vector<matrix> inputs;
+
+	while (true)
+	{
+		chess::Movelist moves;
+		chess::movegen::legalmoves(moves, board);
+
+		if (moves.size() == 0)
+		{
+			std::string stuff;
+			std::cout << "no moves\n";
+			std::cin >> stuff;
+		}
+
+		for (int i = 0; i < moves.size(); i++)
+		{
+			chess::Move move = moves[i];
+			board.makeMove(move);
+
+			leonardo_util::set_matrix_from_chessboard_one_hot(board, input);
+
+			inputs.push_back(input);
+
+			board.unmakeMove(move);
+		}
+
+		board.makeMove(moves[rand() % moves.size()]);
+
+		if (board.isGameOver().second != chess::GameResult::NONE)
+		{
+			board = chess::Board(DEFAULT_FEN);
+
+			data_space ds(
+				leonardo_util::get_input_format_one_hot(),
+				leonardo_util::get_input_format_one_hot(),
+				inputs,
+				inputs);
+
+			std::cout << "testing\n";
+			std::cout << nnet.test_on_ds(ds).to_string() << "\n";
+			std::cout << "learning\n";
+			nnet.learn_on_ds(ds, 1, 1, 0.0001f, false);
+			std::cout << "paying games\n";
+			inputs.clear();
+			continue;
+		}
+	}
+}
 int main()
 {
-	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
-	
-	/*
-	ChessGame game(
-		std::make_unique<AlphaBetaPruningBot>(4), 
-		std::make_unique<AlphaBetaPruningBot>(4),
-		STARTING_FEN);
-	game.start();
-	return 0;
-	*/
-	leonardo_overlord overlord("test_run");
-	overlord.train_value_nnet();
-	return 0;
+	leonardo_overlord ov("test");
+	ov.train_value_nnet();
 
-	data_space mock;
-	mock.to_string(); //remove - used to not get optimized away
-	
-	//board.getFen();
-	ChessBoard board("r2q1rk1/pppb1ppp/3b1n2/3P4/3QP3/3P4/PP1B1PPP/RN2KB1R b KQ - 1 12");
-	neural_network nnet("C:\\Users\\krame\\Desktop\\all\\_coding\\Leonardo\\LeonardoAi\\models\\double_alpha_400\\value.parameters");
-	
-	matrix in(leonardo_util::get_input_format());
-	leonardo_util::set_matrix_from_chessboard(board, in);
-	//std::cout << in.get_string() << std::endl;
-	nnet.forward_propagation(in);
-	
-	std::cout << "state: " << nnet.get_output().get_string() << std::endl;
-	std::cout << "value: " << leonardo_util::get_value_nnet_output(nnet.get_output())<< std::endl;
-
-	//std::cout << nnet.parameter_analysis();
-	
 	return 0;
-	matrix m(vector3(1, 1, 1));
-	m.get_string();
+	stockfish_interface::init();
+
+	leonardo_value_bot_1 player1(4); //4
+	abp_player player2(5); //5
+
+	chess_game game(
+		&player1,
+		&player2
+	);
+
+	game.play();
+
+
+	std::cout << "Hello World!\n";
 }
