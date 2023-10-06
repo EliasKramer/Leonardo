@@ -39,4 +39,5 @@ namespace leonardo_util
 	vector3 get_sparse_input_format();
 	void encode_m_to_sparse_matrix(const chess::Board& board, matrix& input, chess::Color col);
 	void encode_m_to_sparse_matrix(const chess::Board& board, matrix& input);
+	void set_value_nnet_output(matrix& output, float value);
 }

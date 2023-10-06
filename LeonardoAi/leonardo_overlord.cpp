@@ -517,6 +517,17 @@ static void convert_dataset(
 
 void leonardo_overlord::train_value_nnet()
 {
+	best_value_nnet = neural_network(); //reset the best nnet
+	best_value_nnet.set_input_format(leonardo_util::get_sparse_input_format());
+	best_value_nnet.add_fully_connected_layer(200, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(200, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(100, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(100, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(50, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(50, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), leaky_relu_fn);
+	best_value_nnet.xavier_initialization();
+
 	std::vector<std::string> lines = read_file_lines("dataset.txt");
 	std::vector <std::vector<std::string>> game_moves;
 	std::vector <std::vector<float>> game_values;
@@ -531,9 +542,9 @@ void leonardo_overlord::train_value_nnet()
 		return;
 	}
 
-	const int games_per_training = 1000;
+	const int games_per_training = 10;
 
-	matrix input(leonardo_util::get_input_format());
+	matrix input(leonardo_util::get_sparse_input_format());
 	matrix label(leonardo_util::get_value_nnet_output_format());
 
 	std::vector<matrix> inputs;
@@ -560,7 +571,7 @@ void leonardo_overlord::train_value_nnet()
 				if (uci_move == chess::uci::moveToUci(move))
 				{
 					board.makeMove(move);
-					leonardo_util::set_matrix_from_chessboard(board, input);
+					leonardo_util::encode_m_to_sparse_matrix(board, input);
 					inputs.push_back(input);
 
 					matrix label(leonardo_util::get_value_nnet_output_format());
@@ -579,7 +590,7 @@ void leonardo_overlord::train_value_nnet()
 		if ((i + 1) % games_per_training == 0)
 		{
 			data_space ds(
-				leonardo_util::get_input_format(),
+				leonardo_util::get_sparse_input_format(),
 				leonardo_util::get_value_nnet_output_format(),
 				inputs,
 				labels);

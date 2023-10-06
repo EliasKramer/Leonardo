@@ -221,7 +221,7 @@ vector3 leonardo_util::get_sparse_input_format()
 	//2 friendly king
 	//3 enemy king
 
-	return vector3(8, 8, 12);
+	return vector3(8, 8, 4);
 }
 
 void leonardo_util::encode_m_to_sparse_matrix(const chess::Board& board, matrix& input, chess::Color col_to_move)
@@ -242,6 +242,13 @@ void leonardo_util::encode_m_to_sparse_matrix(const chess::Board& board, matrix&
 void leonardo_util::encode_m_to_sparse_matrix(const chess::Board& board, matrix& input)
 {
 	encode_m_to_sparse_matrix(board, input, board.sideToMove());
+}
+void leonardo_util::set_value_nnet_output(matrix& output, float value)
+{
+	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output_format()));
+	smart_assert(output.host_data_is_updated());
+
+	output.set_at_flat_host(0, value);
 }
 
 /*

@@ -1,6 +1,5 @@
-/*
 #include "CppUnitTest.h"
-#include "../MockChessEngine/ChessBoard.h"
+#include "../LeonardoAi/chess.hpp"
 #include "../LeonardoAi/leonardo_util.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -13,8 +12,8 @@ namespace AiTest
 			const std::string& first_fen,
 			const std::string& second_fen)
 		{
-			ChessBoard w_board(first_fen);
-			ChessBoard b_board(second_fen);
+			chess::Board w_board = chess::Board(first_fen);
+			chess::Board b_board = chess::Board(second_fen);
 
 			matrix w_matrix(leonardo_util::get_input_format());
 			matrix b_matrix(leonardo_util::get_input_format());
@@ -46,6 +45,49 @@ namespace AiTest
 				"rnbqkbnr/pppp1ppp/8/4p3/2P1P3/8/PP1P1PPP/RNBQKBNR b KQkq - 0 1"
 			);
 		}
+
+		void test_sparse_matrix_board(
+			const std::string& first_fen,
+			const std::string& second_fen)
+		{
+			chess::Board w_board = chess::Board(first_fen);
+			chess::Board b_board = chess::Board(second_fen);
+
+			matrix w_matrix(leonardo_util::get_sparse_input_format());
+			matrix b_matrix(leonardo_util::get_sparse_input_format());
+
+			leonardo_util::encode_m_to_sparse_matrix(w_board, w_matrix);
+			leonardo_util::encode_m_to_sparse_matrix(b_board, b_matrix);
+
+			Assert::IsTrue(matrix::are_equal(w_matrix, b_matrix));
+		}
+
+		TEST_METHOD(sparse_start_pos)
+		{
+			test_sparse_matrix_board(
+				"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+				"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
+		}
+
+		TEST_METHOD(sparse_moved_position)
+		{
+			test_sparse_matrix_board(
+				"rnbqkbnr/ppppppp1/8/7p/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+				"rnbqkbnr/pppppppp/8/8/7P/8/PPPPPPP1/RNBQKBNR b KQkq - 0 1");
+		}
+
+		TEST_METHOD(sparse_asymmetric_position)
+		{
+			test_sparse_matrix_board(
+				"rnbqkbnr/pp1p1ppp/8/2p1p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1",
+				"rnbqkbnr/pppp1ppp/8/4p3/2P1P3/8/PP1P1PPP/RNBQKBNR b KQkq - 0 1");
+		}
+
+		TEST_METHOD(sparse_asymmetric_position_2)
+		{
+			test_sparse_matrix_board(
+				"rnbqkbnr/pp1p1ppp/8/2p1p3/4P3/8/PPPPKPPP/RNBQ1BNR w - - 0 1",
+				"rnbq1bnr/ppppkppp/8/4p3/2P1P3/8/PP1P1PPP/RNBQKBNR b - - 0 1");
+		}
 	};
 }
-*/

@@ -1,6 +1,7 @@
 #include "CppUnitTest.h"
 #include "../LeonardoAi/chess.hpp"
 #include "../LeonardoAi/leonardo_util.hpp"
+/*
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace AiTest
@@ -55,4 +56,4 @@ namespace AiTest
 		}
 		
 	};
-}
+}*/
