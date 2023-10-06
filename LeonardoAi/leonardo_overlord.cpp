@@ -519,12 +519,13 @@ void leonardo_overlord::train_value_nnet()
 {
 	best_value_nnet = neural_network(); //reset the best nnet
 	best_value_nnet.set_input_format(leonardo_util::get_sparse_input_format());
-	best_value_nnet.add_fully_connected_layer(200, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(200, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(100, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(100, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(50, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(50, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(8, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(2, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), leaky_relu_fn);
 	best_value_nnet.xavier_initialization();
 
