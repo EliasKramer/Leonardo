@@ -117,6 +117,31 @@ void leonardo_util::set_matrix_from_chessboard_one_hot(const chess::Board& board
 	set_matrix_from_chessboard_one_hot(board, input, board.sideToMove());
 }
 
+
+std::vector<std::string> leonardo_util::split_string(const std::string& input, char separator)
+{
+	std::vector<std::string> result;
+	std::string current;
+
+	for (char c : input) {
+		if (c == separator) {
+			if (!current.empty()) {
+				result.push_back(current);
+				current.clear();
+			}
+		}
+		else {
+			current += c;
+		}
+	}
+
+	if (!current.empty()) {
+		result.push_back(current);
+	}
+
+	return result;
+}
+
 float leonardo_util::get_value_nnet_output(matrix& output)
 {
 	if (!output.host_data_is_updated())
@@ -161,391 +186,142 @@ float leonardo_util::get_value_nnet_eval(
 	return our_value - their_value;
 }
 
-
-vector3 leonardo_util::get_pawn_input_format()
+vector3 leonardo_util::sq_to_pawn_matrix_pos(const chess::Square sq, const int z_idx)
 {
-	return vector3(8, 8, 1);
+	const chess::Bitboard curr_bb = chess::Bitboard(1) << sq;
+
+	const int x = sq % 8;
+	int y = sq / 8;
+
+	y -= 1;
+
+	return vector3(x, y, z_idx);
 }
 
-void leonardo_util::set_board_matrix(matrix& m, int z_idx, float val, chess::Bitboard bb, bool add, bool flip)
+void leonardo_util::set_board_matrix(matrix& m, int z_idx, float val, chess::Bitboard bb)
 {
 	smart_assert(m.host_data_is_updated());
-	smart_assert(m.get_format().x == 8);
-	smart_assert(m.get_format().y == 8);
 
 	while (bb)
 	{
 		const unsigned int sq = chess::builtin::poplsb(bb);
-		const chess::Bitboard curr_bb = chess::Bitboard(1) << sq;
 
-		const int x = sq % 8;
-		int y = sq / 8;
-
-		if (flip)
-		{
-			y = 7 - y;
-		}
-
-		if (add)
-		{
-			m.add_at_host(vector3(x, y, z_idx), val);
-		}
-		else
-		{
-			m.set_at_host(vector3(x, y, z_idx), val);
-		}
+		m.set_at_host(
+			sq_to_pawn_matrix_pos(chess::Square(sq), z_idx),
+			val);
 	}
 }
 
-std::vector<std::string> leonardo_util::split_string(const std::string& input, char separator)
+vector3 leonardo_util::get_pawn_input_format()
 {
-	std::vector<std::string> result;
-	std::string current;
+	//0 white pawns
+	//1 black pawns
 
-	for (char c : input) {
-		if (c == separator) {
-			if (!current.empty()) {
-				result.push_back(current);
-				current.clear();
-			}
-		}
-		else {
-			current += c;
-		}
-	}
-
-	if (!current.empty()) {
-		result.push_back(current);
-	}
-
-	return result;
+	return vector3(8, 6, 2);
 }
 
-vector3 leonardo_util::get_sparse_input_format()
+void leonardo_util::encode_pawn_matrix(const chess::Board& board, matrix& input)
 {
-	//0 friendly pawns
-	//1 enemy pawns
-	//2 friendly king
-	//3 enemy king
-
-	return vector3(8, 8, 2);
-}
-
-void leonardo_util::encode_m_to_sparse_matrix(const chess::Board& board, matrix& input, chess::Color col_to_move)
-{
-	smart_assert(vector3::are_equal(input.get_format(), get_sparse_input_format()));
+	smart_assert(vector3::are_equal(input.get_format(), get_pawn_input_format()));
 
 	input.set_all(0);
 
-	chess::Bitboard our_pawns = board.pieces(chess::PieceType::PAWN, col_to_move);
-	chess::Bitboard their_pawns = board.pieces(chess::PieceType::PAWN, ~col_to_move);
-	//chess::Bitboard our_king = board.pieces(chess::PieceType::KING, col_to_move);
-	//chess::Bitboard their_king = board.pieces(chess::PieceType::KING, ~col_to_move);
+	chess::Bitboard w_pawns = board.pieces(chess::PieceType::PAWN, chess::Color::WHITE);
+	chess::Bitboard b_pawns = board.pieces(chess::PieceType::PAWN, chess::Color::BLACK);
 
-	bool flip = col_to_move == chess::Color::BLACK;
-
-	set_board_matrix(input, 0, 1, our_pawns,  false, flip);
-	set_board_matrix(input, 1, 1, their_pawns,false, flip);
-	//set_board_matrix(input, 2, 1, our_king,   false, flip);
-	//set_board_matrix(input, 3, 1, their_king, false, flip);
-	/*
-	chess::Bitboard own_attacks   = attack_bb(board, ~col_to_move);
-	chess::Bitboard enemy_attacks = attack_bb(board, col_to_move);
-	chess::Bitboard our_pieces = board.us(col_to_move);
-	chess::Bitboard their_pieces = board.them(col_to_move);
-
-	set_board_matrix(input, 0, .1, own_attacks,   true, flip);
-	set_board_matrix(input, 1, .1, enemy_attacks, true, flip);
-	set_board_matrix(input, 2, .1, our_pieces,    true, flip);
-	set_board_matrix(input, 3, .1, their_pieces,  true, flip);*/
+	set_board_matrix(input, 0, 1, w_pawns);
+	set_board_matrix(input, 1, 1, b_pawns);
 }
 
-void leonardo_util::encode_m_to_sparse_matrix(const chess::Board& board, matrix& input)
-{
-	encode_m_to_sparse_matrix(board, input, board.sideToMove());
-}
-void leonardo_util::set_value_nnet_output(matrix& output, float value)
+void leonardo_util::set_pawn_matrix_value(matrix& output, float value, chess::Color side_to_move)
 {
 	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output_format()));
-	smart_assert(output.host_data_is_updated());
 
-	output.set_at_flat_host(0, value);
+	float col_mult = side_to_move == chess::Color::WHITE ? 1 : -1;
+	output.set_at_flat_host(0, value * col_mult);
 }
 
-chess::Bitboard leonardo_util::attack_bb(const chess::Board& board, chess::Color col)
+float leonardo_util::get_pawn_matrix_value(matrix& output, float value, chess::Color side_to_move)
 {
-	chess::Bitboard result = 0;
-	for (int i = 0; i < 64; i++)
-	{
-		const chess::Square sq = chess::Square(i);
-		if (board.isAttacked(sq, ~col))
-		{
-			result |= chess::Bitboard(1) << sq;
-		}
-	}
-	return result;
-}
-
-/*
-int leonardo_util::square_to_flat_idx(Square s, ChessColor color_to_move)
-{
-	const vector3 board_dimensions(8, 8, 1);
-
-	int x = s % 8;
-	int y = s / 8;
-
-	if (color_to_move == Black)
-	{
-		y = 7 - y;
-	}
-
-	return vector3(x, y, 0).get_index(board_dimensions);
-}
-
-float leonardo_util::get_move_value(const Move& move, const matrix& policy_output, ChessColor color)
-{
-	smart_assert(vector3::are_equal(policy_output.get_format(), get_policy_output_format()));
-	smart_assert(policy_output.host_data_is_updated());
-
-	vector3 coord(0, 0, 0);
-
-	int flat_start_idx = square_to_flat_idx(move.getStart(), color);
-	int flat_dest_idx = square_to_flat_idx(move.getDestination(), color);
-
-	coord.x = flat_start_idx;
-	coord.y = flat_dest_idx;
-
-	return policy_output.get_at_host(coord);
-}
-
-void leonardo_util::set_move_value(const Move& move, matrix& output, float value, const ChessColor color_to_move)
-{
-	smart_assert(vector3::are_equal(output.get_format(), get_policy_output_format()));
-	smart_assert(output.host_data_is_updated());
-
-	vector3 coord(0, 0, 0);
-
-	int flat_start_idx = square_to_flat_idx(move.getStart(), color_to_move);
-	int flat_dest_idx = square_to_flat_idx(move.getDestination(), color_to_move);
-
-	coord.x = flat_start_idx;
-	coord.y = flat_dest_idx;
-
-	output.set_at_host(coord, value);
-}
-
-int leonardo_util::get_best_move(
-	const matrix& output,
-	const UniqueMoveList& allowed_moves,
-	ChessColor curr_turn_col)
-{
-	smart_assert(vector3::are_equal(output.get_format(), get_policy_output_format()));
-
-	int max_idx = 0;
-	float max_value = FLT_MIN;
-
-	int move_idx = 0;
-	for (const std::unique_ptr<Move>& move : allowed_moves)
-	{
-		float value = get_move_value(*move, output, curr_turn_col);
-
-		if (value > max_value)
-		{
-			max_value = value;
-			max_idx = move_idx;
-		}
-
-		move_idx++;
-	}
-
-	return max_idx;
-}
-
-static double output_to_exponent(float value)
-{
-	//would be a nice implementation, if the compiler would support it
-	//std::clamp((double)value / 10,-7097,7097);
-
-	//these values got found by writing a little test script.
-	//exp((double)x/10) is invalid if x is smaller than -7097 or larger than 7097
-	if (value < -7097)
-	{
-		std::cout << "WARNING: value too small for exponentiation. Clamping to -7097.\n";
-		return -7097;
-	}
-	else if (value > 7097)
-	{
-		std::cout << "WARNING: value too large for exponentiation. Clamping to 7097.\n";
-		return 7097;
-	}
-	else
-	{
-		return (double)value / 10;
-	}
-}
-
-int leonardo_util::get_random_best_move(
-	const matrix& output,
-	const UniqueMoveList& allowed_moves,
-	ChessColor curr_turn_col)
-{
-	smart_assert(matrix::equal_format(output.get_format(), get_policy_output_format()));
-
-	//we are implementing softmax here instead of the nnet, in order to save some time.
-	//a layer that does softmax would be cleaner
-
-	double e_sum = 0;
-	for (const std::unique_ptr<Move>& move : allowed_moves)
-	{
-		float value = get_move_value(*move, output, curr_turn_col);
-		double e = exp(output_to_exponent(value));
-		e_sum += e;
-	}
-
-	float random = random_float_excl(0, 1);
-	//std::cout << "random: " << random << std::endl;
-
-	double current_sum = 0;
-	int move_idx = 0;
-	for (const std::unique_ptr<Move>& move : allowed_moves)
-	{
-		float value = get_move_value(*move, output, curr_turn_col);
-		double e = exp((output_to_exponent(value)));
-
-		double prob = e / e_sum;
-
-		//std::cout << "m_idx " << move_idx << " curr sum: " << current_sum << " value " << value << " prob: " << prob << " e " << e << " esum " << e_sum << std::endl;
-
-		current_sum += prob;
-		if (current_sum >= random)
-		{
-			//std::cout << "move found: " << move_idx << std::endl;
-			return move_idx;
-		}
-		move_idx++;
-	}
-
-	//this could occur due to rounding errors
-	//in very few cases
-	std::cout << "no move found\n";
-	return 0;
-}
-
-void leonardo_util::set_value_nnet_output(matrix& output, const ChessBoard& game, ChessColor color)
-{
-	GameState state = game.getGameState();
 	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output_format()));
-	smart_assert(output.host_data_is_updated());
-	smart_assert(state != GameState::Ongoing);
 
-	//color wins
-	// 1 | 0
-	//color loses
-	// 0 | 1
-	//draw or stalemate
-	// 0.5 | 0.5
-	/*
-	output.set_at_flat_host(0,
-		(state == GameState::WhiteWon && color == White) ||
-		(state == GameState::BlackWon && color == Black)
-		? 1.0f : 0.0f);
-	output.set_at_flat_host(1,
-		state == GameState::BlackWon && color == White ||
-		state == GameState::WhiteWon && color == Black
-		? 1.0f : 0.0f);
+	float col_mult = side_to_move == chess::Color::WHITE ? 1 : -1;
+	return output.get_at_flat_host(0) * col_mult;
+}
 
-	if (state == GameState::Draw || state == GameState::Stalemate)
+void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const chess::Move& move)
+{
+	bool is_pawn_move = board.at<chess::PieceType>(move.from()) == chess::PieceType::PAWN;
+	bool white_to_move = board.sideToMove() == chess::Color::WHITE;
+
+	if (is_pawn_move)
 	{
-		output.set_at_flat_host(0, 0.5f);
-		output.set_at_flat_host(1, 0.5f);
-	}
-	output.set_at_flat_host(0,
-		(state == GameState::WhiteWon && color == White) ||
-		(state == GameState::BlackWon && color == Black) ? 50.0f :
-		(state == GameState::BlackWon && color == White) ||
-		(state == GameState::WhiteWon && color == Black) ? -50.0f : 0.0f);
+		bool is_promotion = move.typeOf() == chess::Move::PROMOTION;
+		bool is_en_passant = move.typeOf() == chess::Move::ENPASSANT;
 
-	output.sync_device_and_host();
-}
-
-
-matrix& leonardo_util::matrix_map_get(
-	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
-	const ChessBoard& game)
-{
-	//insert it into map if it does not exist
-	if (map.find(game) == map.end())
-	{
-		map.insert(std::make_pair(game, matrix(get_policy_output_format())));
-	}
-
-	matrix& m = map[game];
-
-	smart_assert(vector3::are_equal(m.get_format(), get_policy_output_format()));
-
-	return m;
-}
-
-float leonardo_util::matrix_map_get_float(
-	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
-	const ChessBoard& game,
-	const Move& move)
-{
-	matrix& m = matrix_map_get(map, game);
-	return get_move_value(move, m, game.getCurrentTurnColor());
-}
-
-void leonardo_util::matrix_map_set_float(
-	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
-	const ChessBoard& game,
-	const Move& move,
-	float value)
-{
-	matrix& m = matrix_map_get(map, game);
-	set_move_value(move, m, value, game.getCurrentTurnColor());
-}
-
-float leonardo_util::matrix_map_sum(
-	std::unordered_map<ChessBoard, matrix, chess_board_hasher>& map,
-	const ChessBoard& game,
-	std::vector<std::unique_ptr<Move>>& legal_moves)
-{
-	matrix& m = matrix_map_get(map, game);
-	float sum = 0;
-	for (const std::unique_ptr<Move>& move : legal_moves)
-	{
-		sum += get_move_value(*move, m, game.getCurrentTurnColor());
-	}
-	return sum;
-}
-
-void leonardo_util::update_thread(
-	const size_t& progression,
-	size_t total,
-	size_t tick_in_ms)
-{
-	long long start = std::chrono::duration_cast<std::chrono::milliseconds>(
-		std::chrono::system_clock::now().time_since_epoch()).count();
-
-	while (true)
-	{
-		long long now = std::chrono::duration_cast<std::chrono::milliseconds>(
-			std::chrono::system_clock::now().time_since_epoch()).count();
-		long long passed_ms = now - start;
-
-		std::cout
-			<< "progress: " << progression << "/" << total
-			<< " (" << (float)progression / (float)total * 100.0f << "%)"
-			<< " passed: " << ms_to_str(passed_ms)
-			<< " remaining: " << ms_to_str((long long)((float)passed_ms / (float)progression * (float)(total - progression)))
-			<< std::endl;
-
-		if (progression >= total)
+		if (is_en_passant) //just recalculate the pawn matrix if en passant
 		{
-			break;
+			board.makeMove(move);
+			encode_pawn_matrix(board, pawn_board);
+			return;
 		}
+		int our_idx = white_to_move ? 0 : 1;
+		int their_idx = white_to_move ? 1 : 0;
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(tick_in_ms));
+		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.from(), our_idx), 0);
+
+		if (!is_promotion) // on promotions the .to() square gets out of bounds
+		{
+			pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), our_idx), 1);
+			pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), their_idx), 0); // to handle captures
+		}
 	}
+	
+	bool is_capturing_pawn =
+		((1ULL << move.to()) & board.pieces(chess::PieceType::PAWN)) != 0;
+
+	if (is_capturing_pawn)
+	{
+		int their_idx = white_to_move ? 1 : 0;
+		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), their_idx), 0);
+	}
+
+	board.makeMove(move);
 }
-*/
+
+void leonardo_util::unmake_move(chess::Board& board, matrix& pawn_board, const chess::Move& move)
+{
+	bool is_promotion = move.typeOf() == chess::Move::PROMOTION;
+	bool is_en_passant = move.typeOf() == chess::Move::ENPASSANT;
+	if (is_en_passant || is_promotion) //just recalculate the pawn matrix if en passant or promotion
+	{
+		board.unmakeMove(move);
+		encode_pawn_matrix(board, pawn_board);
+		return;
+	}
+
+	bool is_pawn_move = board.at<chess::PieceType>(move.to()) == chess::PieceType::PAWN;
+	bool white_to_move = board.sideToMove() == chess::Color::BLACK;
+	int their_idx = white_to_move ? 1 : 0;
+
+	if (is_pawn_move)
+	{
+		int our_idx = white_to_move ? 0 : 1;
+		//if white is to unmake a move, then black has currently their turn
+
+		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.from(), our_idx), 1);
+		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), our_idx), 0);
+
+	}
+
+	chess::Piece captured_piece = board.prevStates().back().captured_piece;
+
+	if (captured_piece == chess::Piece::WHITEPAWN ||
+		captured_piece == chess::Piece::BLACKPAWN)
+	{
+		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), their_idx), 1); // to handle captures
+	}
+
+
+	board.unmakeMove(move);
+}

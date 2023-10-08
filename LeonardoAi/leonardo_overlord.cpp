@@ -518,7 +518,7 @@ static void convert_dataset(
 	std::cout << "convertion done\n";
 }
 
-static bool should_add_to_dataset(chess::Board& board)
+static bool board_material_equal(chess::Board& board)
 {
 	static const float PIECE_EVAL[5] = { 100.0f, 300.0f, 300.0f, 500.0f, 900.0f };
 
@@ -550,7 +550,7 @@ static bool should_add_to_dataset(chess::Board& board)
 void leonardo_overlord::train_value_nnet()
 {
 	best_value_nnet = neural_network(); //reset the best nnet
-	best_value_nnet.set_input_format(leonardo_util::get_sparse_input_format());
+	best_value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
 	//best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
 	//best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
 	//best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
@@ -580,7 +580,7 @@ void leonardo_overlord::train_value_nnet()
 
 	const int games_per_training = 1000;
 
-	matrix input(leonardo_util::get_sparse_input_format());
+	matrix input(leonardo_util::get_pawn_input_format());
 	matrix label(leonardo_util::get_value_nnet_output_format());
 
 	std::vector<matrix> inputs;
@@ -608,9 +608,9 @@ void leonardo_overlord::train_value_nnet()
 				{
 					board.makeMove(move);
 
-					if (should_add_to_dataset(board))
+					if (board_material_equal(board))
 					{
-						leonardo_util::encode_m_to_sparse_matrix(board, input);
+						leonardo_util::encode_pawn_matrix(board, input);
 						inputs.push_back(input);
 
 						label.set_at_flat_host(0, value);
@@ -629,7 +629,7 @@ void leonardo_overlord::train_value_nnet()
 		if ((i + 1) % games_per_training == 0)
 		{
 			data_space ds(
-				leonardo_util::get_sparse_input_format(),
+				leonardo_util::get_pawn_input_format(),
 				leonardo_util::get_value_nnet_output_format(),
 				inputs,
 				labels);
