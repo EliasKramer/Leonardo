@@ -97,8 +97,8 @@ void leonardo_util::set_matrix_from_chessboard_one_hot(const chess::Board& board
 				bool is_us = (our_pieces & (chess::Bitboard(1) << square)) != 0;
 
 				vector3 coord(
-					x, 
-					flipped ? y : 7 - y, 
+					x,
+					flipped ? y : 7 - y,
 					is_us ? (int)curr_type : (int)curr_type + 6
 				);
 
@@ -167,17 +167,17 @@ vector3 leonardo_util::get_pawn_input_format()
 	return vector3(8, 8, 1);
 }
 
-void leonardo_util::set_board_matrix(matrix& m, int z_idx, int val, chess::Bitboard bb, bool flip)
+void leonardo_util::set_board_matrix(matrix& m, int z_idx, float val, chess::Bitboard bb, bool add, bool flip)
 {
 	smart_assert(m.host_data_is_updated());
 	smart_assert(m.get_format().x == 8);
 	smart_assert(m.get_format().y == 8);
-	
+
 	while (bb)
 	{
 		const unsigned int sq = chess::builtin::poplsb(bb);
 		const chess::Bitboard curr_bb = chess::Bitboard(1) << sq;
-		
+
 		const int x = sq % 8;
 		int y = sq / 8;
 
@@ -186,7 +186,14 @@ void leonardo_util::set_board_matrix(matrix& m, int z_idx, int val, chess::Bitbo
 			y = 7 - y;
 		}
 
-		m.set_at_host(vector3(x, y, z_idx), val);
+		if (add)
+		{
+			m.add_at_host(vector3(x, y, z_idx), val);
+		}
+		else
+		{
+			m.set_at_host(vector3(x, y, z_idx), val);
+		}
 	}
 }
 
@@ -221,22 +228,36 @@ vector3 leonardo_util::get_sparse_input_format()
 	//2 friendly king
 	//3 enemy king
 
-	return vector3(8, 8, 4);
+	return vector3(8, 8, 2);
 }
 
 void leonardo_util::encode_m_to_sparse_matrix(const chess::Board& board, matrix& input, chess::Color col_to_move)
 {
 	smart_assert(vector3::are_equal(input.get_format(), get_sparse_input_format()));
 
+	input.set_all(0);
+
 	chess::Bitboard our_pawns = board.pieces(chess::PieceType::PAWN, col_to_move);
 	chess::Bitboard their_pawns = board.pieces(chess::PieceType::PAWN, ~col_to_move);
-	chess::Bitboard our_king = board.pieces(chess::PieceType::KING, col_to_move);
-	chess::Bitboard their_king = board.pieces(chess::PieceType::KING, ~col_to_move);
+	//chess::Bitboard our_king = board.pieces(chess::PieceType::KING, col_to_move);
+	//chess::Bitboard their_king = board.pieces(chess::PieceType::KING, ~col_to_move);
 
-	set_board_matrix(input, 0, 1, our_pawns, col_to_move == chess::Color::BLACK);
-	set_board_matrix(input, 1, 1, their_pawns, col_to_move == chess::Color::BLACK);
-	set_board_matrix(input, 2, 1, our_king, col_to_move == chess::Color::BLACK);
-	set_board_matrix(input, 3, 1, their_king, col_to_move == chess::Color::BLACK);
+	bool flip = col_to_move == chess::Color::BLACK;
+
+	set_board_matrix(input, 0, 1, our_pawns,  false, flip);
+	set_board_matrix(input, 1, 1, their_pawns,false, flip);
+	//set_board_matrix(input, 2, 1, our_king,   false, flip);
+	//set_board_matrix(input, 3, 1, their_king, false, flip);
+	/*
+	chess::Bitboard own_attacks   = attack_bb(board, ~col_to_move);
+	chess::Bitboard enemy_attacks = attack_bb(board, col_to_move);
+	chess::Bitboard our_pieces = board.us(col_to_move);
+	chess::Bitboard their_pieces = board.them(col_to_move);
+
+	set_board_matrix(input, 0, .1, own_attacks,   true, flip);
+	set_board_matrix(input, 1, .1, enemy_attacks, true, flip);
+	set_board_matrix(input, 2, .1, our_pieces,    true, flip);
+	set_board_matrix(input, 3, .1, their_pieces,  true, flip);*/
 }
 
 void leonardo_util::encode_m_to_sparse_matrix(const chess::Board& board, matrix& input)
@@ -249,6 +270,20 @@ void leonardo_util::set_value_nnet_output(matrix& output, float value)
 	smart_assert(output.host_data_is_updated());
 
 	output.set_at_flat_host(0, value);
+}
+
+chess::Bitboard leonardo_util::attack_bb(const chess::Board& board, chess::Color col)
+{
+	chess::Bitboard result = 0;
+	for (int i = 0; i < 64; i++)
+	{
+		const chess::Square sq = chess::Square(i);
+		if (board.isAttacked(sq, ~col))
+		{
+			result |= chess::Bitboard(1) << sq;
+		}
+	}
+	return result;
 }
 
 /*

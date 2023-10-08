@@ -91,7 +91,7 @@ void some_encoding()
 }
 int main()
 {
-	leonardo_overlord ov("test");
+	leonardo_overlord ov("mini_only_pawn_eq");
 	ov.train_value_nnet();
 
 	return 0;

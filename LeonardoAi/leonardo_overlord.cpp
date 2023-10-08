@@ -1,8 +1,9 @@
 #include "leonardo_overlord.hpp"
+#include "./NeuroFox/util.hpp"
 #include <cmath>
 void leonardo_overlord::save_best_to_file(size_t epoch, bool value_nnet, bool policy_nnet)
 {
-	std::cout << "\nsaving best network to file " << epoch << "\n";
+	std::cout << "saving best network to file " << epoch << "\n";
 	//check if folder exists
 	if (!std::filesystem::exists("models"))
 	{
@@ -23,7 +24,7 @@ void leonardo_overlord::save_best_to_file(size_t epoch, bool value_nnet, bool po
 		std::string value_nnet_path = folder_name + "/value.parameters";
 		best_value_nnet.save_to_file(value_nnet_path);
 	}
-	std::cout << "\nsaved best network to file\n";
+	std::cout << "saved best network to file\n";
 }
 /*
 float leonardo_overlord::search(
@@ -471,6 +472,7 @@ static void convert_dataset(
 	std::vector <std::vector<std::string>>& game_moves,
 	std::vector <std::vector<float>>& game_values)
 {
+	std::cout << "convert dataset\n";
 	for (int i = 0; i < lines.size(); i += 2)
 	{
 		std::string line_m = lines[i];
@@ -513,6 +515,36 @@ static void convert_dataset(
 		}
 		game_values.push_back(values);
 	}
+	std::cout << "convertion done\n";
+}
+
+static bool should_add_to_dataset(chess::Board& board)
+{
+	static const float PIECE_EVAL[5] = { 100.0f, 300.0f, 300.0f, 500.0f, 900.0f };
+
+	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
+	chess::Bitboard white_bb = board.us(chess::Color::WHITE);
+	float score = 0;
+	for (int i = 1; i < 5; i++)
+	{
+		chess::Bitboard curr_bb = board.pieces(chess::PieceType(i));
+
+		while (curr_bb)
+		{
+			unsigned int sq = chess::builtin::poplsb(curr_bb);
+			chess::Bitboard curr_bb = chess::Bitboard(1) << sq;
+			if ((curr_bb & black_bb) != 0)
+			{
+				score -= PIECE_EVAL[i];
+			}
+			else
+			{
+				score += PIECE_EVAL[i];
+			}
+		}
+	}
+
+	return score == 0;
 }
 
 void leonardo_overlord::train_value_nnet()
@@ -521,15 +553,18 @@ void leonardo_overlord::train_value_nnet()
 	best_value_nnet.set_input_format(leonardo_util::get_sparse_input_format());
 	//best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
 	//best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(8, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(2, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(8, leaky_relu_fn);
+	//best_value_nnet.add_fully_connected_layer(8, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
 
+	std::cout << "read data\n";
 	std::vector<std::string> lines = read_file_lines("dataset.txt");
+	std::cout << "finished reading data\n";
 	std::vector <std::vector<std::string>> game_moves;
 	std::vector <std::vector<float>> game_values;
 
@@ -543,16 +578,16 @@ void leonardo_overlord::train_value_nnet()
 		return;
 	}
 
-	const int games_per_training = 10;
+	const int games_per_training = 1000;
 
 	matrix input(leonardo_util::get_sparse_input_format());
 	matrix label(leonardo_util::get_value_nnet_output_format());
 
 	std::vector<matrix> inputs;
 	std::vector<matrix> labels;
+	auto start = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < game_moves.size(); i++)
 	{
-
 		std::vector<std::string>& moves_uci = game_moves[i];
 		std::vector<float>& values = game_values[i];
 
@@ -572,12 +607,15 @@ void leonardo_overlord::train_value_nnet()
 				if (uci_move == chess::uci::moveToUci(move))
 				{
 					board.makeMove(move);
-					leonardo_util::encode_m_to_sparse_matrix(board, input);
-					inputs.push_back(input);
 
-					matrix label(leonardo_util::get_value_nnet_output_format());
-					label.set_at_flat_host(0, value);
-					labels.push_back(label);
+					if (should_add_to_dataset(board))
+					{
+						leonardo_util::encode_m_to_sparse_matrix(board, input);
+						inputs.push_back(input);
+
+						label.set_at_flat_host(0, value);
+						labels.push_back(label);
+					}
 					move_found = true;
 					break;
 				}
@@ -596,16 +634,28 @@ void leonardo_overlord::train_value_nnet()
 				inputs,
 				labels);
 
+			std::cout << "testing\n";
 			test_result res = best_value_nnet.test_on_ds(ds);
 			std::cout << res.to_string() << "\n";
-			best_value_nnet.learn_on_ds(ds, 1, 1, 0.0001f, false);
+			std::cout << "learning \n";
+			best_value_nnet.learn_on_ds(ds, 1, 256, 0.0001f, false);
 
 			inputs.clear();
 			labels.clear();
 
 			save_best_to_file(i, true, false);
+
+			auto stop = std::chrono::high_resolution_clock::now();
+			long duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
+			long remaining_ms = remaining_time(duration_ms, i, game_moves.size());
+
+			std::cout << (i + 1) << "/" << game_moves.size() << " games  " << ((((float)i + 1) / (float)game_moves.size()) * 100.0f) << "%\n";
+			std::cout << "elapsed: " << ms_to_str(duration_ms) << " remaining: " << ms_to_str(remaining_ms) << "\n";
+			std::cout << "---------------\n";
 		}
 	}
+
+	return;
 }
 /*
 

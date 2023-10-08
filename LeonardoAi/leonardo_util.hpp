@@ -34,10 +34,12 @@ namespace leonardo_util
 
 	//pawn
 	vector3 get_pawn_input_format();
-	void set_board_matrix(matrix& m, int z_idx, int val, chess::Bitboard bb, bool flip);
+	void set_board_matrix(matrix& m, int z_idx, float val, chess::Bitboard bb, bool add, bool flip);
 
 	vector3 get_sparse_input_format();
 	void encode_m_to_sparse_matrix(const chess::Board& board, matrix& input, chess::Color col);
 	void encode_m_to_sparse_matrix(const chess::Board& board, matrix& input);
 	void set_value_nnet_output(matrix& output, float value);
+
+	chess::Bitboard attack_bb(const chess::Board& board, chess::Color col);
 }
