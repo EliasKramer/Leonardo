@@ -1,22 +1,22 @@
 #include "Move.h"
 
-Move::Move(Piece *piece, square from, square to) :
-	piece(piece),
+Move::Move(Piece *piece, uint8_t pieceIndex, square from, square to) :
+	pieceIndex(pieceIndex),
 	from(from), 
 	to(to)
 {
 }
 
-Move::Move(Piece *piece, square from, square to, moveType type) :
-	piece(piece),
+Move::Move(Piece *piece, uint8_t pieceIndex, square from, square to, moveType type) :
+	pieceIndex(pieceIndex),
 	from(from), 
 	to(to), 
 	type(type)
 {
 }
 
-Move::Move(Piece *piece, square from, square to, pieceType promotion) :
-	piece(piece),
+Move::Move(Piece *piece, uint8_t pieceIndex, square from, square to, pieceType promotion) :
+	pieceIndex(pieceIndex),
 	from(from), 
 	to(to), 
 	promotion(promotion),
@@ -24,9 +24,10 @@ Move::Move(Piece *piece, square from, square to, pieceType promotion) :
 {
 }
 
-Piece *Move::getPiece()
+
+uint8_t Move::getPieceIndex() 
 {
-	return piece;
+	return pieceIndex;
 }
 
 square Move::getFrom()
@@ -51,5 +52,5 @@ moveType Move::getType()
 
 bool Move::operator==(const Move& other) const
 {
-	return piece == other.piece && from == other.from && to == other.to && promotion == other.promotion && type == other.type;
+	return pieceIndex == other.pieceIndex && from == other.from && to == other.to && promotion == other.promotion && type == other.type;
 }

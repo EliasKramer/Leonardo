@@ -32,8 +32,8 @@ class Board
 
 		std::vector<Piece> getPiecesOfColor(Color color);
 		bool checkDirectionForAttack(square square, direction dir, bitboard enemySlidingPieces) const;
-		void movePieceFromList(Color color, square from, square to);
-		void removePieceFromList(Color color, square square);
+		void changeBoardPositionInList(std::vector<Piece> *list_p, square from, square to);
+		void removePieceFromList(std::vector<Piece> *list_p, square square);
 	public:
 		Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces);
 		Board(std::string FEN, Color turnColor, square enPassantSquare, bool whiteLeftCastle, bool whiteRightCastle, bool blackLeftCastle, bool blackRightCastle);

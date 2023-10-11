@@ -12,16 +12,16 @@ enum moveType : uint8_t {
 class Move
 {
 	private:
-		Piece *piece;
+		uint8_t pieceIndex;
 		square from;
 		square to;
 		moveType type = NORMAL;
 		pieceType promotion = PIECE_NONE;
 	public:
-		Move(Piece *piece, square from, square to);
-		Move(Piece *piece, square from, square to, moveType type);
-		Move(Piece *piece, square from, square to, pieceType promotion);
-		Piece *getPiece();
+		Move(Piece *piece, uint8_t pieceIndex, square from, square to);
+		Move(Piece *piece, uint8_t pieceIndex, square from, square to, moveType type);
+		Move(Piece *piece, uint8_t pieceIndex, square from, square to, pieceType promotion);
+		uint8_t getPieceIndex();
 		square getFrom();
 		square getTo();
 		pieceType getPromotion();
