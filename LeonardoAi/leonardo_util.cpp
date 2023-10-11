@@ -241,12 +241,18 @@ void leonardo_util::set_pawn_matrix_value(matrix& output, float value, chess::Co
 	output.set_at_flat_host(0, value * col_mult);
 }
 
-float leonardo_util::get_pawn_matrix_value(matrix& output, float value, chess::Color side_to_move)
+float leonardo_util::get_pawn_matrix_value(matrix& output, chess::Color side_to_move)
 {
 	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output_format()));
 
 	float col_mult = side_to_move == chess::Color::WHITE ? 1 : -1;
 	return output.get_at_flat_host(0) * col_mult;
+}
+float leonardo_util::get_pawn_matrix_value(matrix& output)
+{
+	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output_format()));
+
+	return output.get_at_flat_host(0);
 }
 
 void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const chess::Move& move)
@@ -276,7 +282,7 @@ void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const che
 			pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), their_idx), 0); // to handle captures
 		}
 	}
-	
+
 	bool is_capturing_pawn =
 		((1ULL << move.to()) & board.pieces(chess::PieceType::PAWN)) != 0;
 
@@ -324,4 +330,34 @@ void leonardo_util::unmake_move(chess::Board& board, matrix& pawn_board, const c
 
 
 	board.unmakeMove(move);
+}
+
+bool leonardo_util::board_material_equal(chess::Board& board)
+{
+	static const float PIECE_EVAL[5] = { 100.0f, 300.0f, 300.0f, 500.0f, 900.0f };
+	//only consider pieces, not pawns
+
+	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
+	chess::Bitboard white_bb = board.us(chess::Color::WHITE);
+	float score = 0;
+	for (int i = 1; i < 5; i++)
+	{
+		chess::Bitboard curr_bb = board.pieces(chess::PieceType(i));
+
+		while (curr_bb)
+		{
+			unsigned int sq = chess::builtin::poplsb(curr_bb);
+			chess::Bitboard curr_bb = chess::Bitboard(1) << sq;
+			if ((curr_bb & black_bb) != 0)
+			{
+				score -= PIECE_EVAL[i];
+			}
+			else
+			{
+				score += PIECE_EVAL[i];
+			}
+		}
+	}
+
+	return score == 0;
 }

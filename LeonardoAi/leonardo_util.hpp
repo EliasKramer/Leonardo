@@ -38,10 +38,13 @@ namespace leonardo_util
 	vector3 get_pawn_input_format();
 	void encode_pawn_matrix(const chess::Board& board, matrix& input);
 	void set_pawn_matrix_value(matrix& output, float value, chess::Color side_to_move);
-	float get_pawn_matrix_value(matrix& output, float value, chess::Color side_to_move);
+	float get_pawn_matrix_value(matrix& output, chess::Color side_to_move);
+	float get_pawn_matrix_value(matrix& output);
 
 	//executes the move on the board and the pawn board
 	void make_move(chess::Board& board, matrix& pawn_board, const chess::Move& move);
 	//unmakes the move on the board and the pawn board
 	void unmake_move(chess::Board& board, matrix& pawn_board, const chess::Move& move);
+
+	bool board_material_equal(chess::Board& board);
 }

@@ -8,7 +8,6 @@ class leonardo_value_bot : public chess_player
 {
 private:
 	int end_depth;
-
 	std::vector<std::pair<size_t, chess::Move>> openings;
 
 	neural_network value_nnet;

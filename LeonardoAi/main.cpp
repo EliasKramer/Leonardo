@@ -8,6 +8,7 @@
 #include "chess.hpp"
 #include "leonardo_value_bot.hpp"
 #include "leonardo_value_bot_1.hpp"
+#include "leonardo_value_bot_3.hpp"
 #include "leonardo_overlord.hpp"
 
 uint64_t perft(chess::Board& board, int depth) {
@@ -110,17 +111,19 @@ void test_pawn_encoding()
 		}
 	}
 }
+void train()
+{
+	leonardo_overlord ov("nanopawn");
+	ov.train_value_nnet();
+}
 int main()
 {
-	test_pawn_encoding();
-	//leonardo_overlord ov("mini_only_pawn_eq");
-	//ov.train_value_nnet();
-
-	return 0;
+	//train();
+	//return 0;
 	stockfish_interface::init();
 
-	leonardo_value_bot_1 player1(4); //4
-	abp_player player2(5); //5
+	abp_player player1(4);
+	leonardo_value_bot_3 player2(4);
 
 	chess_game game(
 		&player1,

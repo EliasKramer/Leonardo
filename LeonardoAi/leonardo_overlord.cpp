@@ -511,6 +511,7 @@ static void convert_dataset(
 		{
 			float value = std::stof(v);
 			value = std::clamp(value, -20.0f, 20.0f);
+			value /= 20; //normalizing values
 			values.push_back(value);
 		}
 		game_values.push_back(values);
@@ -518,47 +519,13 @@ static void convert_dataset(
 	std::cout << "convertion done\n";
 }
 
-static bool board_material_equal(chess::Board& board)
-{
-	static const float PIECE_EVAL[5] = { 100.0f, 300.0f, 300.0f, 500.0f, 900.0f };
-
-	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
-	chess::Bitboard white_bb = board.us(chess::Color::WHITE);
-	float score = 0;
-	for (int i = 1; i < 5; i++)
-	{
-		chess::Bitboard curr_bb = board.pieces(chess::PieceType(i));
-
-		while (curr_bb)
-		{
-			unsigned int sq = chess::builtin::poplsb(curr_bb);
-			chess::Bitboard curr_bb = chess::Bitboard(1) << sq;
-			if ((curr_bb & black_bb) != 0)
-			{
-				score -= PIECE_EVAL[i];
-			}
-			else
-			{
-				score += PIECE_EVAL[i];
-			}
-		}
-	}
-
-	return score == 0;
-}
-
 void leonardo_overlord::train_value_nnet()
 {
 	best_value_nnet = neural_network(); //reset the best nnet
 	best_value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
-	//best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(8, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(8, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
 
@@ -570,7 +537,6 @@ void leonardo_overlord::train_value_nnet()
 
 	convert_dataset(lines, game_moves, game_values);
 	lines.clear();
-
 
 	if (game_moves.size() != game_values.size())
 	{
@@ -597,6 +563,10 @@ void leonardo_overlord::train_value_nnet()
 		{
 			std::string uci_move = moves_uci[j];
 			float value = values[j];
+			if (board.sideToMove() == chess::Color::BLACK)
+			{
+				value = -value;
+			}
 
 			chess::Movelist moves;
 			chess::movegen::legalmoves(moves, board);
@@ -608,12 +578,12 @@ void leonardo_overlord::train_value_nnet()
 				{
 					board.makeMove(move);
 
-					if (board_material_equal(board))
+					if (leonardo_util::board_material_equal(board))
 					{
 						leonardo_util::encode_pawn_matrix(board, input);
 						inputs.push_back(input);
 
-						label.set_at_flat_host(0, value);
+						leonardo_util::set_pawn_matrix_value(label, value, board.sideToMove());
 						labels.push_back(label);
 					}
 					move_found = true;
@@ -638,7 +608,7 @@ void leonardo_overlord::train_value_nnet()
 			test_result res = best_value_nnet.test_on_ds(ds);
 			std::cout << res.to_string() << "\n";
 			std::cout << "learning \n";
-			best_value_nnet.learn_on_ds(ds, 1, 256, 0.0001f, false);
+			best_value_nnet.learn_on_ds(ds, 1, 128, 0.0001f, false);
 
 			inputs.clear();
 			labels.clear();
