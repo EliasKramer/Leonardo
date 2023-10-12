@@ -32,6 +32,8 @@ uint64_t perft(chess::Board& board, int depth) {
 }
 void test_pawn_encoding()
 {
+	int promotion_count = 0;
+	int en_passant_count = 0;
 	while (true)
 	{
 		chess::Board board(DEFAULT_FEN);
@@ -40,6 +42,7 @@ void test_pawn_encoding()
 		leonardo_util::encode_pawn_matrix(board, board_m);
 		std::cout << "\n\n";
 		std::vector<chess::Move> move_history;
+
 		while (board.isGameOver().second == chess::GameResult::NONE)
 		{
 			chess::Movelist moves;
@@ -47,42 +50,30 @@ void test_pawn_encoding()
 
 			int random_idx = rand() % moves.size();
 			chess::Move chosen_move = chess::Move::NULL_MOVE;
-			if (false)
-			{
-				for (int i = 0; i < moves.size(); i++)
-				{
-					std::string uci_str = chess::uci::moveToUci(moves[i]);
-					std::cout << uci_str << "\n";
-					if (uci_str == "b4a4")
-					{
-						chosen_move = moves[i];
-						break;
-					}
-				}
-				if (chosen_move == chess::Move::NULL_MOVE)
-				{
-					std::cout << "error\n";
-					return;
-				}
-			}
-			else {
-				chosen_move = moves[random_idx];
-			}
+			chosen_move = moves[random_idx];
 
 			leonardo_util::make_move(board, board_m, chosen_move);
 
 			leonardo_util::encode_pawn_matrix(board, slow_board_m);
 			move_history.push_back(chosen_move);
+			
+			if(chosen_move.typeOf() == chess::Move::PROMOTION)
+				promotion_count++;
+			if (chosen_move.typeOf() == chess::Move::ENPASSANT)
+				en_passant_count++;
+
 
 			if (slow_board_m != board_m)
 			{
 				std::cout << "error " << chess::uci::moveToUci(chosen_move) << "\n";
 				std::cout << "slow_m: \n" << slow_board_m.get_string() << "\n";
 				std::cout << "fast_m: \n" << board_m.get_string() << "\n";
+				std::cout << "diff_m: \n" << matrix::get_difference_string(slow_board_m, board_m) << "\n";
+
 				return;
 			}
 
-			std::cout << chess::uci::moveToUci(chosen_move) << "\n";
+			//std::cout << chess::uci::moveToUci(chosen_move) << "\n";
 		}
 		for (int i = move_history.size() - 1; i >= 0; i--)
 		{
@@ -95,18 +86,24 @@ void test_pawn_encoding()
 				std::cout << "error " << chess::uci::moveToUci(move) << "\n";
 				std::cout << "slow_m: \n" << slow_board_m.get_string() << "\n";
 				std::cout << "fast_m: \n" << board_m.get_string() << "\n";
+				std::cout << "diff_m: \n" << matrix::get_difference_string(slow_board_m, board_m) << "\n";
+
 				return;
 			}
 		}
 		chess::Board starting_board(DEFAULT_FEN);
 		matrix m_start(leonardo_util::get_pawn_input_format());
 		leonardo_util::encode_pawn_matrix(starting_board, m_start);
+		std::cout << "promotion count: " << promotion_count << "\n";
+		std::cout << "en passant count: " << en_passant_count << "\n";
+		std::cout << "---------------------\n";
 
 		if (m_start != board_m || m_start != slow_board_m)
 		{
 			std::cout << "start " << "\n";
 			std::cout << "slow_m: \n" << slow_board_m.get_string() << "\n";
 			std::cout << "fast_m: \n" << board_m.get_string() << "\n";
+			std::cout << "diff_m: \n" << matrix::get_difference_string(slow_board_m, board_m) << "\n";
 			return;
 		}
 	}
@@ -118,12 +115,13 @@ void train()
 }
 int main()
 {
+	test_pawn_encoding();
 	//train();
-	//return 0;
+	return 0;
 	stockfish_interface::init();
 
-	abp_player player1(4);
-	leonardo_value_bot_3 player2(4);
+	leonardo_value_bot_3 player1(5);
+	abp_player player2(5);
 
 	chess_game game(
 		&player1,

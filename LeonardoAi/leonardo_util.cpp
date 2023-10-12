@@ -255,36 +255,70 @@ float leonardo_util::get_pawn_matrix_value(matrix& output)
 	return output.get_at_flat_host(0);
 }
 
+static chess::Square get_en_passant_captured_pos(const chess::Move& move)
+{
+	smart_assert(move.typeOf() == chess::Move::ENPASSANT);
+
+	const int to = move.to();
+
+	//map to square to the square of the captured pawn
+
+	//40 to 32 (from 41)
+	//41 to 33
+	//42 to 34
+	//47 to 39
+	//-8 diff
+
+	//16 to 24
+	//17 to 25
+	//18 to 26
+	//23 to 31
+	//+8 diff
+
+	return (chess::Square)(move.to() + (move.from() < move.to() ? -8 : 8));
+}
+
 void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const chess::Move& move)
 {
 	bool is_pawn_move = board.at<chess::PieceType>(move.from()) == chess::PieceType::PAWN;
 	bool white_to_move = board.sideToMove() == chess::Color::WHITE;
+	bool is_capturing_pawn =
+		((1ULL << move.to()) & board.pieces(chess::PieceType::PAWN)) != 0;
 
 	if (is_pawn_move)
 	{
 		bool is_promotion = move.typeOf() == chess::Move::PROMOTION;
 		bool is_en_passant = move.typeOf() == chess::Move::ENPASSANT;
 
-		if (is_en_passant) //just recalculate the pawn matrix if en passant
-		{
-			board.makeMove(move);
-			encode_pawn_matrix(board, pawn_board);
-			return;
-		}
 		int our_idx = white_to_move ? 0 : 1;
 		int their_idx = white_to_move ? 1 : 0;
-
+		//if it is a pawn move the pawn will not be on the from square anymore
 		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.from(), our_idx), 0);
+
+		if (is_en_passant)
+		{
+			board.makeMove(move);
+			//set the current pawn to the next square
+			pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), our_idx), 1);
+
+			chess::Square en_passant_sq = get_en_passant_captured_pos(move);
+			//the taken pawn is on the en passant square
+			pawn_board.set_at_host(sq_to_pawn_matrix_pos(en_passant_sq, their_idx), 0);
+
+			return;
+		}
 
 		if (!is_promotion) // on promotions the .to() square gets out of bounds
 		{
 			pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), our_idx), 1);
-			pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), their_idx), 0); // to handle captures
+
+			// we only need to set the .to() square to 0 if we are capturing a pawn
+			if (is_capturing_pawn)
+			{
+				pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), their_idx), 0); // to handle captures
+			}
 		}
 	}
-
-	bool is_capturing_pawn =
-		((1ULL << move.to()) & board.pieces(chess::PieceType::PAWN)) != 0;
 
 	if (is_capturing_pawn)
 	{
@@ -297,27 +331,35 @@ void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const che
 
 void leonardo_util::unmake_move(chess::Board& board, matrix& pawn_board, const chess::Move& move)
 {
-	bool is_promotion = move.typeOf() == chess::Move::PROMOTION;
-	bool is_en_passant = move.typeOf() == chess::Move::ENPASSANT;
-	if (is_en_passant || is_promotion) //just recalculate the pawn matrix if en passant or promotion
+	//if white is to unmake a move, then black has currently their turn
+	bool white_to_move = board.sideToMove() == chess::Color::BLACK;
+	int their_idx = white_to_move ? 1 : 0;
+	int our_idx = white_to_move ? 0 : 1;
+
+	if (move.typeOf() == chess::Move::PROMOTION)
 	{
+		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.from(), our_idx), 1);
 		board.unmakeMove(move);
-		encode_pawn_matrix(board, pawn_board);
+		return;
+	}
+	if (move.typeOf() == chess::Move::ENPASSANT)
+	{
+		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.from(), our_idx), 1);
+		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), our_idx), 0);
+
+		pawn_board.set_at_host(sq_to_pawn_matrix_pos(
+			get_en_passant_captured_pos(move), their_idx), 1);
+
+		board.unmakeMove(move);
 		return;
 	}
 
 	bool is_pawn_move = board.at<chess::PieceType>(move.to()) == chess::PieceType::PAWN;
-	bool white_to_move = board.sideToMove() == chess::Color::BLACK;
-	int their_idx = white_to_move ? 1 : 0;
 
 	if (is_pawn_move)
 	{
-		int our_idx = white_to_move ? 0 : 1;
-		//if white is to unmake a move, then black has currently their turn
-
 		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.from(), our_idx), 1);
 		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), our_idx), 0);
-
 	}
 
 	chess::Piece captured_piece = board.prevStates().back().captured_piece;
@@ -327,7 +369,6 @@ void leonardo_util::unmake_move(chess::Board& board, matrix& pawn_board, const c
 	{
 		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), their_idx), 1); // to handle captures
 	}
-
 
 	board.unmakeMove(move);
 }
