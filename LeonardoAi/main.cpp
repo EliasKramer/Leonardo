@@ -32,6 +32,17 @@ uint64_t perft(chess::Board& board, int depth) {
 }
 void test_pawn_encoding()
 {
+	neural_network nnet_fast;
+	nnet_fast.set_input_format(leonardo_util::get_pawn_input_format());
+	nnet_fast.add_fully_connected_layer(64, leaky_relu_fn);
+	nnet_fast.add_fully_connected_layer(32, leaky_relu_fn);
+	nnet_fast.add_fully_connected_layer(16, leaky_relu_fn);
+	nnet_fast.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
+
+	nnet_fast.apply_noise(.5f);
+
+	neural_network nnet_slow = nnet_fast;
+
 	int promotion_count = 0;
 	int en_passant_count = 0;
 	while (true)
@@ -39,7 +50,10 @@ void test_pawn_encoding()
 		chess::Board board(DEFAULT_FEN);
 		matrix board_m(leonardo_util::get_pawn_input_format());
 		matrix slow_board_m(leonardo_util::get_pawn_input_format());
+		matrix fast_nnet_out(leonardo_util::get_value_nnet_output_format());
+		matrix slow_nnet_out(leonardo_util::get_value_nnet_output_format());
 		leonardo_util::encode_pawn_matrix(board, board_m);
+		nnet_fast.forward_propagation(board_m);
 		std::cout << "\n\n";
 		std::vector<chess::Move> move_history;
 
@@ -52,12 +66,17 @@ void test_pawn_encoding()
 			chess::Move chosen_move = chess::Move::NULL_MOVE;
 			chosen_move = moves[random_idx];
 
-			leonardo_util::make_move(board, board_m, chosen_move);
+			leonardo_util::make_move(board, board_m, chosen_move, nnet_fast);
+			nnet_fast.rest_partial_forward_prop();
+			fast_nnet_out = nnet_fast.get_output();
 
 			leonardo_util::encode_pawn_matrix(board, slow_board_m);
+			nnet_slow.forward_propagation(slow_board_m);
+			slow_nnet_out = nnet_slow.get_output();
+
 			move_history.push_back(chosen_move);
-			
-			if(chosen_move.typeOf() == chess::Move::PROMOTION)
+
+			if (chosen_move.typeOf() == chess::Move::PROMOTION)
 				promotion_count++;
 			if (chosen_move.typeOf() == chess::Move::ENPASSANT)
 				en_passant_count++;
@@ -72,14 +91,27 @@ void test_pawn_encoding()
 
 				return;
 			}
+			if (!matrix::are_equal(fast_nnet_out, slow_nnet_out, 0.001))
+			{
+				std::cout << "error " << chess::uci::moveToUci(chosen_move) << "\n";
+				std::cout << "slow_nnet_out: \n" << slow_nnet_out.get_string() << "\n";
+				std::cout << "fast_nnet_out: \n" << fast_nnet_out.get_string() << "\n";
+				std::cout << "diff_nnet_out: \n" << matrix::get_difference_string(slow_nnet_out, fast_nnet_out) << "\n";
+				return;
+			}
 
 			//std::cout << chess::uci::moveToUci(chosen_move) << "\n";
 		}
 		for (int i = move_history.size() - 1; i >= 0; i--)
 		{
 			chess::Move move = move_history[i];
-			leonardo_util::unmake_move(board, board_m, move);
+			leonardo_util::unmake_move(board, board_m, move, nnet_fast);
+			nnet_fast.rest_partial_forward_prop();
+			fast_nnet_out = nnet_fast.get_output();
+
 			leonardo_util::encode_pawn_matrix(board, slow_board_m);
+			nnet_slow.forward_propagation(slow_board_m);
+			slow_nnet_out = nnet_slow.get_output();
 
 			if (slow_board_m != board_m)
 			{
@@ -88,6 +120,14 @@ void test_pawn_encoding()
 				std::cout << "fast_m: \n" << board_m.get_string() << "\n";
 				std::cout << "diff_m: \n" << matrix::get_difference_string(slow_board_m, board_m) << "\n";
 
+				return;
+			}
+			if (!matrix::are_equal(fast_nnet_out, slow_nnet_out, 0.001))
+			{
+				std::cout << "error " << chess::uci::moveToUci(move) << "\n";
+				std::cout << "slow_nnet_out: \n" << slow_nnet_out.get_string() << "\n";
+				std::cout << "fast_nnet_out: \n" << fast_nnet_out.get_string() << "\n";
+				std::cout << "diff_nnet_out: \n" << matrix::get_difference_string(slow_nnet_out, fast_nnet_out) << "\n";
 				return;
 			}
 		}
@@ -115,6 +155,7 @@ void train()
 }
 int main()
 {
+	//train();
 	test_pawn_encoding();
 	//train();
 	return 0;

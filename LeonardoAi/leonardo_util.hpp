@@ -42,9 +42,9 @@ namespace leonardo_util
 	float get_pawn_matrix_value(matrix& output);
 
 	//executes the move on the board and the pawn board
-	void make_move(chess::Board& board, matrix& pawn_board, const chess::Move& move);
+	void make_move(chess::Board& board, matrix& pawn_board, const chess::Move& move, neural_network& pawn_nnet);
 	//unmakes the move on the board and the pawn board
-	void unmake_move(chess::Board& board, matrix& pawn_board, const chess::Move& move);
+	void unmake_move(chess::Board& board, matrix& pawn_board, const chess::Move& move, neural_network& pawn_nnet);
 
 	bool board_material_equal(chess::Board& board);
 }

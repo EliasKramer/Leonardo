@@ -215,9 +215,8 @@ float leonardo_value_bot_3::recursive_eval(
 	}
 	for (chess::Move move : moves)
 	{
-		value_nnet.partial_forward_prop(input_matrix, input_matrix, vector3(0));
-		value_nnet.partial_forward_prop(input_matrix, input_matrix, vector3(0));
 		board.makeMove(move);
+		//leonardo_util::make_move(b)
 		int depth_bonus = 0;
 
 		float score = recursive_eval(depth + 1, depth_addition + depth_bonus, board, alpha, beta, best_move);
@@ -326,12 +325,12 @@ leonardo_value_bot_3::leonardo_value_bot_3(int end_depth)
 	: end_depth(end_depth)
 {
 	load_openings();
-	//value_nnet = neural_network("nanopawn.parameters");
-	value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
-	value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
-	value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
-	value_nnet.add_fully_connected_layer(8, leaky_relu_fn);
-	value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
+	value_nnet = neural_network("nanopawn.parameters");
+	//value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
+	//value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
+	//value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
+	//value_nnet.add_fully_connected_layer(8, leaky_relu_fn);
+	//value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 
 	input_matrix = matrix(leonardo_util::get_pawn_input_format());
 }

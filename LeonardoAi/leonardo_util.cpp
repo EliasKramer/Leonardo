@@ -278,12 +278,13 @@ static chess::Square get_en_passant_captured_pos(const chess::Move& move)
 	return (chess::Square)(move.to() + (move.from() < move.to() ? -8 : 8));
 }
 
-void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const chess::Move& move)
+void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const chess::Move& move, neural_network& pawn_nnet)
 {
 	bool is_pawn_move = board.at<chess::PieceType>(move.from()) == chess::PieceType::PAWN;
 	bool white_to_move = board.sideToMove() == chess::Color::WHITE;
 	bool is_capturing_pawn =
 		((1ULL << move.to()) & board.pieces(chess::PieceType::PAWN)) != 0;
+	vector3 change_idx(0, 0, 0);
 
 	if (is_pawn_move)
 	{
@@ -293,29 +294,43 @@ void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const che
 		int our_idx = white_to_move ? 0 : 1;
 		int their_idx = white_to_move ? 1 : 0;
 		//if it is a pawn move the pawn will not be on the from square anymore
-		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.from(), our_idx), 0);
+
+		change_idx = sq_to_pawn_matrix_pos(move.from(), our_idx);
+		pawn_nnet.partial_forward_prop(pawn_board, 0, change_idx);
+		pawn_board.set_at_host(change_idx, 0);
 
 		if (is_en_passant)
 		{
 			board.makeMove(move);
 			//set the current pawn to the next square
-			pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), our_idx), 1);
+		
+			change_idx = sq_to_pawn_matrix_pos(move.to(), our_idx);
+			pawn_nnet.partial_forward_prop(pawn_board, 1, change_idx);
+			pawn_board.set_at_host(change_idx, 1);
+
 
 			chess::Square en_passant_sq = get_en_passant_captured_pos(move);
 			//the taken pawn is on the en passant square
-			pawn_board.set_at_host(sq_to_pawn_matrix_pos(en_passant_sq, their_idx), 0);
+			
+			change_idx = sq_to_pawn_matrix_pos(en_passant_sq, their_idx);
+			pawn_nnet.partial_forward_prop(pawn_board, 0, change_idx);
+			pawn_board.set_at_host(change_idx, 0);
 
 			return;
 		}
 
 		if (!is_promotion) // on promotions the .to() square gets out of bounds
 		{
-			pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), our_idx), 1);
+			change_idx = sq_to_pawn_matrix_pos(move.to(), our_idx);
+			pawn_nnet.partial_forward_prop(pawn_board, 1, change_idx);
+			pawn_board.set_at_host(change_idx, 1);
 
 			// we only need to set the .to() square to 0 if we are capturing a pawn
 			if (is_capturing_pawn)
 			{
-				pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), their_idx), 0); // to handle captures
+				change_idx = sq_to_pawn_matrix_pos(move.to(), their_idx);
+				pawn_nnet.partial_forward_prop(pawn_board, 0, change_idx);
+				pawn_board.set_at_host(change_idx, 0);
 			}
 		}
 	}
@@ -323,32 +338,44 @@ void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const che
 	if (is_capturing_pawn)
 	{
 		int their_idx = white_to_move ? 1 : 0;
-		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), their_idx), 0);
+
+		change_idx = sq_to_pawn_matrix_pos(move.to(), their_idx);
+		pawn_nnet.partial_forward_prop(pawn_board, 0, change_idx);
+		pawn_board.set_at_host(change_idx, 0);
 	}
 
 	board.makeMove(move);
 }
 
-void leonardo_util::unmake_move(chess::Board& board, matrix& pawn_board, const chess::Move& move)
+void leonardo_util::unmake_move(chess::Board& board, matrix& pawn_board, const chess::Move& move, neural_network& pawn_nnet)
 {
 	//if white is to unmake a move, then black has currently their turn
 	bool white_to_move = board.sideToMove() == chess::Color::BLACK;
 	int their_idx = white_to_move ? 1 : 0;
 	int our_idx = white_to_move ? 0 : 1;
+	vector3 change_idx(0, 0, 0);
 
 	if (move.typeOf() == chess::Move::PROMOTION)
 	{
-		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.from(), our_idx), 1);
+		change_idx = sq_to_pawn_matrix_pos(move.from(), our_idx);
+		pawn_nnet.partial_forward_prop(pawn_board, 1, change_idx);
+		pawn_board.set_at_host(change_idx, 1);
 		board.unmakeMove(move);
 		return;
 	}
 	if (move.typeOf() == chess::Move::ENPASSANT)
 	{
-		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.from(), our_idx), 1);
-		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), our_idx), 0);
+		change_idx = sq_to_pawn_matrix_pos(move.from(), our_idx);
+		pawn_nnet.partial_forward_prop(pawn_board, 1, change_idx);
+		pawn_board.set_at_host(change_idx, 1);
 
-		pawn_board.set_at_host(sq_to_pawn_matrix_pos(
-			get_en_passant_captured_pos(move), their_idx), 1);
+		change_idx = sq_to_pawn_matrix_pos(move.to(), our_idx);
+		pawn_nnet.partial_forward_prop(pawn_board, 0, change_idx);
+		pawn_board.set_at_host(change_idx, 0);
+
+		change_idx = sq_to_pawn_matrix_pos(get_en_passant_captured_pos(move), their_idx);
+		pawn_nnet.partial_forward_prop(pawn_board, 1, change_idx);
+		pawn_board.set_at_host(change_idx, 1);
 
 		board.unmakeMove(move);
 		return;
@@ -358,8 +385,13 @@ void leonardo_util::unmake_move(chess::Board& board, matrix& pawn_board, const c
 
 	if (is_pawn_move)
 	{
-		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.from(), our_idx), 1);
-		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), our_idx), 0);
+		change_idx = sq_to_pawn_matrix_pos(move.from(), our_idx);
+		pawn_nnet.partial_forward_prop(pawn_board, 1, change_idx);
+		pawn_board.set_at_host(change_idx, 1);
+
+		change_idx = sq_to_pawn_matrix_pos(move.to(), our_idx);
+		pawn_nnet.partial_forward_prop(pawn_board, 0, change_idx);	
+		pawn_board.set_at_host(change_idx, 0);
 	}
 
 	chess::Piece captured_piece = board.prevStates().back().captured_piece;
@@ -367,7 +399,9 @@ void leonardo_util::unmake_move(chess::Board& board, matrix& pawn_board, const c
 	if (captured_piece == chess::Piece::WHITEPAWN ||
 		captured_piece == chess::Piece::BLACKPAWN)
 	{
-		pawn_board.set_at_host(sq_to_pawn_matrix_pos(move.to(), their_idx), 1); // to handle captures
+		change_idx = sq_to_pawn_matrix_pos(move.to(), their_idx);
+		pawn_nnet.partial_forward_prop(pawn_board, 1, change_idx);
+		pawn_board.set_at_host(change_idx, 1);
 	}
 
 	board.unmakeMove(move);
