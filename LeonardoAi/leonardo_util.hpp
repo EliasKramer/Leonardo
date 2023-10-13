@@ -32,14 +32,19 @@ namespace leonardo_util
 		chess::Board& board,
 		bool double_eval);
 
-	//pawn
+	vector3 sq_to_pawn_matrix_pos(const chess::Square sq, const int z_idx);
+	void set_board_matrix(matrix& m, int z_idx, float val, chess::Bitboard bb);
+
 	vector3 get_pawn_input_format();
-	void set_board_matrix(matrix& m, int z_idx, float val, chess::Bitboard bb, bool add, bool flip);
+	void encode_pawn_matrix(const chess::Board& board, matrix& input);
+	void set_pawn_matrix_value(matrix& output, float value, chess::Color side_to_move);
+	float get_pawn_matrix_value(matrix& output, chess::Color side_to_move);
+	float get_pawn_matrix_value(matrix& output);
 
-	vector3 get_sparse_input_format();
-	void encode_m_to_sparse_matrix(const chess::Board& board, matrix& input, chess::Color col);
-	void encode_m_to_sparse_matrix(const chess::Board& board, matrix& input);
-	void set_value_nnet_output(matrix& output, float value);
+	//executes the move on the board and the pawn board
+	void make_move(chess::Board& board, matrix& pawn_board, const chess::Move& move);
+	//unmakes the move on the board and the pawn board
+	void unmake_move(chess::Board& board, matrix& pawn_board, const chess::Move& move);
 
-	chess::Bitboard attack_bb(const chess::Board& board, chess::Color col);
+	bool board_material_equal(chess::Board& board);
 }

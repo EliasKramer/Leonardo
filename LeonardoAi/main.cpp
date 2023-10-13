@@ -8,6 +8,7 @@
 #include "chess.hpp"
 #include "leonardo_value_bot.hpp"
 #include "leonardo_value_bot_1.hpp"
+#include "leonardo_value_bot_3.hpp"
 #include "leonardo_overlord.hpp"
 
 uint64_t perft(chess::Board& board, int depth) {
@@ -29,76 +30,98 @@ uint64_t perft(chess::Board& board, int depth) {
 
 	return nodes;
 }
-
-void some_encoding()
+void test_pawn_encoding()
 {
-	neural_network nnet;
-	nnet.set_input_format(leonardo_util::get_input_format_one_hot());
-	//nnet.add_fully_connected_layer(200, leaky_relu_fn);
-	nnet.add_fully_connected_layer(leonardo_util::get_input_format_one_hot(), identity_fn);
-	nnet.xavier_initialization();
-
-	chess::Board board = chess::Board(DEFAULT_FEN);
-	matrix input(leonardo_util::get_input_format_one_hot());
-
-	std::vector<matrix> inputs;
-
+	int promotion_count = 0;
+	int en_passant_count = 0;
 	while (true)
 	{
-		chess::Movelist moves;
-		chess::movegen::legalmoves(moves, board);
+		chess::Board board(DEFAULT_FEN);
+		matrix board_m(leonardo_util::get_pawn_input_format());
+		matrix slow_board_m(leonardo_util::get_pawn_input_format());
+		leonardo_util::encode_pawn_matrix(board, board_m);
+		std::cout << "\n\n";
+		std::vector<chess::Move> move_history;
 
-		if (moves.size() == 0)
+		while (board.isGameOver().second == chess::GameResult::NONE)
 		{
-			std::string stuff;
-			std::cout << "no moves\n";
-			std::cin >> stuff;
+			chess::Movelist moves;
+			chess::movegen::legalmoves(moves, board);
+
+			int random_idx = rand() % moves.size();
+			chess::Move chosen_move = chess::Move::NULL_MOVE;
+			chosen_move = moves[random_idx];
+
+			leonardo_util::make_move(board, board_m, chosen_move);
+
+			leonardo_util::encode_pawn_matrix(board, slow_board_m);
+			move_history.push_back(chosen_move);
+			
+			if(chosen_move.typeOf() == chess::Move::PROMOTION)
+				promotion_count++;
+			if (chosen_move.typeOf() == chess::Move::ENPASSANT)
+				en_passant_count++;
+
+
+			if (slow_board_m != board_m)
+			{
+				std::cout << "error " << chess::uci::moveToUci(chosen_move) << "\n";
+				std::cout << "slow_m: \n" << slow_board_m.get_string() << "\n";
+				std::cout << "fast_m: \n" << board_m.get_string() << "\n";
+				std::cout << "diff_m: \n" << matrix::get_difference_string(slow_board_m, board_m) << "\n";
+
+				return;
+			}
+
+			//std::cout << chess::uci::moveToUci(chosen_move) << "\n";
 		}
-
-		for (int i = 0; i < moves.size(); i++)
+		for (int i = move_history.size() - 1; i >= 0; i--)
 		{
-			chess::Move move = moves[i];
-			board.makeMove(move);
+			chess::Move move = move_history[i];
+			leonardo_util::unmake_move(board, board_m, move);
+			leonardo_util::encode_pawn_matrix(board, slow_board_m);
 
-			leonardo_util::set_matrix_from_chessboard_one_hot(board, input);
+			if (slow_board_m != board_m)
+			{
+				std::cout << "error " << chess::uci::moveToUci(move) << "\n";
+				std::cout << "slow_m: \n" << slow_board_m.get_string() << "\n";
+				std::cout << "fast_m: \n" << board_m.get_string() << "\n";
+				std::cout << "diff_m: \n" << matrix::get_difference_string(slow_board_m, board_m) << "\n";
 
-			inputs.push_back(input);
-
-			board.unmakeMove(move);
+				return;
+			}
 		}
+		chess::Board starting_board(DEFAULT_FEN);
+		matrix m_start(leonardo_util::get_pawn_input_format());
+		leonardo_util::encode_pawn_matrix(starting_board, m_start);
+		std::cout << "promotion count: " << promotion_count << "\n";
+		std::cout << "en passant count: " << en_passant_count << "\n";
+		std::cout << "---------------------\n";
 
-		board.makeMove(moves[rand() % moves.size()]);
-
-		if (board.isGameOver().second != chess::GameResult::NONE)
+		if (m_start != board_m || m_start != slow_board_m)
 		{
-			board = chess::Board(DEFAULT_FEN);
-
-			data_space ds(
-				leonardo_util::get_input_format_one_hot(),
-				leonardo_util::get_input_format_one_hot(),
-				inputs,
-				inputs);
-
-			std::cout << "testing\n";
-			std::cout << nnet.test_on_ds(ds).to_string() << "\n";
-			std::cout << "learning\n";
-			nnet.learn_on_ds(ds, 1, 1, 0.0001f, false);
-			std::cout << "paying games\n";
-			inputs.clear();
-			continue;
+			std::cout << "start " << "\n";
+			std::cout << "slow_m: \n" << slow_board_m.get_string() << "\n";
+			std::cout << "fast_m: \n" << board_m.get_string() << "\n";
+			std::cout << "diff_m: \n" << matrix::get_difference_string(slow_board_m, board_m) << "\n";
+			return;
 		}
 	}
 }
+void train()
+{
+	leonardo_overlord ov("nanopawn");
+	ov.train_value_nnet();
+}
 int main()
 {
-	leonardo_overlord ov("mini_only_pawn_eq");
-	ov.train_value_nnet();
-
+	test_pawn_encoding();
+	//train();
 	return 0;
 	stockfish_interface::init();
 
-	leonardo_value_bot_1 player1(4); //4
-	abp_player player2(5); //5
+	leonardo_value_bot_3 player1(5);
+	abp_player player2(5);
 
 	chess_game game(
 		&player1,

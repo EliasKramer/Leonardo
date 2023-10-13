@@ -511,6 +511,7 @@ static void convert_dataset(
 		{
 			float value = std::stof(v);
 			value = std::clamp(value, -20.0f, 20.0f);
+			value /= 20; //normalizing values
 			values.push_back(value);
 		}
 		game_values.push_back(values);
@@ -521,15 +522,10 @@ static void convert_dataset(
 void leonardo_overlord::train_value_nnet()
 {
 	best_value_nnet = neural_network(); //reset the best nnet
-	best_value_nnet.set_input_format(leonardo_util::get_sparse_input_format());
-	//best_value_nnet.add_fully_connected_layer(512, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(256, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
+	best_value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
 	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(8, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(8, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
 
@@ -542,7 +538,6 @@ void leonardo_overlord::train_value_nnet()
 	convert_dataset(lines, game_moves, game_values);
 	lines.clear();
 
-
 	if (game_moves.size() != game_values.size())
 	{
 		std::cout << "error in dataset\n";
@@ -551,7 +546,7 @@ void leonardo_overlord::train_value_nnet()
 
 	const int games_per_training = 1000;
 
-	matrix input(leonardo_util::get_sparse_input_format());
+	matrix input(leonardo_util::get_pawn_input_format());
 	matrix label(leonardo_util::get_value_nnet_output_format());
 
 	std::vector<matrix> inputs;
@@ -568,6 +563,10 @@ void leonardo_overlord::train_value_nnet()
 		{
 			std::string uci_move = moves_uci[j];
 			float value = values[j];
+			if (board.sideToMove() == chess::Color::BLACK)
+			{
+				value = -value;
+			}
 
 			chess::Movelist moves;
 			chess::movegen::legalmoves(moves, board);
@@ -579,12 +578,12 @@ void leonardo_overlord::train_value_nnet()
 				{
 					board.makeMove(move);
 
-					if (should_add_to_dataset(board))
+					if (leonardo_util::board_material_equal(board))
 					{
-						leonardo_util::encode_m_to_sparse_matrix(board, input);
+						leonardo_util::encode_pawn_matrix(board, input);
 						inputs.push_back(input);
 
-						label.set_at_flat_host(0, value);
+						leonardo_util::set_pawn_matrix_value(label, value, board.sideToMove());
 						labels.push_back(label);
 					}
 					move_found = true;
@@ -600,7 +599,7 @@ void leonardo_overlord::train_value_nnet()
 		if ((i + 1) % games_per_training == 0)
 		{
 			data_space ds(
-				leonardo_util::get_sparse_input_format(),
+				leonardo_util::get_pawn_input_format(),
 				leonardo_util::get_value_nnet_output_format(),
 				inputs,
 				labels);
@@ -609,7 +608,7 @@ void leonardo_overlord::train_value_nnet()
 			test_result res = best_value_nnet.test_on_ds(ds);
 			std::cout << res.to_string() << "\n";
 			std::cout << "learning \n";
-			best_value_nnet.learn_on_ds(ds, 1, 256, 0.0001f, false);
+			best_value_nnet.learn_on_ds(ds, 1, 128, 0.0001f, false);
 
 			inputs.clear();
 			labels.clear();

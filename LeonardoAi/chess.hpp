@@ -1519,6 +1519,8 @@ class Board {
 
    private:
     std::string original_fen_;
+   public:
+    const std::vector<State>& prevStates() const { return prev_states_; }
 };
 
 /****************************************************************************\
