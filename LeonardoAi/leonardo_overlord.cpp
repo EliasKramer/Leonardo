@@ -518,35 +518,6 @@ static void convert_dataset(
 	std::cout << "convertion done\n";
 }
 
-static bool should_add_to_dataset(chess::Board& board)
-{
-	static const float PIECE_EVAL[5] = { 100.0f, 300.0f, 300.0f, 500.0f, 900.0f };
-
-	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
-	chess::Bitboard white_bb = board.us(chess::Color::WHITE);
-	float score = 0;
-	for (int i = 1; i < 5; i++)
-	{
-		chess::Bitboard curr_bb = board.pieces(chess::PieceType(i));
-
-		while (curr_bb)
-		{
-			unsigned int sq = chess::builtin::poplsb(curr_bb);
-			chess::Bitboard curr_bb = chess::Bitboard(1) << sq;
-			if ((curr_bb & black_bb) != 0)
-			{
-				score -= PIECE_EVAL[i];
-			}
-			else
-			{
-				score += PIECE_EVAL[i];
-			}
-		}
-	}
-
-	return score == 0;
-}
-
 void leonardo_overlord::train_value_nnet()
 {
 	best_value_nnet = neural_network(); //reset the best nnet
