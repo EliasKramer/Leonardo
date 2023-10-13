@@ -156,13 +156,13 @@ void train()
 int main()
 {
 	//train();
-	test_pawn_encoding();
+	//test_pawn_encoding();
 	//train();
-	return 0;
+	//return 0;
 	stockfish_interface::init();
 
-	leonardo_value_bot_3 player1(5);
-	abp_player player2(5);
+	leonardo_value_bot_3 player1(4);
+	abp_player player2(4);
 
 	chess_game game(
 		&player1,

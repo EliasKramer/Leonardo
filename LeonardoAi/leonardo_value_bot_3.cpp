@@ -215,13 +215,14 @@ float leonardo_value_bot_3::recursive_eval(
 	}
 	for (chess::Move move : moves)
 	{
-		board.makeMove(move);
+		leonardo_util::make_move(board, input_matrix, move, value_nnet);
 		//leonardo_util::make_move(b)
 		int depth_bonus = 0;
 
 		float score = recursive_eval(depth + 1, depth_addition + depth_bonus, board, alpha, beta, best_move);
 
-		board.unmakeMove(move);
+		leonardo_util::unmake_move(board, input_matrix, move, value_nnet);
+
 		if (maximizing)
 		{
 			if (score > best_score)
@@ -364,6 +365,9 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	nodes_visited = 0;
 	bool maximizing = board.sideToMove() == chess::Color::WHITE;
 	chess::Move best_move = chess::Move::NULL_MOVE;
+
+	leonardo_util::encode_pawn_matrix(board, input_matrix);
+
 	auto start = std::chrono::high_resolution_clock::now();
 	float score = recursive_eval(
 		0,
