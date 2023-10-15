@@ -18,7 +18,7 @@ private:
 
 	void load_openings();
 
-	float eval(chess::Board& board, int depth);
+	float eval(chess::Board& board, chess::Movelist& moves, int depth);
 
 	float recursive_eval(
 		int depth,

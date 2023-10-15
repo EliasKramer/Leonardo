@@ -278,7 +278,10 @@ static chess::Square get_en_passant_captured_pos(const chess::Move& move)
 	return (chess::Square)(move.to() + (move.from() < move.to() ? -8 : 8));
 }
 
-void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const chess::Move& move)
+void leonardo_util::make_move(
+	chess::Board& board, 
+	matrix& pawn_board, 
+	const chess::Move& move)
 {
 	bool is_pawn_move = board.at<chess::PieceType>(move.from()) == chess::PieceType::PAWN;
 	bool white_to_move = board.sideToMove() == chess::Color::WHITE;
@@ -400,5 +403,5 @@ bool leonardo_util::board_material_equal(chess::Board& board)
 		}
 	}
 
-	return score == 0;
+	return score == 0 && !board.inCheck();
 }

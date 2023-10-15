@@ -118,11 +118,11 @@ const float POSITION_VALUE[2][5][64]
 	}
 };
 
-float leonardo_value_bot_3::eval(chess::Board& board, int depth)
+float leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int depth)
 {
 	float score = 0.0f;
 
-	std::pair<chess::GameResultReason, chess::GameResult> res = board.isGameOver();
+	std::pair<chess::GameResultReason, chess::GameResult> res = board.isGameOver(moves);
 	if (res.first != chess::GameResultReason::NONE)
 	{
 		float val = 0.0f;
@@ -171,7 +171,7 @@ float leonardo_value_bot_3::eval(chess::Board& board, int depth)
 	}
 
 	//evaluate with nnet
-	if (board_material_equal_score == 0)
+	if (board_material_equal_score == 0 && !board.inCheck())
 	{
 		value_nnet.rest_partial_forward_prop();
 		//this is the slow option to do this.
@@ -194,8 +194,12 @@ float leonardo_value_bot_3::recursive_eval(
 	chess::Move& best_move)
 {
 	nodes_visited++;
+
+	chess::Movelist moves;
+	chess::movegen::legalmoves(moves, board);
+
 	if (depth >= (end_depth + depth_addition))
-		return eval(board, depth);
+		return eval(board, moves, depth);
 
 	if (depth >= end_depth)
 		depth_addition -= 1;
@@ -204,14 +208,11 @@ float leonardo_value_bot_3::recursive_eval(
 
 	float best_score = maximizing ? -FLT_MAX : FLT_MAX;
 
-	chess::Movelist moves;
-	chess::movegen::legalmoves(moves, board);
-
 	//sort_move_list(moves, board);
 
 	if (moves.size() == 0 || board.isRepetition())
 	{
-		return eval(board, depth);
+		return eval(board, moves, depth);
 	}
 	for (chess::Move move : moves)
 	{
@@ -374,7 +375,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		90000,
 		best_move);
 	auto end = std::chrono::high_resolution_clock::now();
-	long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	long long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
 	if (board.sideToMove() == chess::Color::BLACK)
 		score *= -1;
