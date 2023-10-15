@@ -568,6 +568,8 @@ static void play_pawn_game(
 
 	matrix board_matrix(leonardo_util::get_pawn_input_format());
 	std::vector<float> scores;
+
+	int back_to_back_king_move_count = 0;
 	do
 	{
 		best_move = chess::Move::NULL_MOVE;
@@ -576,7 +578,7 @@ static void play_pawn_game(
 			board,
 			best_move,
 			0,
-			8,
+			4,
 			-FLT_MAX,
 			FLT_MAX);
 
@@ -586,9 +588,26 @@ static void play_pawn_game(
 		input_matrices.push_back(board_matrix);
 		scores.push_back(board_eval);
 
-		if (best_move != chess::Move::NULL_MOVE)
-			board.makeMove(best_move);
+		if (best_move == chess::Move::NULL_MOVE)
+		{
+			break;
+		}
+		chess::Bitboard kings = board.pieces(chess::PieceType::KING);
+		bool king_move = ((1ULL << best_move.from()) & kings) != 0;
+		board.makeMove(best_move);
 
+		if (king_move)
+		{
+			back_to_back_king_move_count++;
+		}
+		else
+		{
+			back_to_back_king_move_count = 0;
+		}
+		if (back_to_back_king_move_count >= 3)
+		{
+			break;
+		}
 		//std::cout << "best move: " << chess::uci::moveToUci(best_move) << " score: " << board_eval << "\n";
 		//std::cout << board.getFen() << std::endl;
 		//std::cout << board << std::endl;
@@ -609,11 +628,13 @@ static void play_pawn_game(
 	matrix label(leonardo_util::get_value_nnet_output_format());
 	for (int i = 0; i < scores.size(); i++)
 	{
-		leonardo_util::set_pawn_matrix_value(label, discounted_scores[i] / 20); // normalize
+		discounted_scores[i] /= 20;
+		discounted_scores[i] = std::clamp(discounted_scores[i], -1.0f, 1.0f);
+		leonardo_util::set_pawn_matrix_value(label, discounted_scores[i]); // normalize
 		output_matrices.push_back(label);
 
-		std::cout << "score: " << scores[i] <<
-			" discounted score: " << discounted_scores[i] / 20 << "\n";
+		//std::cout << "score: " << scores[i] <<
+		//	" discounted score: " << discounted_scores[i] << "\n";
 	}
 	//important. the last move is always a win loss or a draw
 	//win loss is a queen on either board. a pawn matrix cannot represent this
@@ -626,12 +647,16 @@ static chess::Board random_pawn_board()
 {
 	chess::Board board("4k3/pppppppp/8/8/8/8/PPPPPPPP/4K3 w - - 0 1");
 
-	std::random_device rd;
-	std::mt19937 gen(rd());
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
 
 	chess::Move chosen_move = chess::Move::NULL_MOVE;
 
-	for (int i = 0; i < 10; i++)
+	//number between 0 and 4
+	std::uniform_int_distribution<> dis(0, 3);
+	int rnd_depth = dis(gen);
+
+	for (int i = 0; i < 4 + rnd_depth; i++) //between 100k and 480mio differnt positions
 	{
 		chosen_move = chess::Move::NULL_MOVE;
 
@@ -659,7 +684,7 @@ static chess::Board random_pawn_board()
 
 		board.makeMove(chosen_move);
 	}
-	std::cout << board << std::endl;
+	//std::cout << board << std::endl;
 
 	return board;
 }
@@ -674,8 +699,10 @@ void leonardo_overlord::reinforcement_learning_pawns()
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
 
-	const int games_per_learning = 1;
-
+	const int games_per_learning = 1000;
+	long long position_count = 0;
+	long long games_count = 0;
+	auto start = std::chrono::high_resolution_clock::now();
 	for (int iteration = 0; ; iteration++)
 	{
 		std::vector<matrix> input_matrices;
@@ -689,7 +716,11 @@ void leonardo_overlord::reinforcement_learning_pawns()
 			bool pawn_moves_possible = get_pawn_moves(random_board, moves);
 
 			if (!pawn_moves_possible)
+			{
+				std::cout << "game ended after random moves\n";
 				continue;
+			}
+			games_count++;
 
 			play_pawn_game(
 				random_board.getFen(),
@@ -707,12 +738,26 @@ void leonardo_overlord::reinforcement_learning_pawns()
 				output_matrices
 			};
 
-			test_result test_res = best_value_nnet.test_on_ds(ds);
-			std::cout << "test_result: \n" << test_res.to_string();
+			position_count += ds.get_item_count();
 
-			best_value_nnet.learn_on_ds(ds, 1, 1, 0.0001f, false);
+			if (iteration % 100 == 0)
+			{
+				test_result test_res = best_value_nnet.test_on_ds(ds);
+				std::cout << "test_result: \n" << test_res.to_string() << "\n";
 
-			save_best_to_file(iteration, true, false);
+				best_value_nnet.learn_on_ds(ds, 1, 1, 0.0001f, false);
+
+				save_best_to_file(iteration, true, false);
+			}
+
+			auto stop = std::chrono::high_resolution_clock::now();
+
+			long long duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
+			std::cout << get_current_time_str() << "\n";
+			std::cout << "duration: " << ms_to_str(duration_ms) << "\n";
+			std::cout << "games: " << games_count << "\n";
+			std::cout << "position count: " << position_count << "\n";
+			std::cout << "--------\n";
 		}
 	}
 }

@@ -155,7 +155,7 @@ void train()
 }
 void play_pawn()
 {
-	leonardo_overlord ov("nanopawn_reinforcement");
+	leonardo_overlord ov("nanopawn_reinforcement_64_32_16");
 
 	ov.reinforcement_learning_pawns();
 }
