@@ -4,7 +4,7 @@
 //PAWN, KNIGHT, BISHOP, ROOK, QUEEN
 const float PIECE_EVAL[5] = { 100.0f, 320.0f, 330.0f, 500.0f, 900.0f };
 //helps determin if a position is equal if you only count piece values and skip pawns
-const float PIECE_VALUE_EQL_POSITIONS[5] = { 0, 300.0f, 300.0f, 500.0f, 900.0f };
+const float PIECE_VALUE_EQL_POSITIONS[5] = { 100, 300.0f, 300.0f, 500.0f, 900.0f };
 
 const float POSITION_VALUE[2][5][64]
 {
@@ -117,7 +117,52 @@ const float POSITION_VALUE[2][5][64]
 		 -20,-10,-10, -5, -5,-10,-10,-20}
 	}
 };
+const int POSITION_VALUE_KING[2][2][64] =
+{
+	//white	
+	{
+		//midgame
+		{20, 30, 10, 0, 0, 10, 30, 20,
+		20, 20, 0, 0, 0, 0, 20, 20,
+		-10, -20, -20, -20, -20, -20, -20, -10,
+		-20, -30, -30, -40, -40, -30, -30, -20,
+		-30, -40, -40, -50, -50, -40, -40, -30,
+		-30, -40, -40, -50, -50, -40, -40, -30,
+		-30, -40, -40, -50, -50, -40, -40, -30,
+		-30, -40, -40, -50, -50, -40, -40, -30},
 
+		//endgame
+		{-50, -30, -30, -30, -30, -30, -30, -50,
+		-30, -30, 0, 0, 0, 0, -30, -30,
+		-30, -10, 20, 30, 30, 20, -10, -30,
+		-30, -10, 30, 40, 40, 30, -10, -30,
+		-30, -10, 30, 40, 40, 30, -10, -30,
+		-30, -10, 20, 30, 30, 20, -10, -30,
+		-30, -20, -10, 0, 0, -10, -20, -30,
+		-50, -40, -30, -20, -20, -30, -40, -50}
+	},
+	//black
+	{
+		//midgame
+		{-30,-40,-40,-50,-50,-40,-40,-30,
+		-30,-40,-40,-50,-50,-40,-40,-30,
+		-30,-40,-40,-50,-50,-40,-40,-30,
+		-30,-40,-40,-50,-50,-40,-40,-30,
+		-20,-30,-30,-40,-40,-30,-30,-20,
+		-10,-20,-20,-20,-20,-20,-20,-10,
+		20, 20, 0, 0, 0, 0, 20, 20,
+		20, 30, 10, 0, 0, 10, 30, 20},
+		//endgame
+		{-50,-40,-30,-20,-20,-30,-40,-50,
+		-30,-20,-10, 0, 0,-10,-20,-30,
+		-30,-10, 20, 30, 30, 20,-10,-30,
+		-30,-10, 30, 40, 40, 30,-10,-30,
+		-30,-10, 30, 40, 40, 30,-10,-30,
+		-30,-10, 20, 30, 30, 20,-10,-30,
+		-30,-30, 0, 0, 0, 0,-30,-30,
+		-50,-30,-30,-30,-30,-30,-30,-50}
+	}
+};
 float leonardo_value_bot_3::eval(chess::Board& board, int depth)
 {
 	float score = 0.0f;
@@ -135,7 +180,7 @@ float leonardo_value_bot_3::eval(chess::Board& board, int depth)
 			val = -100000 + depth;
 			break;
 		case chess::GameResult::DRAW:
-			val = -10.0f + depth;
+			val = -1000.0f + depth;
 			break;
 		}
 		if (board.sideToMove() == chess::Color::BLACK)
@@ -146,6 +191,10 @@ float leonardo_value_bot_3::eval(chess::Board& board, int depth)
 
 	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
 	chess::Bitboard white_bb = board.us(chess::Color::WHITE);
+
+	int non_pawn_count_white = 0;
+	int non_pawn_count_black = 0;
+
 	float board_material_equal_score = 0;
 	for (int i = 0; i < 5; i++)
 	{
@@ -160,15 +209,27 @@ float leonardo_value_bot_3::eval(chess::Board& board, int depth)
 				score -= PIECE_EVAL[i];
 				score -= POSITION_VALUE[1][i][sq];
 				board_material_equal_score -= PIECE_VALUE_EQL_POSITIONS[i];
+				if(i != 0)
+					non_pawn_count_black++;
 			}
 			else
 			{
 				score += PIECE_EVAL[i];
 				score += POSITION_VALUE[0][i][sq];
 				board_material_equal_score += PIECE_VALUE_EQL_POSITIONS[i];
+				if(i != 0)
+					non_pawn_count_white++;
 			}
 		}
 	}
+
+	int game_duration_state_white = non_pawn_count_white < 4 ? 1 : 0;
+	int game_duration_state_black = non_pawn_count_black < 4 ? 1 : 0;
+
+	float king_score = POSITION_VALUE_KING[0][game_duration_state_white][board.kingSq(chess::Color::WHITE)];
+	king_score -= POSITION_VALUE_KING[1][game_duration_state_black][board.kingSq(chess::Color::BLACK)];
+
+	score += king_score;
 
 	//evaluate with nnet
 	if (board_material_equal_score == 0)
@@ -177,10 +238,29 @@ float leonardo_value_bot_3::eval(chess::Board& board, int depth)
 		//this is the slow option to do this.
 		//leonardo_util::encode_pawn_matrix(board, input_matrix);
 		//value_nnet.partial_forward_prop(input_matrix, input_matrix, vector3(0, 0, 0));
-		score +=
+		float nnet_score =
 			leonardo_util::get_pawn_matrix_value(value_nnet.get_output()) * //is around -1 and 1 (not guaranteed)
-			100.0f;
+			1000;
+
+		score += nnet_score;
+
+		if (print_count > 0)
+		{
+
+			std::cout << "----------\n";
+			std::cout << "nnet score: " << nnet_score << std::endl;
+
+			std::cout << leonardo_util::get_pawn_structure_str(board);
+
+			std::cout << "----------\n";
+			print_count--;
+		}
+
+
+		leaf_nodes_evaluated_nnet++;
 	}
+
+	leaf_nodes++;
 
 	return score;
 }
@@ -363,6 +443,12 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 
 	pruned = 0;
 	nodes_visited = 0;
+
+	leaf_nodes = 0;
+	leaf_nodes_evaluated_nnet = 0;
+
+	print_count = 0;
+
 	bool maximizing = board.sideToMove() == chess::Color::WHITE;
 	chess::Move best_move = chess::Move::NULL_MOVE;
 
@@ -373,8 +459,8 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		0,
 		0,
 		board,
-		-90000,
-		90000,
+		-FLT_MAX,
+		FLT_MAX,
 		best_move);
 	auto end = std::chrono::high_resolution_clock::now();
 	long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
@@ -382,8 +468,12 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	if (board.sideToMove() == chess::Color::BLACK)
 		score *= -1;
 
+
 	std::cout
 		<< "pruned: " << pruned << "\n"
+		<< "leaf nodes: " << leaf_nodes << "\n"
+		<< "leaf nodes evaluated by nnet: " << leaf_nodes_evaluated_nnet << "\n"
+		<< "nnet eval leaf nodes: " << (leaf_nodes_evaluated_nnet / (float)std::max(1, leaf_nodes)) * 100.0f << "%\n"
 		<< "nodes visited: " << nodes_visited << "\n"
 		<< "time taken: " << ms_taken << "ms\n"
 		<< "nodes/second: " << (nodes_visited / (ms_taken / 1000.0)) << "\n"

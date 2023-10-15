@@ -11,6 +11,12 @@ private:
 
 	int pruned = 0;
 	int nodes_visited = 0;
+
+	int leaf_nodes = 0;
+	int leaf_nodes_evaluated_nnet = 0;
+
+	int print_count = 0;
+
 	std::vector<std::pair<size_t, chess::Move>> openings;
 
 	neural_network value_nnet;

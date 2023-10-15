@@ -150,19 +150,27 @@ void test_pawn_encoding()
 }
 void train()
 {
-	leonardo_overlord ov("nanopawn");
+	leonardo_overlord ov("nanopawn_big_lay");
 	ov.train_value_nnet();
+}
+void play_pawn()
+{
+	leonardo_overlord ov("nanopawn_reinforcement");
+
+	ov.reinforcement_learning_pawns();
 }
 int main()
 {
+	play_pawn();
+	return 0;
 	//train();
 	//test_pawn_encoding();
 	//train();
 	//return 0;
-	stockfish_interface::init();
+	//stockfish_interface::init();
 
-	leonardo_value_bot_3 player1(4);
-	abp_player player2(4);
+	leonardo_value_bot_3 player1(5);
+	abp_player player2(5);
 
 	chess_game game(
 		&player1,

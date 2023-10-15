@@ -240,6 +240,12 @@ void leonardo_util::set_pawn_matrix_value(matrix& output, float value, chess::Co
 	float col_mult = side_to_move == chess::Color::WHITE ? 1 : -1;
 	output.set_at_flat_host(0, value * col_mult);
 }
+void leonardo_util::set_pawn_matrix_value(matrix& output, float value)
+{
+	smart_assert(vector3::are_equal(output.get_format(), get_value_nnet_output_format()));
+
+	output.set_at_flat_host(0, value);
+}
 
 float leonardo_util::get_pawn_matrix_value(matrix& output, chess::Color side_to_move)
 {
@@ -303,7 +309,7 @@ void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const che
 		{
 			board.makeMove(move);
 			//set the current pawn to the next square
-		
+
 			change_idx = sq_to_pawn_matrix_pos(move.to(), our_idx);
 			pawn_nnet.partial_forward_prop(pawn_board, 1, change_idx);
 			pawn_board.set_at_host(change_idx, 1);
@@ -311,7 +317,7 @@ void leonardo_util::make_move(chess::Board& board, matrix& pawn_board, const che
 
 			chess::Square en_passant_sq = get_en_passant_captured_pos(move);
 			//the taken pawn is on the en passant square
-			
+
 			change_idx = sq_to_pawn_matrix_pos(en_passant_sq, their_idx);
 			pawn_nnet.partial_forward_prop(pawn_board, 0, change_idx);
 			pawn_board.set_at_host(change_idx, 0);
@@ -390,7 +396,7 @@ void leonardo_util::unmake_move(chess::Board& board, matrix& pawn_board, const c
 		pawn_board.set_at_host(change_idx, 1);
 
 		change_idx = sq_to_pawn_matrix_pos(move.to(), our_idx);
-		pawn_nnet.partial_forward_prop(pawn_board, 0, change_idx);	
+		pawn_nnet.partial_forward_prop(pawn_board, 0, change_idx);
 		pawn_board.set_at_host(change_idx, 0);
 	}
 
@@ -415,7 +421,7 @@ bool leonardo_util::board_material_equal(chess::Board& board)
 	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
 	chess::Bitboard white_bb = board.us(chess::Color::WHITE);
 	float score = 0;
-	for (int i = 1; i < 5; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		chess::Bitboard curr_bb = board.pieces(chess::PieceType(i));
 
@@ -435,4 +441,39 @@ bool leonardo_util::board_material_equal(chess::Board& board)
 	}
 
 	return score == 0;
+}
+
+std::string leonardo_util::get_pawn_structure_str(chess::Board& board)
+{
+	std::string res = "";
+
+	chess::Bitboard white_bb = board.us(chess::Color::WHITE);
+
+	for (int y = 7; y >= 0; y--)
+	{
+		for (int x = 0; x < 8; x++)
+		{
+			int sq = y * 8 + x;
+			if (board.at<chess::PieceType>((chess::Square)sq) == chess::PieceType::PAWN)
+			{
+				if ((1ULL << sq & white_bb) != 0)
+				{
+					res += "W ";
+				}
+				else
+				{
+					res += "B ";
+				}
+			}
+			else
+			{
+				res += ". ";
+			}
+
+		}
+		res += "\n";
+	}
+
+	return res + "\n";
+
 }

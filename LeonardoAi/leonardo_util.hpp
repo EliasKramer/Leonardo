@@ -38,6 +38,7 @@ namespace leonardo_util
 	vector3 get_pawn_input_format();
 	void encode_pawn_matrix(const chess::Board& board, matrix& input);
 	void set_pawn_matrix_value(matrix& output, float value, chess::Color side_to_move);
+	void set_pawn_matrix_value(matrix& output, float value);
 	float get_pawn_matrix_value(matrix& output, chess::Color side_to_move);
 	float get_pawn_matrix_value(matrix& output);
 
@@ -47,4 +48,5 @@ namespace leonardo_util
 	void unmake_move(chess::Board& board, matrix& pawn_board, const chess::Move& move, neural_network& pawn_nnet);
 
 	bool board_material_equal(chess::Board& board);
+	std::string get_pawn_structure_str(chess::Board& board);
 }
