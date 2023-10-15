@@ -115,7 +115,52 @@ const float POSITION_VALUE[2][5][64]
 		 -20,-10,-10, -5, -5,-10,-10,-20}
 	}
 };
+const int POSITION_VALUE_KING[2][2][64] =
+{
+	//white	
+	{
+		//midgame
+		{20, 30, 10, 0, 0, 10, 30, 20,
+		20, 20, 0, 0, 0, 0, 20, 20,
+		-10, -20, -20, -20, -20, -20, -20, -10,
+		-20, -30, -30, -40, -40, -30, -30, -20,
+		-30, -40, -40, -50, -50, -40, -40, -30,
+		-30, -40, -40, -50, -50, -40, -40, -30,
+		-30, -40, -40, -50, -50, -40, -40, -30,
+		-30, -40, -40, -50, -50, -40, -40, -30},
 
+		//endgame
+		{-50, -30, -30, -30, -30, -30, -30, -50,
+		-30, -30, 0, 0, 0, 0, -30, -30,
+		-30, -10, 20, 30, 30, 20, -10, -30,
+		-30, -10, 30, 40, 40, 30, -10, -30,
+		-30, -10, 30, 40, 40, 30, -10, -30,
+		-30, -10, 20, 30, 30, 20, -10, -30,
+		-30, -20, -10, 0, 0, -10, -20, -30,
+		-50, -40, -30, -20, -20, -30, -40, -50}
+	},
+	//black
+	{
+		//midgame
+		{-30,-40,-40,-50,-50,-40,-40,-30,
+		-30,-40,-40,-50,-50,-40,-40,-30,
+		-30,-40,-40,-50,-50,-40,-40,-30,
+		-30,-40,-40,-50,-50,-40,-40,-30,
+		-20,-30,-30,-40,-40,-30,-30,-20,
+		-10,-20,-20,-20,-20,-20,-20,-10,
+		20, 20, 0, 0, 0, 0, 20, 20,
+		20, 30, 10, 0, 0, 10, 30, 20},
+		//endgame
+		{-50,-40,-30,-20,-20,-30,-40,-50,
+		-30,-20,-10, 0, 0,-10,-20,-30,
+		-30,-10, 20, 30, 30, 20,-10,-30,
+		-30,-10, 30, 40, 40, 30,-10,-30,
+		-30,-10, 30, 40, 40, 30,-10,-30,
+		-30,-10, 20, 30, 30, 20,-10,-30,
+		-30,-30, 0, 0, 0, 0,-30,-30,
+		-50,-30,-30,-30,-30,-30,-30,-50}
+	}
+};
 static float eval(chess::Board& board, int depth)
 {
 	float score = 0.0f;
@@ -145,6 +190,9 @@ static float eval(chess::Board& board, int depth)
 	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
 	chess::Bitboard white_bb = board.us(chess::Color::WHITE);
 
+	int non_pawn_count_black = 0;
+	int non_pawn_count_white = 0;
+
 	for (int i = 0; i < 5; i++)
 	{
 		chess::Bitboard curr_bb = board.pieces(chess::PieceType(i));
@@ -157,14 +205,26 @@ static float eval(chess::Board& board, int depth)
 			{
 				score -= PIECE_EVAL[i];
 				score -= POSITION_VALUE[1][i][sq];
+				if (i != 0)
+					non_pawn_count_black++;
 			}
 			else
 			{
 				score += PIECE_EVAL[i];
 				score += POSITION_VALUE[0][i][sq];
+				if (i != 0)
+					non_pawn_count_white++;
 			}
 		}
 	}
+
+	int game_duration_state_white = non_pawn_count_white < 4 ? 1 : 0;
+	int game_duration_state_black = non_pawn_count_black < 4 ? 1 : 0;
+
+	float king_score = POSITION_VALUE_KING[0][game_duration_state_white][board.kingSq(chess::Color::WHITE)];
+	king_score -= POSITION_VALUE_KING[1][game_duration_state_black][board.kingSq(chess::Color::BLACK)];
+
+	score += king_score;
 
 	return score / 100;
 }

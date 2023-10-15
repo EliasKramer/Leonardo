@@ -34,4 +34,7 @@ public:
 
 	void test_value_nnet_single(std::string& game);
 	void test_value_nnet();
+
+	//pawngame
+	void reinforcement_learning_pawns();
 };
