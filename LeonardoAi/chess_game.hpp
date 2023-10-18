@@ -9,6 +9,6 @@ private:
 	chess_player* black_player;
 public:
 	chess_game(chess_player* white_player, chess_player* black_player);
-	void play();
+	int play();
 };
 

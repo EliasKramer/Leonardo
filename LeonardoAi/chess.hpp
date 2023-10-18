@@ -1749,6 +1749,7 @@ inline void Board::setFen(const std::string &fen) { setFenInternal(fen); }
 }
 
 inline std::ostream &operator<<(std::ostream &os, const Board &b) {
+    os << b.getFen() << "\n";
     for (int i = 63; i >= 0; i -= 8) {
         os << " " << pieceToChar(b.board_[i - 7]) << " " << pieceToChar(b.board_[i - 6]) << " "
            << pieceToChar(b.board_[i - 5]) << " " << pieceToChar(b.board_[i - 4]) << " "
