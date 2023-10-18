@@ -584,9 +584,11 @@ void leonardo_value_bot_3::sort_move_list(chess::Movelist& moves, chess::Board& 
 		board.makeMove(move);
 		size_t hash = board.hash();
 		board.unmakeMove(move);
-		tt_item* stored_tt_item = tt_get(board, FLT_MAX);
+		tt_item* stored_tt_item = tt_get(board, INT_MAX);
 		if (stored_tt_item != nullptr)
 		{
+			float val = stored_tt_item->value * 1000;
+			val *= board.sideToMove() == chess::Color::WHITE ? 1 : -1;
 			move.setScore(stored_tt_item->value * 1000); //always in front of the capture moves
 		}
 		else if (board.isCapture(move))
@@ -657,10 +659,10 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 
 	if (board.sideToMove() == chess::Color::BLACK)
 		score *= -1;
+
 	std::cout << "transposition table size: " << tt.size()
 		<< " | transpositions: " << transpositions_count
 		<< "\n";
-
 #ifdef DEBUG_PRINT
 	std::cout
 		<< "pruned: " << pruned << "\n"
