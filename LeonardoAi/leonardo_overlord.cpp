@@ -749,7 +749,6 @@ void leonardo_overlord::reinforcement_learning_pawns()
 			}
 
 			auto stop = std::chrono::high_resolution_clock::now();
-
 			long long duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
 			std::cout << get_current_time_str() << "\n";
 			std::cout << "duration: " << ms_to_str(duration_ms) << "\n";

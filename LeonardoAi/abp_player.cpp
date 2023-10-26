@@ -1,5 +1,6 @@
 #include "abp_player.hpp"
 #include "leonardo_util.hpp"
+//#define DEBUG_PRINT
 
 //PAWN, KNIGHT, BISHOP, ROOK, QUEEN
 const float PIECE_EVAL[5] = { 100.0f, 320.0f, 330.0f, 500.0f, 900.0f };
@@ -267,8 +268,15 @@ static float recursive_eval(
 			best_score = std::min(best_score, score);
 			beta = std::min(beta, score);
 		}
+
+		//std::cout << "move: " << chess::uci::moveToUci(move) << ": " << score
+		//	<< " a: " << alpha << "| b: " << beta << "\n";
+
 		if (beta <= alpha)
+		{
+			//std::cout << "pruned\n";
 			break;
+		}
 	}
 
 	return best_score;
@@ -352,7 +360,9 @@ chess::Move abp_player::get_move(chess::Board& board)
 	int opening_move_idx = get_opening_move(board.hash());
 	if (opening_move_idx != -1)
 	{
+#ifdef DEBUG_PRINT
 		std::cout << "opening move found\n\n";
+#endif // DEBUG_PRINT
 		return openings[opening_move_idx].second;
 	}
 
@@ -366,10 +376,13 @@ chess::Move abp_player::get_move(chess::Board& board)
 	{
 		board.makeMove(move);
 		float score = recursive_eval(start_depth - 1, board, board.sideToMove() == chess::Color::WHITE, -FLT_MAX, FLT_MAX);
+		//std::cout << "move: " << chess::uci::moveToUci(move) << ": " << score << "\n";
 		if (board.sideToMove() == chess::Color::WHITE)
 			score *= -1;
 		board.unmakeMove(move);
+		#ifdef DEBUG_PRINT
 		std::cout << chess::uci::moveToUci(move) << " " << score << "\n";
+		#endif
 		if (score > best_score)
 		{
 			best_score = score;

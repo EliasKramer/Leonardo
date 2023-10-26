@@ -1,8 +1,18 @@
 #pragma once
+//#define DEBUG_PRINT
 
 #include "chess_player.hpp"
 #include "NeuroFox/neural_network.hpp"
 #include "stockfish_interface.hpp"
+
+class tt_item
+{
+public:
+	int depth;
+	float value;
+	float alpha;
+	float beta;
+};
 
 class leonardo_value_bot_3 : public chess_player
 {
@@ -15,16 +25,26 @@ private:
 	int leaf_nodes = 0;
 	int leaf_nodes_evaluated_nnet = 0;
 
+	bool use_nnet = false;
+
 	int print_count = 0;
+
+	int transpositions_count = 0;
+
+	//transposition table
+	std::unordered_map<size_t, tt_item> tt;
 
 	std::vector<std::pair<size_t, chess::Move>> openings;
 
 	neural_network value_nnet;
 	matrix input_matrix;
 
+	tt_item* tt_get(chess::Board& board, int depth);
+	void tt_store(chess::Board& board, int depth, float value, float alpha, float beta);
+
 	void load_openings();
 
-	float eval(chess::Board& board, int depth);
+	float eval(chess::Board& board, chess::Movelist& moves, int depth);
 
 	float recursive_eval(
 		int depth,

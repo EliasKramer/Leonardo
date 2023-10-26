@@ -159,26 +159,42 @@ void play_pawn()
 
 	ov.reinforcement_learning_pawns();
 }
-int main()
-{
-	play_pawn();
-	return 0;
-	//train();
-	//test_pawn_encoding();
-	//train();
-	//return 0;
-	//stockfish_interface::init();
 
-	leonardo_value_bot_3 player1(5);
-	abp_player player2(5);
+void play(int* scores, std::mutex& m)
+{
+	abp_player player1(5); //bit stronger abp
+	leonardo_value_bot_3 player2(5);
 
 	chess_game game(
 		&player1,
-		&player2
-	);
+		&player2);
 
-	game.play();
+	while (true)
+	{
+		int idx = game.play() + 1;
+		std::lock_guard<std::mutex> lock(m);
+		scores[idx] += 1;
+		std::cout << "b(" << scores[0] << ") d(" << scores[1] << ") w(" << scores[2] << ")\n";
+	}
+}
 
+void async_play()
+{
+	std::mutex m;
+	int scores[3] = { 0,0,0 };
+	int thread_count = 1;
+	std::vector<std::thread> threads;
+	for (int i = 0; i < thread_count; i++)
+	{
+		threads.push_back(std::thread(play, scores, std::ref(m)));
+	}
+	for (int i = 0; i < thread_count; i++)
+	{
+		threads[i].join();
+	}
+}
 
-	std::cout << "Hello World!\n";
+int main()
+{
+	async_play();
 }

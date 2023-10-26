@@ -16,7 +16,7 @@ const std::string OUTCOME_STR[6] = {
 	"THREEFOLD_REPETITION",
 	"NONE"
 };
-void chess_game::play()
+int chess_game::play()
 {
 	chess::Board board = chess::Board(DEFAULT_FEN);
 	bool white_to_move = true;
@@ -27,16 +27,18 @@ void chess_game::play()
 	int moves_calculated[2] = { 0, 0 };
 	int moves_played[2] = { 0, 0 };
 
-	while (board.isGameOver().first == chess::GameResultReason::NONE)
+	while (board.isGameOver().second == chess::GameResult::NONE)
 	{
 		white_to_move = board.sideToMove() == chess::Color::WHITE;
+#ifdef DEBUG_PRINT
 		std::cout << (white_to_move ? "white" : "black") << " to move\n";
 		std::cout << board.getFen() << "\n";
 		std::cout << board << std::endl;
+#endif
 
 		auto start = std::chrono::high_resolution_clock::now();
-		chess::Move move = white_to_move ? 
-			white_player->get_move(board) : 
+		chess::Move move = white_to_move ?
+			white_player->get_move(board) :
 			black_player->get_move(board);
 		auto end = std::chrono::high_resolution_clock::now();
 
@@ -60,7 +62,7 @@ void chess_game::play()
 		if (!move_found)
 		{
 			std::cout << "illegal move " << chess::uci::moveToUci(move) << std::endl;
-			return;
+			return 0;
 		}
 		long long ms_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
@@ -68,15 +70,16 @@ void chess_game::play()
 		ms_sum[side_idx] += ms_elapsed;
 		moves_calculated[side_idx] += moves.size();
 		moves_played[side_idx]++;
-
+		
+		#ifdef DEBUG_PRINT
 		std::cout << chess::uci::moveToUci(move) << " took " << ms_elapsed << "ms" << std::endl;
-
+		std::cout << "------------------------\n";
+		#endif // DEBUG_PRINT
 		moves_str += chess::uci::moveToUci(move) + "\n";
 
 		board.makeMove(move);
-
-		std::cout << "------------------------\n";
 	}
+
 
 	std::cout << "game over" << std::endl;
 	std::cout << "color: " << (white_to_move ? "black" : "white") << std::endl;
@@ -88,6 +91,8 @@ void chess_game::play()
 		<< moves_played[0] << "\t" << moves_played[1] << "\t moves_played\n"
 		<< ms_sum[0] / std::max(1, moves_calculated[0]) << "\t" << ms_sum[1] / std::max(1, moves_calculated[1]) << "\t ms_per_move_calculated	\n"
 		<< ms_sum[0] / std::max(1, moves_played[0]) << "\t" << ms_sum[1] / std::max(1, moves_played[1]) << "\t ms_per_move_played\n";
-
 	std::cout << "moves: \n" << moves_str << std::endl;
+	std::cout << board.getFen() << "\n";
+	return board.isGameOver().first != chess::GameResultReason::CHECKMATE ? 0 :
+		white_to_move ? 1 : -1;
 }

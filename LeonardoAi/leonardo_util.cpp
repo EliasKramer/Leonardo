@@ -440,7 +440,7 @@ bool leonardo_util::board_material_equal(chess::Board& board)
 		}
 	}
 
-	return score == 0;
+	return score == 0 && !board.inCheck();
 }
 
 std::string leonardo_util::get_pawn_structure_str(chess::Board& board)
