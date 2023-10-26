@@ -693,9 +693,7 @@ void leonardo_overlord::reinforcement_learning_pawns()
 {
 	best_value_nnet = neural_network(); //reset the best nnet
 	best_value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
-	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
 
@@ -703,12 +701,12 @@ void leonardo_overlord::reinforcement_learning_pawns()
 	long long position_count = 0;
 	long long games_count = 0;
 	auto start = std::chrono::high_resolution_clock::now();
-	for (int iteration = 0; ; iteration++)
+	for (long long iteration = 0; ; iteration++)
 	{
 		std::vector<matrix> input_matrices;
 		std::vector<matrix> output_matrices;
 
-		for (int i = 0; i < games_per_learning; i++)
+		for (long long i = 0; i < games_per_learning; i++)
 		{
 			chess::Board random_board = random_pawn_board();
 			chess::Movelist moves;
