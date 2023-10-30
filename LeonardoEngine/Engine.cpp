@@ -5,9 +5,14 @@ std::vector<Move> getMoves(Board &board)
 {
 	std::vector<Move> moves;
 	std::vector<Piece> &pieces = board.getTurnColor() == WHITE ? board.getWhitePiecesList() : board.getBlackPiecesList();
-	for (Piece &piece : pieces)
+	/*for (Piece &piece : pieces)
 	{
 		std::vector<Move> pieceMoves = getMovesForPiece(board, piece);
+		moves.insert(moves.end(), pieceMoves.begin(), pieceMoves.end());
+	}*/
+	for (uint8_t i = 0; i < pieces.size(); i++)
+	{
+		std::vector<Move> pieceMoves = getMovesForPiece(board, pieces[i], i);
 		moves.insert(moves.end(), pieceMoves.begin(), pieceMoves.end());
 	}
 	return moves;
@@ -31,26 +36,26 @@ int getNodesForDepth(Board& board, int depth)
 }
 
 
-std::vector<Move> getMovesForPiece(const Board &board, Piece &piece)
+std::vector<Move> getMovesForPiece(const Board &board, Piece &piece, uint8_t pieceIndex)
 {	switch (piece.type)
 	{
 		case PAWN:
-			return getMovesForPawn(board, piece);
+			return getMovesForPawn(board, piece, pieceIndex);
 		case KNIGHT:
-			return getMovesForKnight(board, piece);
+			return getMovesForKnight(board, piece, pieceIndex);
 		case BISHOP:
-			return getMovesForBishop(board, piece);
+			return getMovesForBishop(board, piece, pieceIndex);
 		case ROOK:
-			return getMovesForRook(board, piece);
+			return getMovesForRook(board, piece, pieceIndex);
 		case QUEEN:
-			return getMovesForQueen(board, piece);
+			return getMovesForQueen(board, piece, pieceIndex);
 		case KING:
-			return getMovesForKing(board, piece);
+			return getMovesForKing(board, piece, pieceIndex);
 	}
 	throw;
 }
 
-std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn)
+std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn, uint8_t pieceIndex)
 {
 	std::vector<Move> moves;
 	bitboard position = 1ULL << pawn.position;
@@ -65,14 +70,14 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn)
 	{
 		if (target & RANK_8 || target & RANK_1)
 		{
-			Move promoteN(&pawn, pawn.position, targetSquare, KNIGHT);
+			Move promoteN(&pawn, pieceIndex, pawn.position, targetSquare, KNIGHT);
 
 			Board newBoard(board);
 			if (newBoard.isMoveStrictlyLegal(promoteN))
 			{
-				Move promoteB(&pawn, pawn.position, targetSquare, BISHOP);
-				Move promoteR(&pawn, pawn.position, targetSquare, ROOK);
-				Move promoteQ(&pawn, pawn.position, targetSquare, QUEEN);
+				Move promoteB(&pawn, pieceIndex, pawn.position, targetSquare, BISHOP);
+				Move promoteR(&pawn, pieceIndex, pawn.position, targetSquare, ROOK);
+				Move promoteQ(&pawn, pieceIndex, pawn.position, targetSquare, QUEEN);
 
 				moves.push_back(promoteN);
 				moves.push_back(promoteB);
@@ -82,7 +87,7 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn)
 		}
 		else
 		{
-			Move move(&pawn, pawn.position, targetSquare);
+			Move move(&pawn, pieceIndex, pawn.position, targetSquare);
 			Board newBoard(board);
 			if (newBoard.isMoveStrictlyLegal(move))
 				moves.push_back(move);
@@ -93,7 +98,7 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn)
 			targetSquare = (square)(pawn.position + 2 * dir);
 			if (!((1ULL << targetSquare) & piecesOfOtherColor))
 			{
-				Move move(&pawn, pawn.position, targetSquare);
+				Move move(&pawn, pieceIndex, pawn.position, targetSquare);
 				Board newBoard(board);
 				if (newBoard.isMoveStrictlyLegal(move))
 					moves.push_back(move);
@@ -106,14 +111,14 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn)
 		bitboard targetPosition = 1ULL << targetSquare;
 		if (targetPosition & piecesOfOtherColor)
 		{
-			Move move(&pawn, pawn.position, targetSquare);
+			Move move(&pawn, pieceIndex, pawn.position, targetSquare);
 			Board newBoard(board);
 			if (newBoard.isMoveStrictlyLegal(move))
 				moves.push_back(move);
 		}
 		if (targetPosition & board.getEnPassantSquare())
 		{
-			Move move(&pawn, pawn.position, targetSquare, EN_PASSANT);
+			Move move(&pawn, pieceIndex, pawn.position, targetSquare, EN_PASSANT);
 			Board newBoard(board);
 			if (newBoard.isMoveStrictlyLegal(move))
 				moves.push_back(move);
@@ -125,14 +130,14 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn)
 		bitboard targetPosition = 1ULL << targetSquare;
 		if (targetPosition & piecesOfOtherColor)
 		{
-			Move move(&pawn, pawn.position, targetSquare);
+			Move move(&pawn, pieceIndex, pawn.position, targetSquare);
 			Board newBoard(board);
 			if (newBoard.isMoveStrictlyLegal(move))
 				moves.push_back(move);
 		}
 		if (targetPosition & board.getEnPassantSquare())
 		{
-			Move move(&pawn, pawn.position, targetSquare, EN_PASSANT);
+			Move move(&pawn, pieceIndex, pawn.position, targetSquare, EN_PASSANT);
 			Board newBoard(board);
 			if (newBoard.isMoveStrictlyLegal(move))
 				moves.push_back(move);
@@ -142,76 +147,76 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn)
 	return moves;
 }
 
-std::vector<Move> getMovesForKnight(const Board &board, Piece &knight)
+std::vector<Move> getMovesForKnight(const Board &board, Piece &knight, uint8_t pieceIndex)
 {
 	std::vector<Move> moves;
 
-	addMoveInDirection(moves, board, knight, UP_UP_RIGHT);
-	addMoveInDirection(moves, board, knight, RIGHT_RIGHT_UP);
-	addMoveInDirection(moves, board, knight, RIGHT_RIGHT_DOWN);
-	addMoveInDirection(moves, board, knight, DOWN_DOWN_RIGHT);
-	addMoveInDirection(moves, board, knight, DOWN_DOWN_LEFT);
-	addMoveInDirection(moves, board, knight, LEFT_LEFT_DOWN);
-	addMoveInDirection(moves, board, knight, LEFT_LEFT_UP);
-	addMoveInDirection(moves, board, knight, UP_UP_LEFT);
+	addMoveInDirection(moves, board, knight, pieceIndex, UP_UP_RIGHT);
+	addMoveInDirection(moves, board, knight, pieceIndex, RIGHT_RIGHT_UP);
+	addMoveInDirection(moves, board, knight, pieceIndex, RIGHT_RIGHT_DOWN);
+	addMoveInDirection(moves, board, knight, pieceIndex, DOWN_DOWN_RIGHT);
+	addMoveInDirection(moves, board, knight, pieceIndex, DOWN_DOWN_LEFT);
+	addMoveInDirection(moves, board, knight, pieceIndex, LEFT_LEFT_DOWN);
+	addMoveInDirection(moves, board, knight, pieceIndex, LEFT_LEFT_UP);
+	addMoveInDirection(moves, board, knight, pieceIndex, UP_UP_LEFT);
 
 	
 
 	return moves;
 }
 
-std::vector<Move> getMovesForBishop(const Board &board, Piece &bishop)
+std::vector<Move> getMovesForBishop(const Board &board, Piece &bishop, uint8_t pieceIndex)
 {
 	std::vector<Move> moves;
 
-	addSlidingMovesInDirection(moves, board, bishop, RIGHT_UP);
-	addSlidingMovesInDirection(moves, board, bishop, RIGHT_DOWN);
-	addSlidingMovesInDirection(moves, board, bishop, LEFT_DOWN);
-	addSlidingMovesInDirection(moves, board, bishop, LEFT_UP);
+	addSlidingMovesInDirection(moves, board, bishop, pieceIndex, RIGHT_UP);
+	addSlidingMovesInDirection(moves, board, bishop, pieceIndex, RIGHT_DOWN);
+	addSlidingMovesInDirection(moves, board, bishop, pieceIndex, LEFT_DOWN);
+	addSlidingMovesInDirection(moves, board, bishop, pieceIndex, LEFT_UP);
 
 	return moves;
 }
 
-std::vector<Move> getMovesForRook(const Board &board, Piece &rook)
+std::vector<Move> getMovesForRook(const Board &board, Piece &rook, uint8_t pieceIndex)
 {
 	std::vector<Move> moves;
 
-	addSlidingMovesInDirection(moves, board, rook, UP);
-	addSlidingMovesInDirection(moves, board, rook, RIGHT);
-	addSlidingMovesInDirection(moves, board, rook, DOWN);
-	addSlidingMovesInDirection(moves, board, rook, LEFT);
+	addSlidingMovesInDirection(moves, board, rook, pieceIndex, UP);
+	addSlidingMovesInDirection(moves, board, rook, pieceIndex, RIGHT);
+	addSlidingMovesInDirection(moves, board, rook, pieceIndex, DOWN);
+	addSlidingMovesInDirection(moves, board, rook, pieceIndex, LEFT);
 
 	return moves;
 }
 
-std::vector<Move> getMovesForQueen(const Board &board, Piece &queen)
+std::vector<Move> getMovesForQueen(const Board &board, Piece &queen, uint8_t pieceIndex)
 {
 	std::vector<Move> moves;
 
-	addSlidingMovesInDirection(moves, board, queen, UP);
-	addSlidingMovesInDirection(moves, board, queen, RIGHT);
-	addSlidingMovesInDirection(moves, board, queen, DOWN);
-	addSlidingMovesInDirection(moves, board, queen, LEFT);
-	addSlidingMovesInDirection(moves, board, queen, RIGHT_UP);
-	addSlidingMovesInDirection(moves, board, queen, RIGHT_DOWN);
-	addSlidingMovesInDirection(moves, board, queen, LEFT_DOWN);
-	addSlidingMovesInDirection(moves, board, queen, LEFT_UP);
+	addSlidingMovesInDirection(moves, board, queen, pieceIndex, UP);
+	addSlidingMovesInDirection(moves, board, queen, pieceIndex, RIGHT);
+	addSlidingMovesInDirection(moves, board, queen, pieceIndex, DOWN);
+	addSlidingMovesInDirection(moves, board, queen, pieceIndex, LEFT);
+	addSlidingMovesInDirection(moves, board, queen, pieceIndex, RIGHT_UP);
+	addSlidingMovesInDirection(moves, board, queen, pieceIndex, RIGHT_DOWN);
+	addSlidingMovesInDirection(moves, board, queen, pieceIndex, LEFT_DOWN);
+	addSlidingMovesInDirection(moves, board, queen, pieceIndex, LEFT_UP);
 
 	return moves;
 }
 
-std::vector<Move> getMovesForKing(const Board &board, Piece &king)
+std::vector<Move> getMovesForKing(const Board &board, Piece &king, uint8_t pieceIndex)
 {
 	std::vector<Move> moves;
 
-	addMoveInDirection(moves, board, king, UP);
-	addMoveInDirection(moves, board, king, RIGHT_UP);
-	addMoveInDirection(moves, board, king, RIGHT);
-	addMoveInDirection(moves, board, king, RIGHT_DOWN);
-	addMoveInDirection(moves, board, king, DOWN);
-	addMoveInDirection(moves, board, king, LEFT_DOWN);
-	addMoveInDirection(moves, board, king, LEFT);
-	addMoveInDirection(moves, board, king, LEFT_UP);
+	addMoveInDirection(moves, board, king, pieceIndex, UP);
+	addMoveInDirection(moves, board, king, pieceIndex, RIGHT_UP);
+	addMoveInDirection(moves, board, king, pieceIndex, RIGHT);
+	addMoveInDirection(moves, board, king, pieceIndex, RIGHT_DOWN);
+	addMoveInDirection(moves, board, king, pieceIndex, DOWN);
+	addMoveInDirection(moves, board, king, pieceIndex, LEFT_DOWN);
+	addMoveInDirection(moves, board, king, pieceIndex, LEFT);
+	addMoveInDirection(moves, board, king, pieceIndex, LEFT_UP);
 
 	bool leftCastleAvailable = king.color == WHITE ? board.getWhiteLeftCastleAvailable() : board.getBlackLeftCastleAvailable();
 	bool rightCastleAvailable = king.color == WHITE ? board.getWhiteRightCastleAvailable() : board.getBlackRightCastleAvailable();
@@ -230,7 +235,7 @@ std::vector<Move> getMovesForKing(const Board &board, Piece &king)
 			!board.squareIsAttackedBy(c18, (Color)!board.getTurnColor()) &&
 			!board.squareIsAttackedBy(d18, (Color)!board.getTurnColor()))
 		{
-			Move move(&king, king.position, c18, CASTLE_LEFT);
+			Move move(&king, pieceIndex, king.position, c18, CASTLE_LEFT);
 			moves.push_back(move);
 		}
 
@@ -238,7 +243,7 @@ std::vector<Move> getMovesForKing(const Board &board, Piece &king)
 			!board.squareIsAttackedBy(f18, (Color)!board.getTurnColor()) &&
 			!board.squareIsAttackedBy(g18, (Color)!board.getTurnColor()))
 		{
-			Move move(&king, king.position, g18, CASTLE_RIGHT);
+			Move move(&king, pieceIndex, king.position, g18, CASTLE_RIGHT);
 			moves.push_back(move);
 		}
 	}
@@ -246,7 +251,7 @@ std::vector<Move> getMovesForKing(const Board &board, Piece &king)
 	return moves;
 }
 
-void addSlidingMovesInDirection(std::vector<Move>& moves, const Board &board, Piece &piece, direction dir)
+void addSlidingMovesInDirection(std::vector<Move>& moves, const Board &board, Piece &piece, uint8_t pieceIndex, direction dir)
 {
 	bitboard position = 1ULL << piece.position;
 	bitboard piecesOfOtherColor = piece.color == WHITE ? board.getBlackPieces() : board.getWhitePieces();
@@ -260,7 +265,7 @@ void addSlidingMovesInDirection(std::vector<Move>& moves, const Board &board, Pi
 		nextPosition = 1ULL << nextSquare;
 		if (nextPosition & piecesOfOtherColor)
 		{
-			Move move(&piece, piece.position, nextSquare);
+			Move move(&piece, pieceIndex, piece.position, nextSquare);
 			Board newBoard(board);
 			if (newBoard.isMoveStrictlyLegal(move))
 				moves.push_back(move);
@@ -272,7 +277,7 @@ void addSlidingMovesInDirection(std::vector<Move>& moves, const Board &board, Pi
 		}
 		else
 		{
-			Move move(&piece, piece.position, nextSquare);
+			Move move(&piece, pieceIndex, piece.position, nextSquare);
 			Board newBoard(board);
 			if (newBoard.isMoveStrictlyLegal(move))
 				moves.push_back(move);
@@ -283,7 +288,7 @@ void addSlidingMovesInDirection(std::vector<Move>& moves, const Board &board, Pi
 
 
 
-void addMoveInDirection(std::vector<Move>& moves, const Board &board, Piece &piece, direction dir)
+void addMoveInDirection(std::vector<Move>& moves, const Board &board, Piece &piece, uint8_t pieceIndex, direction dir)
 {
 	bitboard position = 1ULL << piece.position;
 	bitboard piecesOfSameColor = piece.color == WHITE ? board.getWhitePieces() : board.getBlackPieces();
@@ -291,7 +296,7 @@ void addMoveInDirection(std::vector<Move>& moves, const Board &board, Piece &pie
 	square targetSquare = (square)(piece.position + dir);
 	if (!((1ULL << piece.position) & EDGES.at(dir)) && !((1ULL << targetSquare) & piecesOfSameColor))
 	{
-		Move move(&piece, piece.position, targetSquare);
+		Move move(&piece, pieceIndex, piece.position, targetSquare);
 		Board newBoard(board);
 		if (newBoard.isMoveStrictlyLegal(move))
 			moves.push_back(move);
