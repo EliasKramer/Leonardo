@@ -337,6 +337,7 @@ void Board::executeMove(Move move)
 		piece.type = move.getPromotion();
 	}
 
+	enPassantSquare = 0ULL;
 	switch (piece.type)
 	{
 		case PAWN:
