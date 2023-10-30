@@ -153,12 +153,15 @@ namespace BoardTest
 			pawn.type = PAWN;
 			pawn.position = D2;
 
-			Move move = Move(&pawn, D2, D4);
+			std::vector<Piece> whitePieces = { pawn };
+			board.setWhitePiecesList(whitePieces);
+
+			Move move = Move(&pawn, 0, D2, D4);
 
 			board.executeMove(move);
 			std::string expected = "8/8/8/8/3P4/8/8/8";
 
-			Assert::AreEqual((int)D4, (int)pawn.position);
+			Assert::AreEqual((int)D4, (int)board.getWhitePiecesList().at(0).position);
 			Assert::AreEqual(expected, board.getFEN());
 		}
 
@@ -176,12 +179,15 @@ namespace BoardTest
 			enemyPawn.type = PAWN;
 			enemyPawn.position = E3;
 
-			Move move = Move(&pawn, D2, E3);
+			std::vector<Piece> whitePieces = { pawn };
+			board.setWhitePiecesList(whitePieces);
+
+			Move move = Move(&pawn, 0, D2, E3);
 
 			board.executeMove(move);
 			std::string expected = "8/8/8/8/8/4P3/8/8";
 
-			Assert::AreEqual((int)E3, (int)pawn.position);
+			Assert::AreEqual((int)E3, (int)board.getWhitePiecesList().at(0).position);
 			Assert::IsFalse(board.getBlackPieces());
 			Assert::IsTrue(board.getBlackPiecesList().empty());
 			Assert::AreEqual(expected, board.getFEN());
@@ -201,12 +207,15 @@ namespace BoardTest
 			enemyPawn.type = PAWN;
 			enemyPawn.position = E5;
 
-			Move move = Move(&pawn, D5, E6, EN_PASSANT);
+			std::vector<Piece> whitePieces = { pawn };
+			board.setWhitePiecesList(whitePieces);
+
+			Move move = Move(&pawn, 0, D5, E6, EN_PASSANT);
 
 			board.executeMove(move);
 			std::string expected = "8/8/4P3/8/8/8/8/8";
 
-			Assert::AreEqual((int)E6, (int)pawn.position);
+			Assert::AreEqual((int)E6, (int)board.getWhitePiecesList().at(0).position);
 			Assert::IsFalse(board.getBlackPieces());
 			Assert::IsTrue(board.getBlackPiecesList().empty());
 			Assert::AreEqual(expected, board.getFEN());
@@ -221,13 +230,16 @@ namespace BoardTest
 			pawn.type = PAWN;
 			pawn.position = D7;
 
-			Move move = Move(&pawn, D7, D8, QUEEN);
+			std::vector<Piece> whitePieces = { pawn };
+			board.setWhitePiecesList(whitePieces);
+
+			Move move = Move(&pawn, 0, D7, D8, QUEEN);
 
 			board.executeMove(move);
 			std::string expected = "3Q4/8/8/8/8/8/8/8";
 
-			Assert::AreEqual((int)D8, (int)pawn.position);
-			Assert::AreEqual((int)QUEEN, (int)pawn.type);
+			Assert::AreEqual((int)D8, (int)board.getWhitePiecesList().at(0).position);
+			Assert::AreEqual((int)QUEEN, (int)board.getWhitePiecesList().at(0).type);
 			Assert::AreEqual(expected, board.getFEN());
 		}
 
@@ -240,15 +252,21 @@ namespace BoardTest
 			king.type = KING;
 			king.position = E1;
 
-			Move move = Move(&king, E1, C1, CASTLE_LEFT);
+			Piece leftRook;
+			leftRook.color = WHITE;
+			leftRook.type = ROOK;
+			leftRook.position = A1;
+
+			std::vector<Piece> whitePieces = { king, leftRook };
+			board.setWhitePiecesList(whitePieces);
+
+			Move move = Move(&king, 0, E1, C1, CASTLE_LEFT);
 
 			board.executeMove(move);
-			std::vector<Piece> whitePieces = board.getWhitePiecesList();
-			Piece leftRook = whitePieces.at(0);
 			std::string expected = "8/8/8/8/8/8/8/2KR3R";
 
-			Assert::AreEqual((int)C1, (int)king.position);
-			Assert::AreEqual((int)D1, (int)leftRook.position);
+			Assert::AreEqual((int)C1, (int)board.getWhitePiecesList().at(0).position);
+			Assert::AreEqual((int)D1, (int)board.getWhitePiecesList().at(1).position);
 			Assert::AreEqual(expected, board.getFEN());
 		}
 
@@ -261,15 +279,21 @@ namespace BoardTest
 			king.type = KING;
 			king.position = E8;
 
-			Move move = Move(&king, E8, G8, CASTLE_RIGHT);
+			Piece rightRook;
+			rightRook.color = BLACK;
+			rightRook.type = ROOK;
+			rightRook.position = H8;
+
+			std::vector<Piece> blackPieces = { king, rightRook };
+			board.setBlackPiecesList(blackPieces);
+
+			Move move = Move(&king, 0, E8, G8, CASTLE_RIGHT);
 
 			board.executeMove(move);
-			std::vector<Piece> blackPieces = board.getBlackPiecesList();
-			Piece rightRook = blackPieces.at(2);
 			std::string expected = "r4rk1/8/8/8/8/8/8/8";
 
-			Assert::AreEqual((int)G8, (int)king.position);
-			Assert::AreEqual((int)F8, (int)rightRook.position);
+			Assert::AreEqual((int)G8, (int)board.getBlackPiecesList().at(0).position);
+			Assert::AreEqual((int)F8, (int)board.getBlackPiecesList().at(1).position);
 			Assert::AreEqual(expected, board.getFEN());
 		}
 
@@ -282,7 +306,7 @@ namespace BoardTest
 			rook.type = ROOK;
 			rook.position = A4;
 
-			Move move = Move(&rook, A4, A1);
+			Move move = Move(&rook, 0, A4, A1);
 
 			board.executeMove(move);
 
@@ -298,13 +322,16 @@ namespace BoardTest
 			pawn.type = PAWN;
 			pawn.position = D2;
 
-			Move move = Move(&pawn, D2, D4);
+			std::vector<Piece> whitePieces = { pawn };
+			board.setWhitePiecesList(whitePieces);
+
+			Move move = Move(&pawn, 0, D2, D4);
 
 			board.executeMove(move);
 			std::string FEN = "8/8/8/8/3P4/8/8/8";
 			bitboard enPassant = 0x80000;
 
-			Assert::AreEqual((int)D4, (int)pawn.position);
+			Assert::AreEqual((int)D4, (int)board.getWhitePiecesList().at(0).position);
 			Assert::AreEqual(FEN, board.getFEN());
 			Assert::AreEqual(enPassant, board.getEnPassantSquare());
 		}

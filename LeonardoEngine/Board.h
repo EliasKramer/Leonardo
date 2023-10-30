@@ -59,6 +59,8 @@ class Board
 
 		std::vector<Piece> &getWhitePiecesList();
 		std::vector<Piece> &getBlackPiecesList();
+		void setWhitePiecesList(std::vector<Piece> &list);
+		void setBlackPiecesList(std::vector<Piece> &list);
 
 		Color getTurnColor() const;
 

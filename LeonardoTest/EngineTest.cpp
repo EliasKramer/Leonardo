@@ -94,9 +94,9 @@ namespace EngineTest
 			pawn.position = A3;
 			pawn.type = PAWN;
 
-			Move regularMove(&pawn, A3, A4);
+			Move regularMove(&pawn, 0, A3, A4);
 
-			std::vector<Move> moves = getMovesForPawn(board, pawn);
+			std::vector<Move> moves = getMovesForPawn(board, pawn, 0);
 
 			Assert::IsTrue(regularMove == moves.at(0));
 		}
@@ -110,11 +110,11 @@ namespace EngineTest
 			pawn.position = A2;
 			pawn.type = PAWN;
 
-			Move singleMove(&pawn, A2, A3);
-			Move doubleMove(&pawn, A2, A4);
+			Move singleMove(&pawn, 0, A2, A3);
+			Move doubleMove(&pawn, 0, A2, A4);
 			std::vector<Move> expected = { singleMove, doubleMove };
 
-			std::vector<Move> actual = getMovesForPawn(board, pawn);
+			std::vector<Move> actual = getMovesForPawn(board, pawn, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -129,12 +129,12 @@ namespace EngineTest
 			pawn.position = B3;
 			pawn.type = PAWN;
 
-			Move leftCapture(&pawn, B3, A4);
-			Move regularMove(&pawn, B3, B4);
-			Move rightCapture(&pawn, B3, C4);
+			Move leftCapture(&pawn, 0, B3, A4);
+			Move regularMove(&pawn, 0, B3, B4);
+			Move rightCapture(&pawn, 0, B3, C4);
 			std::vector<Move> expected = { leftCapture, regularMove, rightCapture };
 
-			std::vector<Move> actual = getMovesForPawn(board, pawn);
+			std::vector<Move> actual = getMovesForPawn(board, pawn, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -149,13 +149,13 @@ namespace EngineTest
 			pawn.position = A7;
 			pawn.type = PAWN;
 
-			Move promoteN(&pawn, A7, A8, KNIGHT);
-			Move promoteB(&pawn, A7, A8, BISHOP);
-			Move promoteR(&pawn, A7, A8, ROOK);
-			Move promoteQ(&pawn, A7, A8, QUEEN);
+			Move promoteN(&pawn, 0, A7, A8, KNIGHT);
+			Move promoteB(&pawn, 0, A7, A8, BISHOP);
+			Move promoteR(&pawn, 0, A7, A8, ROOK);
+			Move promoteQ(&pawn, 0, A7, A8, QUEEN);
 			std::vector<Move> expected = { promoteN, promoteB, promoteR, promoteQ };
 
-			std::vector<Move> actual = getMovesForPawn(board, pawn);
+			std::vector<Move> actual = getMovesForPawn(board, pawn, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -170,11 +170,11 @@ namespace EngineTest
 			pawn.position = A5;
 			pawn.type = PAWN;
 
-			Move regular(&pawn, A5, A6);
-			Move enPassant(&pawn, A5, B6, EN_PASSANT);
+			Move regular(&pawn, 0, A5, A6);
+			Move enPassant(&pawn, 0, A5, B6, EN_PASSANT);
 			std::vector<Move> expected = { regular, enPassant };
 
-			std::vector<Move> actual = getMovesForPawn(board, pawn);
+			std::vector<Move> actual = getMovesForPawn(board, pawn, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -189,17 +189,17 @@ namespace EngineTest
 			knight.position = D4;
 			knight.type = KNIGHT;
 
-			Move upUpRight(&knight, D4, E6);
-			Move rightRightUp(&knight, D4, F5);
-			Move rightRightDown(&knight, D4, F3);
-			Move downDownRight(&knight, D4, E2);
-			Move downDownLeft(&knight, D4, C2);
-			Move leftLeftDown(&knight, D4, B3);
-			Move leftLeftUp(&knight, D4, B5);
-			Move upUpLeft(&knight, D4, C6);
+			Move upUpRight(&knight, 0, D4, E6);
+			Move rightRightUp(&knight, 0, D4, F5);
+			Move rightRightDown(&knight, 0, D4, F3);
+			Move downDownRight(&knight, 0, D4, E2);
+			Move downDownLeft(&knight, 0, D4, C2);
+			Move leftLeftDown(&knight, 0, D4, B3);
+			Move leftLeftUp(&knight, 0, D4, B5);
+			Move upUpLeft(&knight, 0, D4, C6);
 			std::vector<Move> expected = { upUpRight, rightRightUp, rightRightDown, downDownRight, downDownLeft, leftLeftDown, leftLeftUp, upUpLeft };
 
-			std::vector<Move> actual = getMovesForKnight(board, knight);
+			std::vector<Move> actual = getMovesForKnight(board, knight, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -216,20 +216,20 @@ namespace EngineTest
 
 			std::vector<Move> expected;
 			for (int i = 1; i < 5; i++) {
-				Move moveRank(&rook, D4, (square)(D4 + i * RIGHT));
+				Move moveRank(&rook, 0, D4, (square)(D4 + i * RIGHT));
 				expected.push_back(moveRank);
-				Move moveFile(&rook, D4, (square)(D4 + i * UP));
+				Move moveFile(&rook, 0, D4, (square)(D4 + i * UP));
 				expected.push_back(moveFile);
 			}
 
 			for (int i = 1; i < 4; i++) {
-				Move moveRank(&rook, D4, (square)(D4 + i * LEFT));
+				Move moveRank(&rook, 0, D4, (square)(D4 + i * LEFT));
 				expected.push_back(moveRank);
-				Move moveFile(&rook, D4, (square)(D4 + i * DOWN));
+				Move moveFile(&rook, 0, D4, (square)(D4 + i * DOWN));
 				expected.push_back(moveFile);
 			}
 
-			std::vector<Move> actual = getMovesForRook(board, rook);
+			std::vector<Move> actual = getMovesForRook(board, rook, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -245,14 +245,14 @@ namespace EngineTest
 			rook.type = ROOK;
 
 			std::vector<Move> expected;
-			Move moveFile(&rook, A1, (square)(A1 + UP));
+			Move moveFile(&rook, 0, A1, (square)(A1 + UP));
 			expected.push_back(moveFile);
 			for (int i = 1; i < 4; i++) {
-				Move moveRank(&rook, A1, (square)(A1 + i * RIGHT));
+				Move moveRank(&rook, 0, A1, (square)(A1 + i * RIGHT));
 				expected.push_back(moveRank);
 			}
 
-			std::vector<Move> actual = getMovesForRook(board, rook);
+			std::vector<Move> actual = getMovesForRook(board, rook, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -269,11 +269,11 @@ namespace EngineTest
 
 			std::vector<Move> expected;
 			for (int i = 1; i < 3; i++) {
-				Move moveRank(&rook, A1, (square)(A1 + i * RIGHT));
+				Move moveRank(&rook, 0, A1, (square)(A1 + i * RIGHT));
 				expected.push_back(moveRank);
 			}
 
-			std::vector<Move> actual = getMovesForRook(board, rook);
+			std::vector<Move> actual = getMovesForRook(board, rook, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -290,20 +290,20 @@ namespace EngineTest
 
 			std::vector<Move> expected;
 			for (int i = 1; i < 5; i++) {
-				Move moveRightUp(&bishop, D4, (square)(D4 + i * RIGHT_UP));
+				Move moveRightUp(&bishop, 0, D4, (square)(D4 + i * RIGHT_UP));
 				expected.push_back(moveRightUp);
 			}
 
 			for (int i = 1; i < 4; i++) {
-				Move moveLeftUp(&bishop, D4, (square)(D4 + i * LEFT_UP));
+				Move moveLeftUp(&bishop, 0, D4, (square)(D4 + i * LEFT_UP));
 				expected.push_back(moveLeftUp);
-				Move moveLeftDown(&bishop, D4, (square)(D4 + i * LEFT_DOWN));
+				Move moveLeftDown(&bishop, 0, D4, (square)(D4 + i * LEFT_DOWN));
 				expected.push_back(moveLeftDown);
-				Move moveRightDown(&bishop, D4, (square)(D4 + i * RIGHT_DOWN));
+				Move moveRightDown(&bishop, 0, D4, (square)(D4 + i * RIGHT_DOWN));
 				expected.push_back(moveRightDown);
 			}
 
-			std::vector<Move> actual = getMovesForBishop(board, bishop);
+			std::vector<Move> actual = getMovesForBishop(board, bishop, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -320,11 +320,11 @@ namespace EngineTest
 
 			std::vector<Move> expected;
 			for (int i = 1; i < 4; i++) {
-				Move moveRank(&bishop, A1, (square)(A1 + i * RIGHT_UP));
+				Move moveRank(&bishop, 0, A1, (square)(A1 + i * RIGHT_UP));
 				expected.push_back(moveRank);
 			}
 
-			std::vector<Move> actual = getMovesForBishop(board, bishop);
+			std::vector<Move> actual = getMovesForBishop(board, bishop, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -341,11 +341,11 @@ namespace EngineTest
 
 			std::vector<Move> expected;
 			for (int i = 1; i < 3; i++) {
-				Move moveRank(&bishop, A1, (square)(A1 + i * RIGHT_UP));
+				Move moveRank(&bishop, 0, A1, (square)(A1 + i * RIGHT_UP));
 				expected.push_back(moveRank);
 			}
 
-			std::vector<Move> actual = getMovesForBishop(board, bishop);
+			std::vector<Move> actual = getMovesForBishop(board, bishop, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -360,17 +360,17 @@ namespace EngineTest
 			king.position = B2;
 			king.type = KING;
 
-			Move up(&king, B2, B3);
-			Move rightUp(&king, B2, C3);
-			Move right(&king, B2, C2);
-			Move rightDown(&king, B2, C1);
-			Move down(&king, B2, B1);
-			Move leftDown(&king, B2, A1);
-			Move left(&king, B2, A2);
-			Move leftUp(&king, B2, A3);
+			Move up(&king, 0, B2, B3);
+			Move rightUp(&king, 0, B2, C3);
+			Move right(&king, 0, B2, C2);
+			Move rightDown(&king, 0, B2, C1);
+			Move down(&king, 0, B2, B1);
+			Move leftDown(&king, 0, B2, A1);
+			Move left(&king, 0, B2, A2);
+			Move leftUp(&king, 0, B2, A3);
 			std::vector<Move> expected = { up, rightUp, right, rightDown, down, leftDown, left, leftUp };
 
-			std::vector<Move> actual = getMovesForKing(board, king);
+			std::vector<Move> actual = getMovesForKing(board, king, 0);
 
 			Assert::AreEqual(expected.size(), actual.size());
 			Assert::IsTrue(std::is_permutation(expected.begin(), expected.end(), actual.begin()));
@@ -385,20 +385,20 @@ namespace EngineTest
 			king.position = E1;
 			king.type = KING;
 
-			Move castlingLeft1(&king, E1, C1, CASTLE_LEFT);
-			Move castlingRight1(&king, E1, G1, CASTLE_RIGHT);
+			Move castlingLeft1(&king, 0, E1, C1, CASTLE_LEFT);
+			Move castlingRight1(&king, 0, E1, G1, CASTLE_RIGHT);
 
-			std::vector<Move> actual1 = getMovesForKing(board1, king);
+			std::vector<Move> actual1 = getMovesForKing(board1, king, 0);
 
 			Assert::IsTrue(std::find(actual1.begin(), actual1.end(), castlingLeft1) != actual1.end());
 			Assert::IsTrue(std::find(actual1.begin(), actual1.end(), castlingRight1) != actual1.end());
 
 			Board board2("8/8/8/2r5/8/8/8/R3KB1R", WHITE, SQUARE_NONE, true, true, true, true);
 
-			Move castlingLeft2(&king, E1, C1, CASTLE_LEFT);
-			Move castlingRight2(&king, E1, G1, CASTLE_RIGHT);
+			Move castlingLeft2(&king, 0, E1, C1, CASTLE_LEFT);
+			Move castlingRight2(&king, 0, E1, G1, CASTLE_RIGHT);
 
-			std::vector<Move> actual2 = getMovesForKing(board2, king);
+			std::vector<Move> actual2 = getMovesForKing(board2, king, 0);
 
 			Assert::IsTrue(std::find(actual2.begin(), actual2.end(), castlingLeft2) == actual2.end());
 			Assert::IsTrue(std::find(actual2.begin(), actual2.end(), castlingRight2) == actual2.end());

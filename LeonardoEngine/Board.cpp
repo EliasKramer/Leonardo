@@ -546,6 +546,16 @@ bool Board::getWhiteRightCastleAvailable() const
 	return whiteRightCastleAvailable;
 }
 
+void Board::setWhitePiecesList(std::vector<Piece> &list)
+{
+	whitePiecesList = list;
+}
+
+void Board::setBlackPiecesList(std::vector<Piece> &list)
+{
+	blackPiecesList = list;
+}
+
 bool Board::getBlackLeftCastleAvailable() const
 {
 	return blackLeftCastleAvailable;
