@@ -79,6 +79,36 @@ namespace EngineTest
 
 			Assert::AreEqual(97862, nodes);
 		}
+
+		TEST_METHOD(getNodesForDepthFourTestPositionThree) 
+		{
+			std::string testPositionThreeFEN = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8";
+			Board board(testPositionThreeFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			int nodes = getNodesForDepth(board, 4);
+
+			Assert::AreEqual(43238, nodes);
+		}
+
+		TEST_METHOD(getNodesForDepthTwoTestPositionFour)
+		{
+			std::string testPositionFourFEN = "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1";
+			Board board(testPositionFourFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			int nodes = getNodesForDepth(board, 2);
+
+			Assert::AreEqual(264, nodes);
+		}
+
+		TEST_METHOD(getNodesForDepthThreeTestPositionFour)
+		{
+			std::string testPositionFourFEN = "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1";
+			Board board(testPositionFourFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			int nodes = getNodesForDepth(board, 3);
+
+			Assert::AreEqual(9467, nodes);
+		}
 	};
 
 	TEST_CLASS(EngineTest)
