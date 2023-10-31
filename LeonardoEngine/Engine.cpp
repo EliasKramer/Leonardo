@@ -26,7 +26,7 @@ int getNodesForDepth(Board& board, int depth)
 		int nodes = 0;
 		for (Move move : moves)
 		{
-			Board newBoard(board);;
+			Board newBoard(board);
 			newBoard.executeMove(move);
 			nodes += getNodesForDepth(newBoard, depth - 1);
 		}

@@ -377,7 +377,7 @@ void Board::executeMove(Move move)
 	switch (move.getType())
 	{
 		case EN_PASSANT:
-			removePieceFromList(otherPieceslist_p, (square)(to - 8));
+			removePieceFromList(otherPieceslist_p, turnColor == WHITE ? (square)(to - 8) : (square)(to + 8));
 			//we can empty the squares above and below the to square, because when a pawn is moved two squares, the square it came from must be empty 
 			*otherPiecesBB_p = *otherPiecesBB_p & ~(toBB >> 8 | toBB << 8);
 			pawns = pawns & ~(toBB >> 8 | toBB << 8);
