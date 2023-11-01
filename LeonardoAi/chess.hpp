@@ -1496,7 +1496,7 @@ class Board {
 
     friend std::ostream &operator<<(std::ostream &os, const Board &board);
 
-   protected:
+   public:
     virtual void placePiece(Piece piece, Square sq);
     virtual void removePiece(Piece piece, Square sq);
 

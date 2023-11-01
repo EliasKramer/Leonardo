@@ -477,3 +477,96 @@ std::string leonardo_util::get_pawn_structure_str(chess::Board& board)
 	return res + "\n";
 
 }
+
+chess::Square leonardo_util::get_random_square(chess::Bitboard bb)
+{
+	if (bb == 0)
+	{
+		return chess::Square::NO_SQ;
+	}
+
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+
+	std::vector<int> squares;
+
+	while (bb)
+	{
+		squares.push_back(chess::builtin::poplsb(bb));
+	}
+
+	std::uniform_int_distribution<> dis(0, squares.size() - 1);
+
+	return (chess::Square)squares[dis(gen)];
+}
+
+void leonardo_util::remove_random_pawns(chess::Board& board)
+{
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	//inclusive
+	static std::uniform_int_distribution<> dis_remove(0, 0);
+	static std::uniform_int_distribution<> dis_amount(0, 8);
+
+	int should_remove = dis_remove(gen);
+
+	if (should_remove == 0)
+	{
+		return;
+	}
+
+	int amount = dis_amount(gen);
+
+	for (int i = 0; i < amount; i++)
+	{
+		chess::Square pos_to_del = get_random_square(board.pieces(chess::PieceType::PAWN));
+		if (pos_to_del == chess::Square::NO_SQ)
+		{
+			return;
+		}
+		chess::Piece piece_to_del = board.at<chess::Piece>(pos_to_del);
+		board.removePiece(piece_to_del, pos_to_del);
+	}
+}
+
+std::string leonardo_util::pawn_board_to_str(const matrix& pawn_board)
+{
+	//print B where z = 1 && value is 1 
+	//print W where z = 0 && value is 1
+	//print . where 0
+
+	std::string res = "";
+
+	for (int y = 5; y >= 0; y--)
+	{
+		for (int x = 0; x < 8; x++)
+		{
+			bool found = false;
+			for (int z = 0; z < 2; z++)
+			{
+				vector3 pos(x, y, z);
+				int value = pawn_board.get_at_host(pos);
+
+				if (z == 1 && value == 1)
+				{
+					res += "B ";
+					found = true;
+					break;
+				}
+				else if (z == 0 && value == 1)
+				{
+					res += "W ";
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				res += ". ";
+			}
+		}
+		res += "\n";
+	}
+
+	return res + "\n";
+}

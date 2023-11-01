@@ -49,4 +49,9 @@ namespace leonardo_util
 
 	bool board_material_equal(chess::Board& board);
 	std::string get_pawn_structure_str(chess::Board& board);
+
+	chess::Square get_random_square(chess::Bitboard bb);
+	void remove_random_pawns(chess::Board& board);
+
+	std::string pawn_board_to_str(const matrix& pawn_board);
 }

@@ -219,8 +219,8 @@ static float eval(chess::Board& board, int depth)
 		}
 	}
 
-	int game_duration_state_white = non_pawn_count_white < 4 ? 1 : 0;
-	int game_duration_state_black = non_pawn_count_black < 4 ? 1 : 0;
+	int game_duration_state_white = non_pawn_count_white <= 2 ? 1 : 0;
+	int game_duration_state_black = non_pawn_count_black <= 2 ? 1 : 0;
 
 	float king_score = POSITION_VALUE_KING[0][game_duration_state_white][board.kingSq(chess::Color::WHITE)];
 	king_score -= POSITION_VALUE_KING[1][game_duration_state_black][board.kingSq(chess::Color::BLACK)];
