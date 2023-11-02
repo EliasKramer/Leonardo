@@ -120,7 +120,7 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn, uint8_t piece
 		if ((position & RANK_2) && pawn.color == WHITE || ((position & RANK_7) && pawn.color == BLACK))
 		{
 			targetSquare = (square)(pawn.position + 2 * dir);
-			if (!((1ULL << targetSquare) & piecesOfOtherColor))
+			if (!((1ULL << targetSquare) & board.getAllPieces()))
 			{
 				Move move(&pawn, pieceIndex, pawn.position, targetSquare);
 				Board newBoard(board);
