@@ -3,6 +3,7 @@
 #include "Types.h"
 #include "Move.h"
 #include <vector>
+#include <initializer_list>
 class Board
 {
 	private:
@@ -34,6 +35,8 @@ class Board
 		bool checkDirectionForAttack(square square, direction dir, bitboard enemySlidingPieces) const;
 		void changeBoardPositionInList(std::vector<Piece> *list_p, square from, square to);
 		void removePieceFromList(std::vector<Piece> *list_p, square square);
+
+		bitboard OneInDirectionsBB(square position, std::initializer_list<direction> directions) const;
 	public:
 		Board(bitboard pawns, bitboard knights, bitboard bishops, bitboard rooks, bitboard queens, bitboard kings, bitboard whitePieces, bitboard blackPieces);
 		Board(std::string FEN, Color turnColor, square enPassantSquare, bool whiteLeftCastle, bool whiteRightCastle, bool blackLeftCastle, bool blackRightCastle);

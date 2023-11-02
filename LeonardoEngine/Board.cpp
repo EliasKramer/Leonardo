@@ -234,9 +234,9 @@ bool Board::squareIsAttackedBy(square square, Color color) const
 	bitboard enemyQueens = color == WHITE ? whitePieces & queens : blackPieces & queens;
 	bitboard enemyKing = color == WHITE ? whitePieces & kings : blackPieces & kings;
 
-	bitboard dangerousPawns = color == WHITE ? position >> 7 | position >> 9 : position << 7 | position << 9;
-	bitboard dangerousKnights = position << 17 | position << 15 | position << 10 | position << 6 | position >> 17 | position >> 15 | position >> 10 | position >> 6;
-	bitboard dangerousKings = position << 8 | position << 1 | position >> 1 | position >> 8 | position << 7 | position << 9 | position >> 7 | position >> 9;
+	bitboard dangerousPawns = color == WHITE ? OneInDirectionsBB(square, { LEFT_DOWN, RIGHT_DOWN }) : OneInDirectionsBB(square, { LEFT_UP, RIGHT_UP });
+	bitboard dangerousKnights = OneInDirectionsBB(square, { UP_UP_RIGHT, RIGHT_RIGHT_UP, RIGHT_RIGHT_DOWN, DOWN_DOWN_RIGHT, DOWN_DOWN_LEFT, LEFT_LEFT_DOWN, LEFT_LEFT_UP, UP_UP_LEFT });
+	bitboard dangerousKings = OneInDirectionsBB(square, { UP, RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN, LEFT_DOWN, LEFT, LEFT_UP });
 	
 	if ((dangerousPawns & enemyPawns) || (dangerousKnights & enemyKnights) || (dangerousKings & enemyKing))
 	{
@@ -257,6 +257,19 @@ bool Board::squareIsAttackedBy(square square, Color color) const
 	}
 
 	return false;
+}
+
+bitboard Board::OneInDirectionsBB(square position, std::initializer_list<direction> directions) const
+{
+	bitboard oneInDirections = 0ULL;
+	for (direction dir : directions)
+	{
+		if (!((1ULL << position) & EDGES.at(dir)))
+		{
+			oneInDirections |= 1ULL << (position + dir);
+		}
+	}
+	return oneInDirections;
 }
 
 bool Board::checkDirectionForAttack(square position, direction dir, bitboard enemySlidingPieces) const
