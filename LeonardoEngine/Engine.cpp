@@ -68,6 +68,7 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn, uint8_t piece
 
 	if (!(target & board.getAllPieces()))
 	{
+		//promotion
 		if (target & RANK_8 || target & RANK_1)
 		{
 			Move promoteN(&pawn, pieceIndex, pawn.position, targetSquare, KNIGHT);
@@ -85,6 +86,7 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn, uint8_t piece
 				moves.push_back(promoteQ);
 			}
 		}
+		//normal move forward
 		else
 		{
 			Move move(&pawn, pieceIndex, pawn.position, targetSquare);
@@ -93,6 +95,7 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn, uint8_t piece
 				moves.push_back(move);
 		}
 
+		//double move forward
 		if ((position & RANK_2) && pawn.color == WHITE || ((position & RANK_7) && pawn.color == BLACK))
 		{
 			targetSquare = (square)(pawn.position + 2 * dir);
@@ -105,17 +108,41 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn, uint8_t piece
 			}
 		}
 	}
+	//left capture
 	if (!(position & FILE_A))
 	{
 		targetSquare = (square)(pawn.position + dir + LEFT);
 		bitboard targetPosition = 1ULL << targetSquare;
 		if (targetPosition & piecesOfOtherColor)
 		{
-			Move move(&pawn, pieceIndex, pawn.position, targetSquare);
-			Board newBoard(board);
-			if (newBoard.isMoveStrictlyLegal(move))
-				moves.push_back(move);
+			//promotion
+			if (target & RANK_8 || target & RANK_1)
+			{
+				Move promoteN(&pawn, pieceIndex, pawn.position, targetSquare, KNIGHT);
+
+				Board newBoard(board);
+				if (newBoard.isMoveStrictlyLegal(promoteN))
+				{
+					Move promoteB(&pawn, pieceIndex, pawn.position, targetSquare, BISHOP);
+					Move promoteR(&pawn, pieceIndex, pawn.position, targetSquare, ROOK);
+					Move promoteQ(&pawn, pieceIndex, pawn.position, targetSquare, QUEEN);
+
+					moves.push_back(promoteN);
+					moves.push_back(promoteB);
+					moves.push_back(promoteR);
+					moves.push_back(promoteQ);
+				}
+			}
+			//normal caputre
+			else 
+			{
+				Move move(&pawn, pieceIndex, pawn.position, targetSquare);
+				Board newBoard(board);
+				if (newBoard.isMoveStrictlyLegal(move))
+					moves.push_back(move);
+			}
 		}
+		//en passant
 		if (targetPosition & board.getEnPassantSquare())
 		{
 			Move move(&pawn, pieceIndex, pawn.position, targetSquare, EN_PASSANT);
@@ -124,17 +151,41 @@ std::vector<Move> getMovesForPawn(const Board &board, Piece &pawn, uint8_t piece
 				moves.push_back(move);
 		}
 	}
+	//right capture
 	if (!(position & FILE_H))
 	{
 		targetSquare = (square)(pawn.position + dir + RIGHT);
 		bitboard targetPosition = 1ULL << targetSquare;
 		if (targetPosition & piecesOfOtherColor)
 		{
-			Move move(&pawn, pieceIndex, pawn.position, targetSquare);
-			Board newBoard(board);
-			if (newBoard.isMoveStrictlyLegal(move))
-				moves.push_back(move);
+			//promotion
+			if (target & RANK_8 || target & RANK_1)
+			{
+				Move promoteN(&pawn, pieceIndex, pawn.position, targetSquare, KNIGHT);
+
+				Board newBoard(board);
+				if (newBoard.isMoveStrictlyLegal(promoteN))
+				{
+					Move promoteB(&pawn, pieceIndex, pawn.position, targetSquare, BISHOP);
+					Move promoteR(&pawn, pieceIndex, pawn.position, targetSquare, ROOK);
+					Move promoteQ(&pawn, pieceIndex, pawn.position, targetSquare, QUEEN);
+
+					moves.push_back(promoteN);
+					moves.push_back(promoteB);
+					moves.push_back(promoteR);
+					moves.push_back(promoteQ);
+				}
+			}
+			//normal capture
+			else
+			{
+				Move move(&pawn, pieceIndex, pawn.position, targetSquare);
+				Board newBoard(board);
+				if (newBoard.isMoveStrictlyLegal(move))
+					moves.push_back(move);
+			}
 		}
+		//en passant
 		if (targetPosition & board.getEnPassantSquare())
 		{
 			Move move(&pawn, pieceIndex, pawn.position, targetSquare, EN_PASSANT);
