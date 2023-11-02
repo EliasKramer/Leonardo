@@ -35,6 +35,27 @@ int getNodesForDepth(Board& board, int depth)
 	return moves.size();
 }
 
+int getNodesOfTypeForDepth(Board& board, int depth, moveType type) 
+{
+	std::vector<Move> moves = getMoves(board);
+	int nodesOfType = 0;
+	if (depth > 1)
+	{
+		for (Move move : moves)
+		{
+			Board newBoard(board);
+			newBoard.executeMove(move);
+			nodesOfType += getNodesOfTypeForDepth(newBoard, depth - 1, type);
+		}
+		return nodesOfType;
+	}
+	for (Move move : moves)
+	{
+		if (move.getType() == type) nodesOfType++;
+	}
+	return nodesOfType;
+}
+
 
 std::vector<Move> getMovesForPiece(const Board &board, Piece &piece, uint8_t pieceIndex)
 {	switch (piece.type)

@@ -10,6 +10,7 @@ std::vector<Move> getMoves(Board &board);
 
 int getNodesForDepth(Board& board, int depth);
 
+int getNodesOfTypeForDepth(Board& board, int depth, moveType type);
 
 std::vector<Move> getMovesForPiece(const Board &board, Piece &piece, uint8_t pieceIndex);
 

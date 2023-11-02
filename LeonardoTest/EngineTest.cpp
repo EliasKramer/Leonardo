@@ -70,6 +70,16 @@ namespace EngineTest
 			Assert::AreEqual(2039, nodes);
 		}
 
+		TEST_METHOD(getNodesOfTypeCastleDepthTwoKiwipete)
+		{
+			std::string kiwipeteFEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R";
+			Board board(kiwipeteFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			int nodes = getNodesOfTypeForDepth(board, 2, CASTLE_LEFT) + getNodesOfTypeForDepth(board, 2, CASTLE_RIGHT);
+
+			Assert::AreEqual(91, nodes);
+		}
+
 		TEST_METHOD(getNodesDepthThreeKiwipete)
 		{
 			std::string kiwipeteFEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R";
@@ -80,10 +90,51 @@ namespace EngineTest
 			Assert::AreEqual(97862, nodes);
 		}
 
+		TEST_METHOD(getNodesOfTypeCastleDepthThreeKiwipete)
+		{
+			std::string kiwipeteFEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R";
+			Board board(kiwipeteFEN, WHITE, SQUARE_NONE, true, true, true, true);
+
+			int nodes = getNodesOfTypeForDepth(board, 3, CASTLE_LEFT) + getNodesOfTypeForDepth(board, 3, CASTLE_RIGHT);
+
+			Assert::AreEqual(3162, nodes);
+		}
+		
+		TEST_METHOD(getNodesOfTypeCastleDepthOneTestPositionThree) 
+		{
+			std::string testPositionThreeFEN = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8";
+			Board board(testPositionThreeFEN, WHITE, SQUARE_NONE, false, false, false, false);
+
+			int nodes = getNodesOfTypeForDepth(board, 1, CASTLE_LEFT) + getNodesOfTypeForDepth(board, 1, CASTLE_RIGHT);
+
+			Assert::AreEqual(0, nodes);
+		}
+
+		TEST_METHOD(getNodesDepthTwoTestPositionThree)
+		{
+			std::string testPositionThreeFEN = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8";
+			Board board(testPositionThreeFEN, WHITE, SQUARE_NONE, false, false, false, false);
+
+			int nodes = getNodesForDepth(board, 2);
+
+			Assert::AreEqual(191, nodes);
+		}
+
+
+		TEST_METHOD(getNodesDepthThreeTestPositionThree)
+		{
+			std::string testPositionThreeFEN = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8";
+			Board board(testPositionThreeFEN, WHITE, SQUARE_NONE, false, false, false, false);
+
+			int nodes = getNodesForDepth(board, 3);
+
+			Assert::AreEqual(2812, nodes);
+		}
+
 		TEST_METHOD(getNodesForDepthFourTestPositionThree) 
 		{
 			std::string testPositionThreeFEN = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8";
-			Board board(testPositionThreeFEN, WHITE, SQUARE_NONE, true, true, true, true);
+			Board board(testPositionThreeFEN, WHITE, SQUARE_NONE, false, false, false, false);
 
 			int nodes = getNodesForDepth(board, 4);
 
@@ -93,7 +144,7 @@ namespace EngineTest
 		TEST_METHOD(getNodesForDepthTwoTestPositionFour)
 		{
 			std::string testPositionFourFEN = "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1";
-			Board board(testPositionFourFEN, WHITE, SQUARE_NONE, true, true, true, true);
+			Board board(testPositionFourFEN, WHITE, SQUARE_NONE, false, false, true, true);
 
 			int nodes = getNodesForDepth(board, 2);
 
@@ -103,7 +154,7 @@ namespace EngineTest
 		TEST_METHOD(getNodesForDepthThreeTestPositionFour)
 		{
 			std::string testPositionFourFEN = "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1";
-			Board board(testPositionFourFEN, WHITE, SQUARE_NONE, true, true, true, true);
+			Board board(testPositionFourFEN, WHITE, SQUARE_NONE, false, false, true, true);
 
 			int nodes = getNodesForDepth(board, 3);
 
