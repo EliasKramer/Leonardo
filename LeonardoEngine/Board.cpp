@@ -330,17 +330,17 @@ void Board::executeMove(Move move)
 	Piece &piece = turnPieceslist_p->at(move.getPieceIndex());
 
 	*turnPiecesBB_p = (*turnPiecesBB_p & ~fromBB) | toBB;
+
+	pawns = pawns & ~fromToBB;
+	knights = knights & ~fromToBB;
+	bishops = bishops & ~fromToBB;
+	rooks = rooks & ~fromToBB;
+	queens = queens & ~fromToBB;
+	kings = kings & ~fromToBB;
+
 	if (*otherPiecesBB_p & toBB)
 	{
 		*otherPiecesBB_p = *otherPiecesBB_p & ~toBB;
-
-		pawns = pawns & ~fromToBB;
-		knights = knights & ~fromToBB;
-		bishops = bishops & ~fromToBB;
-		rooks = rooks & ~fromToBB;
-		queens = queens & ~fromToBB;
-		kings = kings & ~fromToBB;
-
 		removePieceFromList(otherPieceslist_p, to);
 	}
 
