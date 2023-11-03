@@ -4,7 +4,7 @@
 #include "chess_player.hpp"
 #include "NeuroFox/neural_network.hpp"
 #include "stockfish_interface.hpp"
-
+#include "nnet_table.hpp"
 //Credit to https://web.archive.org/web/20071031100051/http://www.brucemo.com/compchess/programming/hashing.htm
 
 typedef enum _TT_ITEM_TYPE : uint8_t
@@ -37,17 +37,17 @@ class leonardo_value_bot_3 : public chess_player
 private:
 	int pruned = 0;
 	int nodes_visited = 0;
-
 	int leaf_nodes = 0;
 	int leaf_nodes_evaluated_nnet = 0;
-
 	bool use_nnet = false;
 	int print_count = 0;
-
 	int transpositions_count = 0;
-
 	int ms_per_move = 100;
 	std::chrono::steady_clock::time_point start_time;
+
+	nnet_table pawn_nnet_table;
+	chess::Bitboard pawn_w_bb;
+	chess::Bitboard pawn_b_bb;
 
 	//transposition table
 	std::vector<tt_item> tt;

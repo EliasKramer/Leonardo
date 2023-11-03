@@ -343,9 +343,6 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 		}
 	}
 
-	return score;
-
-
 	int game_duration_state_white = non_pawn_count_white < 3 ? 1 : 0;
 	int game_duration_state_black = non_pawn_count_black < 3 ? 1 : 0;
 
@@ -381,15 +378,15 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 	//evaluate with nnet
 	if (use_nnet)//if (board_material_equal_score == 0 && !board.inCheck())
 	{
-		value_nnet.rest_partial_forward_prop();
-		//this is the slow option to do this.
-		//leonardo_util::encode_pawn_matrix(board, input_matrix);
-		//value_nnet.partial_forward_prop(input_matrix, input_matrix, vector3(0, 0, 0));
-		int nnet_score =
-			(leonardo_util::get_pawn_matrix_value(value_nnet.get_output()) * //is around -1 and 1 (not guaranteed)
-				20);
+		int nnet_score = leonardo_util::get_board_val(
+			pawns_bb & white_bb,
+			pawns_bb & black_bb,
+			pawn_w_bb,
+			pawn_b_bb,
+			value_nnet,
+			input_matrix,
+			pawn_nnet_table);
 
-		//std::cout << "score: " << score << " nnet score: " << nnet_score << std::endl;
 		score += nnet_score;
 
 		if (print_count > 0)
@@ -582,7 +579,9 @@ leonardo_value_bot_3::leonardo_value_bot_3()
 	: leonardo_value_bot_3(5, false)
 {}
 leonardo_value_bot_3::leonardo_value_bot_3(int ms_per_move, bool given_use_nnet)
-	: ms_per_move(ms_per_move), use_nnet(given_use_nnet)
+	: ms_per_move(ms_per_move), 
+	use_nnet(given_use_nnet), 
+	pawn_nnet_table(500) //200mb table
 {
 	load_openings();
 	value_nnet = neural_network("nanopawn.parameters");
@@ -646,13 +645,21 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 
 	bool maximizing = board.sideToMove() == chess::Color::WHITE;
 
+	const chess::Bitboard black_bb = board.us(chess::Color::BLACK);
+	const chess::Bitboard white_bb = board.us(chess::Color::WHITE);
+	const chess::Bitboard pawns_bb = board.pieces(chess::PieceType::PAWN);
+
 	leonardo_util::encode_pawn_matrix(board, input_matrix);
+	pawn_w_bb = white_bb & pawns_bb;
+	pawn_b_bb = white_bb & pawns_bb;
+
 	int score = 0;
 	auto start = std::chrono::high_resolution_clock::now();
 
 	int reached_depth = 0;
 	chess::Move best_move = chess::Move::NULL_MOVE;
 	int transpositions_last = 0;
+	use_nnet = true;
 	for (int search_depth = 1; !time_over(); search_depth++)
 	{
 		tt.clear();

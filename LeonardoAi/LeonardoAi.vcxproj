@@ -57,6 +57,7 @@
     <ClCompile Include="NeuroFox\test_result.cpp" />
     <ClCompile Include="NeuroFox\util.cpp" />
     <ClCompile Include="NeuroFox\vector3.cpp" />
+    <ClCompile Include="nnet_table.cpp" />
     <ClCompile Include="random_player.cpp" />
     <ClCompile Include="stockfish_interface.cpp" />
   </ItemGroup>
@@ -121,6 +122,7 @@
     <ClInclude Include="NeuroFox\test_result.hpp" />
     <ClInclude Include="NeuroFox\util.hpp" />
     <ClInclude Include="NeuroFox\vector3.hpp" />
+    <ClInclude Include="nnet_table.hpp" />
     <ClInclude Include="random_player.hpp" />
     <ClInclude Include="stockfish_interface.hpp" />
   </ItemGroup>

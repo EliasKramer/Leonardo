@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 #include <cassert>
+#include "nnet_table.hpp"
 
 namespace leonardo_util
 {
@@ -54,4 +55,14 @@ namespace leonardo_util
 	void remove_random_pawns(chess::Board& board);
 
 	std::string pawn_board_to_str(const matrix& pawn_board);
+
+	int get_board_val(
+		chess::Bitboard curr_white_bb, 
+		chess::Bitboard curr_black_bb, 
+		chess::Bitboard& prev_white_bb, 
+		chess::Bitboard& prev_black_bb, 
+		neural_network& pawn_nnet,
+		matrix& curr_input,
+		nnet_table& table
+	);
 }

@@ -186,6 +186,9 @@
     <ClCompile Include="abp_player.cpp">
       <Filter>source\chess_util\player</Filter>
     </ClCompile>
+    <ClCompile Include="nnet_table.cpp">
+      <Filter>source\leonardo_value_bot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NeuroFox\convolutional_layer.hpp">
@@ -373,6 +376,9 @@
     </ClInclude>
     <ClInclude Include="abp_player.hpp">
       <Filter>header\chess_util\player</Filter>
+    </ClInclude>
+    <ClInclude Include="nnet_table.hpp">
+      <Filter>header\leonardo_value_bot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

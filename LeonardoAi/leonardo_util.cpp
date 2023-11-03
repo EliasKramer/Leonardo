@@ -188,7 +188,7 @@ float leonardo_util::get_value_nnet_eval(
 
 vector3 leonardo_util::sq_to_pawn_matrix_pos(const chess::Square sq, const int z_idx)
 {
-	const chess::Bitboard curr_bb = chess::Bitboard(1) << sq;
+	//const chess::Bitboard curr_bb = chess::Bitboard(1) << sq;
 
 	const int x = sq % 8;
 	int y = sq / 8;
@@ -569,4 +569,82 @@ std::string leonardo_util::pawn_board_to_str(const matrix& pawn_board)
 	}
 
 	return res + "\n";
+}
+
+inline static chess::Bitboard all_removed_values(chess::Bitboard curr_bb, chess::Bitboard prev_bb)
+{
+	return curr_bb & (~prev_bb);
+}
+inline static chess::Bitboard all_added_values(chess::Bitboard curr_bb, chess::Bitboard prev_bb)
+{
+	return prev_bb & (~curr_bb);
+}
+
+inline static void partial_forward_diff(
+	chess::Bitboard bb,
+	neural_network& nn,
+	matrix& curr_input,
+	int change_value,
+	vector3& change_idx)
+{
+	while (bb)
+	{
+		unsigned int sq = chess::builtin::poplsb(bb);
+		change_idx.x = sq % 8;
+		change_idx.y = (sq / 8) - 1;
+		nn.partial_forward_prop(curr_input, change_value, change_idx);
+		curr_input.set_at_host(change_idx, change_value);
+	}
+}
+
+static int call_count = 0;
+static int table_hit = 0;
+
+int leonardo_util::get_board_val(
+	chess::Bitboard curr_white_bb,
+	chess::Bitboard curr_black_bb,
+	chess::Bitboard& prev_white_bb,
+	chess::Bitboard& prev_black_bb,
+	neural_network& pawn_nnet,
+	matrix& curr_input,
+	nnet_table& table)
+{
+	std::cout
+		<< "call count: " << call_count
+		<< " table hits: " << table_hit
+		<< " table inserts: " << table.get_inserted_items_count()
+		<< " table item count: " << table.get_table_item_count()
+		<< " table overriding percent: " << table.percent_overridden() * 100 << "%\n";
+	call_count++;
+
+	int table_value = table.get(curr_white_bb, curr_black_bb);
+	if (table_value != nnet_table::not_found)
+	{
+		table_hit++;
+		return table_value;
+	}
+
+	chess::Bitboard added_black_pieces = all_added_values(curr_black_bb, prev_black_bb);
+	chess::Bitboard removed_black_pieces = all_removed_values(curr_black_bb, prev_black_bb);
+	chess::Bitboard added_white_pieces = all_added_values(curr_white_bb, prev_white_bb);
+	chess::Bitboard removed_white_pieces = all_removed_values(curr_white_bb, prev_white_bb);
+
+	vector3 change_idx(0, 0, 0);
+
+	partial_forward_diff(added_white_pieces, pawn_nnet, curr_input, 1, change_idx);
+	partial_forward_diff(removed_white_pieces, pawn_nnet, curr_input, 0, change_idx);
+
+	change_idx.z = 1;
+	partial_forward_diff(added_black_pieces, pawn_nnet, curr_input, 1, change_idx);
+	partial_forward_diff(removed_black_pieces, pawn_nnet, curr_input, 0, change_idx);
+
+	pawn_nnet.rest_partial_forward_prop();
+	float output = get_pawn_matrix_value(pawn_nnet.get_output());
+
+	prev_black_bb = curr_black_bb;
+	prev_white_bb = curr_white_bb;
+
+	table.insert(curr_black_bb, curr_white_bb, output);
+
+	return output * 20;
 }
