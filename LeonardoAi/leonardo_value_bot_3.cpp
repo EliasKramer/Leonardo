@@ -651,7 +651,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 
 	leonardo_util::encode_pawn_matrix(board, input_matrix);
 	pawn_w_bb = white_bb & pawns_bb;
-	pawn_b_bb = white_bb & pawns_bb;
+	pawn_b_bb = black_bb & pawns_bb;
 
 	int score = 0;
 	auto start = std::chrono::high_resolution_clock::now();

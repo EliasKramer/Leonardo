@@ -571,16 +571,16 @@ std::string leonardo_util::pawn_board_to_str(const matrix& pawn_board)
 	return res + "\n";
 }
 
-inline static chess::Bitboard all_removed_values(chess::Bitboard curr_bb, chess::Bitboard prev_bb)
-{
-	return curr_bb & (~prev_bb);
-}
-inline static chess::Bitboard all_added_values(chess::Bitboard curr_bb, chess::Bitboard prev_bb)
+static chess::Bitboard all_removed_values(chess::Bitboard curr_bb, chess::Bitboard prev_bb)
 {
 	return prev_bb & (~curr_bb);
 }
+static chess::Bitboard all_added_values(chess::Bitboard curr_bb, chess::Bitboard prev_bb)
+{
+	return curr_bb & (~prev_bb);
+}
 
-inline static void partial_forward_diff(
+static void partial_forward_diff(
 	chess::Bitboard bb,
 	neural_network& nn,
 	matrix& curr_input,
@@ -599,7 +599,7 @@ inline static void partial_forward_diff(
 
 static int call_count = 0;
 static int table_hit = 0;
-
+static int false_store = 0;
 int leonardo_util::get_board_val(
 	chess::Bitboard curr_white_bb,
 	chess::Bitboard curr_black_bb,
@@ -614,20 +614,30 @@ int leonardo_util::get_board_val(
 		<< " table hits: " << table_hit
 		<< " table inserts: " << table.get_inserted_items_count()
 		<< " table item count: " << table.get_table_item_count()
-		<< " table overriding percent: " << table.percent_overridden() * 100 << "%\n";
+		<< " table overriding percent: " << table.percent_overridden() * 100 << "%"
+		<< " false store: " << false_store
+		<< "\n";
 	call_count++;
 
 	int table_value = table.get(curr_white_bb, curr_black_bb);
 	if (table_value != nnet_table::not_found)
 	{
 		table_hit++;
-		return table_value;
+		//return table_value;
 	}
 
 	chess::Bitboard added_black_pieces = all_added_values(curr_black_bb, prev_black_bb);
 	chess::Bitboard removed_black_pieces = all_removed_values(curr_black_bb, prev_black_bb);
 	chess::Bitboard added_white_pieces = all_added_values(curr_white_bb, prev_white_bb);
 	chess::Bitboard removed_white_pieces = all_removed_values(curr_white_bb, prev_white_bb);
+
+	std::cout << "matrix: \n" 
+		<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
+		//<< curr_input.get_string() << "\n";
+	std::cout << "curr_black_bb " << curr_black_bb << "\n";
+	std::cout << "curr_white_bb " << curr_white_bb << "\n";
+
+
 
 	vector3 change_idx(0, 0, 0);
 
@@ -639,12 +649,25 @@ int leonardo_util::get_board_val(
 	partial_forward_diff(removed_black_pieces, pawn_nnet, curr_input, 0, change_idx);
 
 	pawn_nnet.rest_partial_forward_prop();
-	float output = get_pawn_matrix_value(pawn_nnet.get_output());
+	float output = get_pawn_matrix_value(pawn_nnet.get_output()) * 20;
+
+	std::cout << "val: " << output << "\n";
+	std::cout << "------------\n";
+
+	if (table_value != nnet_table::not_found && (int)output != table_value)
+	{
+		int table_value_tmp = table.get(curr_white_bb, curr_black_bb);
+
+		std::cout << "false store\n";
+		std::cout << "output: " << (int)output << " table value: " << table_value << "\n";
+		false_store++;
+	}
+
+	if (table_value == nnet_table::not_found)
+		table.insert(curr_white_bb, curr_black_bb, output);
 
 	prev_black_bb = curr_black_bb;
 	prev_white_bb = curr_white_bb;
 
-	table.insert(curr_black_bb, curr_white_bb, output);
-
-	return output * 20;
+	return output;
 }

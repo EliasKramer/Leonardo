@@ -13,6 +13,8 @@ private:
 	{
 	public:
 		chess::U64 key = 0;
+		chess::U64 w = 0;
+		chess::U64 b = 0;
 		int value = 0;
 	};
 
@@ -23,6 +25,7 @@ private:
 	unsigned int inserted_items_count = 0;
 
 	chess::U64 make_key(chess::Bitboard white_bb, chess::Bitboard black_bb) const;
+	chess::U64 black_bb_from_key(chess::Bitboard white_bb, chess::U64 key) const;
 
 public:
 	const static int not_found = -987654321;
