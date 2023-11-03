@@ -38,6 +38,7 @@ namespace leonardo_util
 
 	vector3 get_pawn_input_format();
 	void encode_pawn_matrix(const chess::Board& board, matrix& input);
+	void encode_pawn_matrix(chess::Bitboard w_pawns, chess::Bitboard b_pawns, matrix& input);
 	void set_pawn_matrix_value(matrix& output, float value, chess::Color side_to_move);
 	void set_pawn_matrix_value(matrix& output, float value);
 	float get_pawn_matrix_value(matrix& output, chess::Color side_to_move);

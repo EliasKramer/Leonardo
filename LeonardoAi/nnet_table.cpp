@@ -41,7 +41,6 @@ void nnet_table::insert(
 	table[idx].value = value;
 	table[idx].key = key;
 	table[idx].w = white_bb;
-	table[idx].b = black_bb;
 }
 
 int nnet_table::get(chess::Bitboard white_bb, chess::Bitboard black_bb) const
@@ -50,7 +49,7 @@ int nnet_table::get(chess::Bitboard white_bb, chess::Bitboard black_bb) const
 	int idx = key % table.size();
 	if (table[idx].key == key &&
 		table[idx].w == white_bb &&
-		table[idx].b == black_bb)
+		black_bb_from_key(white_bb, key) == black_bb)
 	{
 		return table[idx].value;
 	}
