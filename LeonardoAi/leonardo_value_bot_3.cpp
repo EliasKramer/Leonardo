@@ -425,12 +425,12 @@ int leonardo_value_bot_3::recursive_eval(
 	nodes_visited++;
 
 	TT_ITEM_TYPE tt_flag = TT_ITEM_TYPE::alpha;
-	int value = probe_tt(board.hash(), ply_from_root, alpha, beta, best_move);
-	if(value != tt_item::unknown_eval)
-	{
+	//int value = probe_tt(board.hash(), ply_from_root, alpha, beta, best_move);
+	//if(value != tt_item::unknown_eval)
+	//{
 		transpositions_count++;
-		return value;
-	}
+		//return value;
+	//}
 
 	chess::Movelist moves;
 	chess::movegen::legalmoves(moves, board);
@@ -438,7 +438,7 @@ int leonardo_value_bot_3::recursive_eval(
 	if (ply_remaining == 0)
 	{
 		int evaluation = eval(board, moves, ply_from_root);
-		record_tt(board.hash(), ply_from_root, evaluation, TT_ITEM_TYPE::exact, best_move);
+		//record_tt(board.hash(), ply_from_root, evaluation, TT_ITEM_TYPE::exact, best_move);
 		return evaluation;
 	}
 
@@ -492,7 +492,7 @@ int leonardo_value_bot_3::recursive_eval(
 			if(beta > score)
 			{
 				beta = score;	
-				record_tt(board.hash(), ply_from_root, score, TT_ITEM_TYPE::beta, best_move);
+				//record_tt(board.hash(), ply_from_root, score, TT_ITEM_TYPE::beta, best_move);
 			}
 			//beta = std::min(beta, score);
 		}
@@ -506,7 +506,7 @@ int leonardo_value_bot_3::recursive_eval(
 		}
 	}
 
-	record_tt(board.hash(), ply_from_root, alpha, tt_flag, best_move);
+	//record_tt(board.hash(), ply_from_root, alpha, tt_flag, best_move);
 
 	return best_score;
 }
@@ -614,8 +614,25 @@ void leonardo_value_bot_3::sort_move_list(chess::Movelist& moves, chess::Board& 
 	moves.sort();*/
 }
 
+void leonardo_value_bot_3::setup_nnet_for_move(const chess::Board& board)
+{
+	if(!use_nnet)
+		return;
+
+	const chess::Bitboard black_bb = board.us(chess::Color::BLACK);
+	const chess::Bitboard white_bb = board.us(chess::Color::WHITE);
+	const chess::Bitboard pawns_bb = board.pieces(chess::PieceType::PAWN);
+
+	leonardo_util::encode_pawn_matrix(board, input_matrix);
+	pawn_w_bb = white_bb & pawns_bb;
+	pawn_b_bb = black_bb & pawns_bb;
+
+	value_nnet.forward_propagation(input_matrix);
+}
+
 chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 {
+	use_nnet = true; //DEBUG
 	int opening_move_idx = get_opening_move(board.hash());
 	if (opening_move_idx != -1)
 	{
@@ -628,7 +645,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	const size_t tt_item_size = sizeof(tt_item); // in byte
 	const size_t tt_desired_size = 200; // in MB
 	const size_t tt_size = tt_desired_size * 1024 * 1024 / tt_item_size;
-	tt.resize(tt_size);
+	//tt.resize(tt_size);
 
 	pruned = 0;
 	nodes_visited = 0;
@@ -645,17 +662,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 
 	bool maximizing = board.sideToMove() == chess::Color::WHITE;
 
-	const chess::Bitboard black_bb = board.us(chess::Color::BLACK);
-	const chess::Bitboard white_bb = board.us(chess::Color::WHITE);
-	const chess::Bitboard pawns_bb = board.pieces(chess::PieceType::PAWN);
-
-	leonardo_util::encode_pawn_matrix(board, input_matrix);
-	pawn_w_bb = white_bb & pawns_bb;
-	pawn_b_bb = black_bb & pawns_bb;
-
-	value_nnet.forward_propagation(input_matrix);
-
-
+	setup_nnet_for_move(board);
 
 	int score = 0;
 	auto start = std::chrono::high_resolution_clock::now();
@@ -663,11 +670,10 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	int reached_depth = 0;
 	chess::Move best_move = chess::Move::NULL_MOVE;
 	int transpositions_last = 0;
-	use_nnet = true;
 	for (int search_depth = 1; !time_over(); search_depth++)
 	{
-		tt.clear();
-		tt.resize(tt_size); //inefficient
+		//tt.clear();
+		//tt.resize(tt_size); //inefficient
 		transpositions_count = 0;
 		chess::Move tmp = chess::Move::NULL_MOVE;
 
@@ -685,7 +691,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 			best_move = tmp;
 			transpositions_last = transpositions_count;
 		}
-		if (search_depth == 2) break;
+		if (search_depth == 5) break; //DEBUG
 	}
 	transpositions_count = transpositions_last;
 
@@ -716,7 +722,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		<< "chosen move: " << chess::uci::moveToUci(best_move) << " "
 		<< score << "\n";
 #endif
-	tt.clear();
+	//tt.clear();
 
 	return best_move;
 }

@@ -14,7 +14,6 @@ private:
 	public:
 		chess::U64 key = 0;
 		chess::U64 w = 0;
-		chess::U64 b = 0;
 		int value = 0;
 	};
 

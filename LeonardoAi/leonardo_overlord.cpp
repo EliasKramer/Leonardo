@@ -666,7 +666,7 @@ static chess::Board random_pawn_board()
 
 void leonardo_overlord::reinforcement_learning_pawns()
 {
-	best_value_nnet = neural_network("256.parameters");
+	//best_value_nnet = neural_network("256.parameters");
 
 	const int games_per_learning = 100;
 	long long position_count = 0;
@@ -729,7 +729,7 @@ void leonardo_overlord::reinforcement_learning_pawns()
 				std::cout << get_current_time_str() << "\n";
 				learning_cycels++;
 			}
-			if (learning_cycels > 2)
+			if (false && learning_cycels > 2)
 			{
 				for (int j = 0; j < 100; j++)
 				{

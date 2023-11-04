@@ -163,7 +163,7 @@ void play_pawn()
 void play(int* scores, std::mutex& m)
 {
 	leonardo_value_bot_3 player1(100, true);
-	leonardo_value_bot_3 player2(100, true);
+	abp_player player2(5);
 
 	chess_game game(
 		&player1,
@@ -182,7 +182,7 @@ void async_play()
 {
 	std::mutex m;
 	int scores[3] = { 0,0,0 };
-	int thread_count = 2;
+	int thread_count = 1;
 	std::vector<std::thread> threads;
 	for (int i = 0; i < thread_count; i++)
 	{
@@ -197,4 +197,5 @@ void async_play()
 int main()
 {
 	async_play();
+	//play_pawn();
 }

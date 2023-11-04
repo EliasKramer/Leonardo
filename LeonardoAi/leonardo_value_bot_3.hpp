@@ -77,6 +77,8 @@ private:
 	int get_opening_move(size_t hash);
 
 	void sort_move_list(chess::Movelist& moves, chess::Board& board);
+
+	void setup_nnet_for_move(const chess::Board& board);
 public:
 	leonardo_value_bot_3();
 	leonardo_value_bot_3(int ms_per_move, bool given_use_nnet);

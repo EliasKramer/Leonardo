@@ -47,10 +47,13 @@ int nnet_table::get(chess::Bitboard white_bb, chess::Bitboard black_bb) const
 {
 	chess::U64 key = make_key(white_bb, black_bb);
 	int idx = key % table.size();
-	if (table[idx].key == key &&
-		table[idx].w == white_bb &&
-		black_bb_from_key(white_bb, key) == black_bb)
+	if (table[idx].key == key && table[idx].w == white_bb)
 	{
+		if (black_bb_from_key(white_bb, key) != black_bb)
+		{
+			std::cout << "alarm";
+		}
+
 		return table[idx].value;
 	}
 	else

@@ -667,9 +667,8 @@ int leonardo_util::get_board_val(
 	matrix m(get_pawn_input_format());
 	encode_pawn_matrix(curr_white_bb, curr_black_bb, m);
 
-	neural_network nn_cpy = pawn_nnet;
-	nn_cpy.forward_propagation(curr_input);
-	int sec_out = std::round(get_pawn_matrix_value(nn_cpy.get_output()) * 100.0f);
+	//pawn_nnet.forward_propagation(curr_input);
+	int sec_out = output;// std::round(get_pawn_matrix_value(nn_cpy.get_output()) * 100.0f);
 
 	std::cout << "matrix: \n"
 		<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
