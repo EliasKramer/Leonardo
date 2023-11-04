@@ -36,8 +36,9 @@ leonardo_overlord::leonardo_overlord(
 	std::cout << "dir: " << p << '\n';
 
 	best_value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
-	best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
 

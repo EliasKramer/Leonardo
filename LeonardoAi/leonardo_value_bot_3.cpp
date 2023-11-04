@@ -385,7 +385,8 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 			pawn_b_bb,
 			value_nnet,
 			input_matrix,
-			pawn_nnet_table);
+			pawn_nnet_table,
+			board.sideToMove() == chess::Color::WHITE);
 
 		score += nnet_score;
 
@@ -583,8 +584,8 @@ leonardo_value_bot_3::leonardo_value_bot_3(int ms_per_move, bool given_use_nnet)
 	use_nnet(given_use_nnet), 
 	pawn_nnet_table(500) //200mb table
 {
-	load_openings();
-	value_nnet = neural_network("nanopawn.parameters");
+	//load_openings();
+	value_nnet = neural_network("643216.parameters");
 	input_matrix = matrix(leonardo_util::get_pawn_input_format());
 }
 void leonardo_value_bot_3::sort_move_list(chess::Movelist& moves, chess::Board& board)

@@ -19,9 +19,6 @@
     <Filter Include="sf">
       <UniqueIdentifier>{abe71d9b-5af9-4a31-bdd5-389e6f46d8b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="header\leonardo_value_bot">
-      <UniqueIdentifier>{92ec8588-1412-4099-97e0-50452c615434}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\leonardo_value_bot">
       <UniqueIdentifier>{8334a3bb-34eb-4e79-905d-15ebda54241c}</UniqueIdentifier>
     </Filter>
@@ -39,6 +36,9 @@
     </Filter>
     <Filter Include="source\chess_util\player">
       <UniqueIdentifier>{ffcc816e-44c6-4c1c-9d8d-60bbbf78df9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\chess_util\leonardo_value_bot">
+      <UniqueIdentifier>{92ec8588-1412-4099-97e0-50452c615434}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -342,16 +342,16 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="leonardo_value_bot.hpp">
-      <Filter>header\leonardo_value_bot</Filter>
+      <Filter>header\chess_util\leonardo_value_bot</Filter>
     </ClInclude>
     <ClInclude Include="leonardo_value_bot_1.hpp">
-      <Filter>header\leonardo_value_bot</Filter>
+      <Filter>header\chess_util\leonardo_value_bot</Filter>
     </ClInclude>
     <ClInclude Include="leonardo_value_bot_2.hpp">
-      <Filter>header\leonardo_value_bot</Filter>
+      <Filter>header\chess_util\leonardo_value_bot</Filter>
     </ClInclude>
     <ClInclude Include="leonardo_value_bot_3.hpp">
-      <Filter>header\leonardo_value_bot</Filter>
+      <Filter>header\chess_util\leonardo_value_bot</Filter>
     </ClInclude>
     <ClInclude Include="chess_game.hpp">
       <Filter>header\chess_util</Filter>
@@ -378,7 +378,7 @@
       <Filter>header\chess_util\player</Filter>
     </ClInclude>
     <ClInclude Include="nnet_table.hpp">
-      <Filter>header\leonardo_value_bot</Filter>
+      <Filter>header\chess_util\leonardo_value_bot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

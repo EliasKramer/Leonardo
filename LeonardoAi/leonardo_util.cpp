@@ -216,8 +216,21 @@ vector3 leonardo_util::get_pawn_input_format()
 {
 	//0 white pawns
 	//1 black pawns
+	//2 meta data 
+	//	(0,0) = 1 = white to move
+	//  (1,0) = 1 = black to move
 
-	return vector3(8, 6, 2);
+	return vector3(8, 6, 3);
+}
+
+vector3 leonardo_util::get_pawn_white_turn_pos()
+{
+	return vector3(0, 0, 2);
+}
+
+vector3 leonardo_util::get_pawn_black_turn_pos()
+{
+	return vector3(1, 0, 2);
 }
 
 void leonardo_util::encode_pawn_matrix(const chess::Board& board, matrix& input)
@@ -225,16 +238,18 @@ void leonardo_util::encode_pawn_matrix(const chess::Board& board, matrix& input)
 	chess::Bitboard w_pawns = board.pieces(chess::PieceType::PAWN, chess::Color::WHITE);
 	chess::Bitboard b_pawns = board.pieces(chess::PieceType::PAWN, chess::Color::BLACK);
 
-	encode_pawn_matrix(w_pawns, b_pawns, input);
+	encode_pawn_matrix(w_pawns, b_pawns, input, board.sideToMove() == chess::Color::WHITE);
 }
 
-void leonardo_util::encode_pawn_matrix(chess::Bitboard w_pawns, chess::Bitboard b_pawns, matrix& input)
+void leonardo_util::encode_pawn_matrix(chess::Bitboard w_pawns, chess::Bitboard b_pawns, matrix& input, bool white_to_move)
 {
 	smart_assert(vector3::are_equal(input.get_format(), get_pawn_input_format()));
 
 	input.set_all(0);
 	set_board_matrix(input, 0, 1, w_pawns);
 	set_board_matrix(input, 1, 1, b_pawns);
+
+	input.set_at_host(white_to_move ? get_pawn_white_turn_pos() : get_pawn_black_turn_pos(), 1);
 }
 
 void leonardo_util::set_pawn_matrix_value(matrix& output, float value, chess::Color side_to_move)
@@ -571,6 +586,14 @@ std::string leonardo_util::pawn_board_to_str(const matrix& pawn_board)
 		}
 		res += "\n";
 	}
+	if (pawn_board.get_at_host(vector3(0, 0, 2)) == 1)
+	{
+		res += "W";
+	}
+	if (pawn_board.get_at_host(vector3(1, 0, 2)) == 1)
+	{
+		res += "B";
+	}
 
 	return res + "\n";
 }
@@ -603,10 +626,30 @@ static void partial_forward_diff(
 	}
 }
 
+static void update_turn(
+	neural_network& nn,
+	matrix& input_prev,
+	bool white_to_move
+)
+{
+	const static vector3 white_turn_idx = leonardo_util::get_pawn_white_turn_pos();
+	const static vector3 black_turn_idx = leonardo_util::get_pawn_black_turn_pos();
+
+	bool prev_was_white = input_prev.get_at_host(white_turn_idx) == 1;
+
+	if (prev_was_white != white_to_move)
+	{
+		nn.partial_forward_prop(input_prev, white_to_move ? 1 : 0, white_turn_idx);
+		input_prev.set_at_host(white_turn_idx, white_to_move ? 1 : 0);
+
+		nn.partial_forward_prop(input_prev, white_to_move ? 0 : 1, black_turn_idx);
+		input_prev.set_at_host(black_turn_idx, white_to_move ? 0 : 1);
+	}
+}
+
 static int call_count = 0;
 static int table_hit = 0;
 static int false_store = 0;
-static bool first = true;
 int leonardo_util::get_board_val(
 	chess::Bitboard curr_white_bb,
 	chess::Bitboard curr_black_bb,
@@ -614,10 +657,12 @@ int leonardo_util::get_board_val(
 	chess::Bitboard& prev_black_bb,
 	neural_network& pawn_nnet,
 	matrix& curr_input,
-	nnet_table& table)
+	nnet_table& table,
+	bool white_to_move)
 {
 	std::cout
 		<< "call count: " << call_count
+		<< " arguemnt wtm: " << white_to_move
 		<< " table hits: " << table_hit
 		<< " table inserts: " << table.get_inserted_items_count()
 		<< " table item count: " << table.get_table_item_count()
@@ -626,23 +671,17 @@ int leonardo_util::get_board_val(
 		<< "\n";
 	call_count++;
 
-	int table_value = table.get(curr_white_bb, curr_black_bb);
+	int table_value = table.get(curr_white_bb, curr_black_bb, white_to_move);
 	if (table_value != nnet_table::not_found)
 	{
 		table_hit++;
 		//return table_value;
 	}
 
-	if (first)
-	{
-		//first = false;
-		//pawn_nnet.forward_propagation(curr_input);
-		//return 0;
-	}
-
-	std::cout << "prev m: \n"
+	std::cout << "\nprev m: \n"
 		<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
 
+	update_turn(pawn_nnet, curr_input, white_to_move);
 	chess::Bitboard added_black_pieces = all_added_values(curr_black_bb, prev_black_bb);
 	chess::Bitboard removed_black_pieces = all_removed_values(curr_black_bb, prev_black_bb);
 	chess::Bitboard added_white_pieces = all_added_values(curr_white_bb, prev_white_bb);
@@ -665,10 +704,11 @@ int leonardo_util::get_board_val(
 	int output = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f);
 
 	matrix m(get_pawn_input_format());
-	encode_pawn_matrix(curr_white_bb, curr_black_bb, m);
+	//throw std::runtime_error("not implemented");
+	leonardo_util::encode_pawn_matrix(curr_white_bb, curr_black_bb, m, white_to_move);
 
-	//pawn_nnet.forward_propagation(curr_input);
-	int sec_out = output;// std::round(get_pawn_matrix_value(nn_cpy.get_output()) * 100.0f);
+	pawn_nnet.forward_propagation(m);
+	int sec_out = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f);
 
 	std::cout << "matrix: \n"
 		<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
@@ -676,14 +716,19 @@ int leonardo_util::get_board_val(
 	std::cout << "curr_black_bb " << curr_black_bb << " ";
 	std::cout << "curr_white_bb " << curr_white_bb << "\n";
 
-	if (std::abs(sec_out - output) > 1)
-	{
-		std::cout << "diff out";
-	}
 
 	if (!matrix::are_equal(m, curr_input))
 	{
 		std::cout << "matrix not equal\n";
+		std::cout << "matrix: \n"
+			<< leonardo_util::pawn_board_to_str(m) << "\n";
+		std::cout << "matrix: \n"
+			<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
+
+	}
+	if (std::abs(sec_out - output) > 1)
+	{
+		std::cout << "diff out";
 	}
 	std::cout << "val: " << output << "\n";
 	std::cout << "------------\n";
@@ -698,7 +743,7 @@ int leonardo_util::get_board_val(
 		std::cout << "+++++++++++++++++++\n";
 		std::cout << curr_input.get_string() << "\n";
 		std::cout << "+++++++++++++++++++\n";
-		int table_value_tmp = table.get(curr_white_bb, curr_black_bb);
+		int table_value_tmp = table.get(curr_white_bb, curr_black_bb, white_to_move);
 		bool eq = matrix::are_equal(m, curr_input);
 		std::cout << "false store\n";
 		std::cout << "output: " << (int)output << " table value: " << table_value << "\n";
@@ -707,7 +752,7 @@ int leonardo_util::get_board_val(
 
 
 	if (table_value == nnet_table::not_found)
-		table.insert(curr_white_bb, curr_black_bb, output);
+		table.insert(curr_white_bb, curr_black_bb, white_to_move, output);
 
 	prev_black_bb = curr_black_bb;
 	prev_white_bb = curr_white_bb;
