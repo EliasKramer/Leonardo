@@ -653,6 +653,10 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	pawn_w_bb = white_bb & pawns_bb;
 	pawn_b_bb = black_bb & pawns_bb;
 
+	value_nnet.forward_propagation(input_matrix);
+
+
+
 	int score = 0;
 	auto start = std::chrono::high_resolution_clock::now();
 
@@ -681,7 +685,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 			best_move = tmp;
 			transpositions_last = transpositions_count;
 		}
-		if (search_depth == 5) break;
+		if (search_depth == 2) break;
 	}
 	transpositions_count = transpositions_last;
 

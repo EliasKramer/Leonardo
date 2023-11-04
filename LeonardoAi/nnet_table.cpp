@@ -14,7 +14,7 @@ nnet_table::nnet_table(size_t table_size_mb)
 	:random_hash_b(0), random_hash_w(0)
 {
 	//WTF if one calculates it like this, lots of values will be overridden for some reason
-	table.resize(30000000);// table_size_mb * 1024 * 1024 / sizeof(nnet_table_entry));
+	table.resize(table_size_mb * 1024 * 1024 / sizeof(nnet_table_entry));// table_size_mb * 1024 * 1024 / sizeof(nnet_table_entry));
 
 	std::random_device rd;
 	std::mt19937_64 gen(rd());

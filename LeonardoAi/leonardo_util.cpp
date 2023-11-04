@@ -596,15 +596,17 @@ static void partial_forward_diff(
 		unsigned int sq = chess::builtin::poplsb(bb);
 		change_idx.x = sq % 8;
 		change_idx.y = (sq / 8) - 1;
+		std::cout << "change " << change_idx.to_string() << " to " << change_value << std::endl;
+
 		nn.partial_forward_prop(curr_input, change_value, change_idx);
-		//curr_input.set_at_host(change_idx, change_value);
+		curr_input.set_at_host(change_idx, change_value);
 	}
 }
 
 static int call_count = 0;
 static int table_hit = 0;
 static int false_store = 0;
-static bool first_call = false;
+static bool first = true;
 int leonardo_util::get_board_val(
 	chess::Bitboard curr_white_bb,
 	chess::Bitboard curr_black_bb,
@@ -631,85 +633,79 @@ int leonardo_util::get_board_val(
 		//return table_value;
 	}
 
-	int output;
-
-	if (first_call)
+	if (first)
 	{
-		first_call = false;
-		
-		matrix m(get_pawn_input_format());
-		encode_pawn_matrix(curr_white_bb, curr_black_bb, m);
-
-		pawn_nnet.forward_propagation(m);
-		output = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 20.0f);
+		//first = false;
+		//pawn_nnet.forward_propagation(curr_input);
+		//return 0;
 	}
 
-	else {
+	std::cout << "prev m: \n"
+		<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
 
-		chess::Bitboard added_black_pieces = all_added_values(curr_black_bb, prev_black_bb);
-		chess::Bitboard removed_black_pieces = all_removed_values(curr_black_bb, prev_black_bb);
-		chess::Bitboard added_white_pieces = all_added_values(curr_white_bb, prev_white_bb);
-		chess::Bitboard removed_white_pieces = all_removed_values(curr_white_bb, prev_white_bb);
+	chess::Bitboard added_black_pieces = all_added_values(curr_black_bb, prev_black_bb);
+	chess::Bitboard removed_black_pieces = all_removed_values(curr_black_bb, prev_black_bb);
+	chess::Bitboard added_white_pieces = all_added_values(curr_white_bb, prev_white_bb);
+	chess::Bitboard removed_white_pieces = all_removed_values(curr_white_bb, prev_white_bb);
 
-		std::cout << "matrix: \n"
-			<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
+	std::cout << "after m: \n"
+		<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
 
-		vector3 change_idx(0, 0, 0);
-		std::cout << "out prev: " << (int)std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 20.0f) << "\n";
+	vector3 change_idx(0, 0, 0);
+	std::cout << "out prev: " << (int)std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f) << "\n";
 
-		partial_forward_diff(added_white_pieces, pawn_nnet, curr_input, 1, change_idx);
-		partial_forward_diff(removed_white_pieces, pawn_nnet, curr_input, 0, change_idx);
+	partial_forward_diff(added_white_pieces, pawn_nnet, curr_input, 1, change_idx);
+	partial_forward_diff(removed_white_pieces, pawn_nnet, curr_input, 0, change_idx);
 
-		change_idx.z = 1;
-		partial_forward_diff(added_black_pieces, pawn_nnet, curr_input, 1, change_idx);
-		partial_forward_diff(removed_black_pieces, pawn_nnet, curr_input, 0, change_idx);
+	change_idx.z = 1;
+	partial_forward_diff(added_black_pieces, pawn_nnet, curr_input, 1, change_idx);
+	partial_forward_diff(removed_black_pieces, pawn_nnet, curr_input, 0, change_idx);
 
-		std::cout << "out prev: " << (int)std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 20.0f) << "\n";
+	pawn_nnet.rest_partial_forward_prop();
+	int output = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f);
 
-		pawn_nnet.rest_partial_forward_prop();
-		output = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 20.0f);
+	matrix m(get_pawn_input_format());
+	encode_pawn_matrix(curr_white_bb, curr_black_bb, m);
 
-		matrix m(get_pawn_input_format());
-		encode_pawn_matrix(curr_white_bb, curr_black_bb, m);
+	neural_network nn_cpy = pawn_nnet;
+	nn_cpy.forward_propagation(curr_input);
+	int sec_out = std::round(get_pawn_matrix_value(nn_cpy.get_output()) * 100.0f);
 
-		pawn_nnet.forward_propagation(curr_input);
-		int sec_out = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 20.0f);
+	std::cout << "matrix: \n"
+		<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
+	//<< curr_input.get_string() << "\n";
+	std::cout << "curr_black_bb " << curr_black_bb << " ";
+	std::cout << "curr_white_bb " << curr_white_bb << "\n";
 
-		std::cout << "matrix: \n"
-			<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
-		//<< curr_input.get_string() << "\n";
-		std::cout << "curr_black_bb " << curr_black_bb << " ";
-		std::cout << "curr_white_bb " << curr_white_bb << "\n";
-
-		if (std::abs(sec_out - output) > 1)
-		{
-			std::cout << "diff out";
-		}
-
-		if (!matrix::are_equal(m, curr_input))
-		{
-			std::cout << "matrix not equal\n";
-		}
-		std::cout << "val: " << output << "\n";
-		std::cout << "------------\n";
-
-		if (table_value != nnet_table::not_found && std::abs(output - table_value) > 1)
-		{
-			std::cout << leonardo_util::pawn_board_to_str(m) << "\n";
-			std::cout << "+++++++++++++++++++\n";
-			std::cout << leonardo_util::pawn_board_to_str(curr_input) << "\n";
-			std::cout << "+++++++++++++++++++\n";
-			std::cout << m.get_string() << "\n";
-			std::cout << "+++++++++++++++++++\n";
-			std::cout << curr_input.get_string() << "\n";
-			std::cout << "+++++++++++++++++++\n";
-			int table_value_tmp = table.get(curr_white_bb, curr_black_bb);
-			bool eq = matrix::are_equal(m, curr_input);
-			std::cout << "false store\n";
-			std::cout << "output: " << (int)output << " table value: " << table_value << "\n";
-			false_store++;
-		}
+	if (std::abs(sec_out - output) > 1)
+	{
+		std::cout << "diff out";
 	}
+
+	if (!matrix::are_equal(m, curr_input))
+	{
+		std::cout << "matrix not equal\n";
+	}
+	std::cout << "val: " << output << "\n";
+	std::cout << "------------\n";
+
+	if (table_value != nnet_table::not_found && std::abs(output - table_value) > 1)
+	{
+		std::cout << leonardo_util::pawn_board_to_str(m) << "\n";
+		std::cout << "+++++++++++++++++++\n";
+		std::cout << leonardo_util::pawn_board_to_str(curr_input) << "\n";
+		std::cout << "+++++++++++++++++++\n";
+		std::cout << m.get_string() << "\n";
+		std::cout << "+++++++++++++++++++\n";
+		std::cout << curr_input.get_string() << "\n";
+		std::cout << "+++++++++++++++++++\n";
+		int table_value_tmp = table.get(curr_white_bb, curr_black_bb);
+		bool eq = matrix::are_equal(m, curr_input);
+		std::cout << "false store\n";
+		std::cout << "output: " << (int)output << " table value: " << table_value << "\n";
+		false_store++;
+	}
+
 
 	if (table_value == nnet_table::not_found)
 		table.insert(curr_white_bb, curr_black_bb, output);
