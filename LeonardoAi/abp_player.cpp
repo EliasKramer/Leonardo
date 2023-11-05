@@ -339,8 +339,8 @@ int abp_player::get_opening_move(size_t hash)
 		return -1;
 	}
 
-	std::random_device rd;
-	std::mt19937 gen(rd());
+	//std::random_device rd;
+	std::mt19937 gen(42); // for reproducibility
 	std::uniform_int_distribution<> dis(0, indices.size() - 1);
 
 	return indices[dis(gen)];
@@ -387,8 +387,10 @@ chess::Move abp_player::get_move(chess::Board& board)
 		{
 			best_score = score;
 			best_move = move;
+			std::cout << "abp - best: " << chess::uci::moveToUci(move) << " score: " << score << "\n";
 		}
 	}
+	std::cout << "abp: best move: " << chess::uci::moveToUci(best_move) << " score: " << best_score << "\n\n";
 
 	return best_move;
 }

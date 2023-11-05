@@ -48,7 +48,7 @@ int chess_game::play()
 		if (move == chess::Move::NULL_MOVE || move == chess::Move::NO_MOVE)
 		{
 			std::cout << "no move\n";
-			break;
+			return 0;
 		}
 		bool move_found = false;
 		for (chess::Move curr : moves)

@@ -70,8 +70,8 @@ private:
 		int ply_remaining,
 		int ply_from_root,
 		chess::Board& board,
-		float alpha,
-		float beta,
+		int alpha,
+		int beta,
 		chess::Move& best_move);
 
 	int get_opening_move(size_t hash);
