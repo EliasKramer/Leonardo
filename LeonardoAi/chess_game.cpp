@@ -26,7 +26,7 @@ int chess_game::play()
 	long ms_sum[2] = { 0, 0 };
 	int moves_calculated[2] = { 0, 0 };
 	int moves_played[2] = { 0, 0 };
-
+	int moves_played_total = 0;
 	while (board.isGameOver().second == chess::GameResult::NONE)
 	{
 		white_to_move = board.sideToMove() == chess::Color::WHITE;
@@ -41,6 +41,17 @@ int chess_game::play()
 			white_player->get_move(board) :
 			black_player->get_move(board);
 		auto end = std::chrono::high_resolution_clock::now();
+		chess::Move move_other = !white_to_move ?
+			white_player->get_move(board) :
+			black_player->get_move(board);
+
+		if (moves_played_total > 40 && move != move_other)
+		{
+			std::cout << "moves not equal\n";
+			std::cout << board << "\n";
+			//return 0;
+		}
+
 
 		chess::Movelist moves;
 		chess::movegen::legalmoves(moves, board);
@@ -78,6 +89,7 @@ int chess_game::play()
 		moves_str += chess::uci::moveToUci(move) + "\n";
 
 		board.makeMove(move);
+		moves_played_total++;
 	}
 
 
@@ -93,6 +105,7 @@ int chess_game::play()
 		<< ms_sum[0] / std::max(1, moves_played[0]) << "\t" << ms_sum[1] / std::max(1, moves_played[1]) << "\t ms_per_move_played\n";
 	std::cout << "moves: \n" << moves_str << std::endl;
 	std::cout << board.getFen() << "\n";
+	exit(0);
 	return board.isGameOver().first != chess::GameResultReason::CHECKMATE ? 0 :
 		white_to_move ? 1 : -1;
 }

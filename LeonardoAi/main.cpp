@@ -162,8 +162,8 @@ void play_pawn()
 
 void play(int* scores, std::mutex& m)
 {
-	abp_player player1(5); //bit stronger abp
-	leonardo_value_bot_3 player2(5);
+	leonardo_value_bot_3 player1(5);
+	abp_player player2(5); //bit stronger abp
 
 	chess_game game(
 		&player1,
@@ -196,5 +196,30 @@ void async_play()
 
 int main()
 {
-	async_play();
+	std::mutex m;
+	int scores[3] = { 0,0,0 };
+	play(scores,m);
+	//async_play();
+	return 0;
+
+	std::string board_fen = "1rbr4/ppN3p1/6k1/6p1/2B1P3/2P5/P4P2/R3K2R b Q - 6 21";
+	leonardo_value_bot_3 player1(4);
+	abp_player player2(4); //bit stronger abp
+
+	chess::Board board(board_fen);
+	std::cout << "leonardo: \n";
+	chess::Move move = player1.get_move(board);
+	std::cout << chess::uci::moveToUci(move) << "\n";
+	std::cout << "abp: \n";
+	chess::Move move2 = player2.get_move(board);
+	std::cout << chess::uci::moveToUci(move2) << "\n";
+
+	if (move != move2)
+	{
+		std::cout << "error\n";
+	}
+	else
+	{
+		std::cout << "ok\n";
+	}
 }

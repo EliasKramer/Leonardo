@@ -214,8 +214,8 @@ static inline bool is_passed_pawn(
 {
 	int file = idx % 8;
 	int rank = idx / 8;
-	static const chess::Bitboard file_a = 0x101010101010101;
-	static const chess::Bitboard file_h = 0x8080808080808080;
+	constexpr chess::Bitboard file_a = 0x101010101010101;
+	constexpr chess::Bitboard file_h = 0x8080808080808080;
 	chess::Bitboard file_bb = file_a << file;
 	chess::Bitboard right = (file_bb << 1) & 0xfefefefefefefefe;
 	chess::Bitboard left = (file_bb >> 1) & 0x7f7f7f7f7f7f7f7f;
@@ -343,7 +343,7 @@ float leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, in
 	float king_score = POSITION_VALUE_KING[0][game_duration_state_white][board.kingSq(chess::Color::WHITE)];
 	king_score -= POSITION_VALUE_KING[1][game_duration_state_black][board.kingSq(chess::Color::BLACK)];
 
-
+	/*
 	//if the other king has a significant piece and you dont
 	//stay away from them
 	if (non_pawn_count_black == 0 && non_pawn_count_white > 0)
@@ -362,17 +362,25 @@ float leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, in
 
 		score -= king_manhatten_distance / 2;
 	}
-
 	score += covered_pawn_count * 5.0f;
 	score += passed_pawn_count * 50.0f;
 	//double pawns get counted twice. triple pawns are not that much more important
 	score += ((float)double_pawn_count / 2) * 15.0f;
+	*/
 	score += king_score;
 
 	//evaluate with nnet
 	if (use_nnet)//if (board_material_equal_score == 0 && !board.inCheck())
 	{
+		auto start = std::chrono::high_resolution_clock::now();
 		value_nnet.rest_partial_forward_prop();
+		auto end = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double> elapsed = end - start;
+
+		ms_per_forward_feed_sum += elapsed.count();
+		forward_feed_count++;
+
+
 		//this is the slow option to do this.
 		//leonardo_util::encode_pawn_matrix(board, input_matrix);
 		//value_nnet.partial_forward_prop(input_matrix, input_matrix, vector3(0, 0, 0));
@@ -476,21 +484,28 @@ float leonardo_value_bot_3::recursive_eval(
 			}
 			beta = std::min(beta, score);
 		}
+
 		if (use_tt)
 		{
-			alpha = tt_curr_pos->alpha;
-			beta = tt_curr_pos->beta;
+			//alpha = tt_curr_pos->alpha;
+			//beta = tt_curr_pos->beta;
+			//this needs fixing
 		}
 		else
 		{
 			tt_store(board, depth, score, alpha, beta);
 		}
+
+		//if(depth == 0)
+			//std::cout << "move: " << chess::uci::moveToUci(move) << " score: " << score << std::endl;
+
 		if (beta <= alpha)
 		{
 			pruned++;
 			//std::cout << "pruned\n";
 			break;
 		}
+
 	}
 
 	return best_score;
@@ -568,6 +583,7 @@ leonardo_value_bot_3::leonardo_value_bot_3(int end_depth)
 {
 	load_openings();
 	value_nnet = neural_network("nanopawn.parameters");
+	std::cout << "leonardo_value_bot: " + value_nnet.get_layer_str() + "\n";
 	//value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
 	//value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
 	//value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
@@ -626,7 +642,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	//chess::Move tmp;
 	//float nnet_eval_v = 
 	//	recursive_eval(4, 0, board, -FLT_MAX, FLT_MAX,tmp);
-	use_nnet = false;// nnet_eval_v < 100;
+	use_nnet = true;// nnet_eval_v < 100;
 	//std::cout << board.getFen() << "\n";
 	//std::cout << board << "\n";
 	//std::cout << "value: " << 0 << "\n";
@@ -651,6 +667,8 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 			-FLT_MAX,
 			FLT_MAX,
 			best_move);
+		//std::cout << "depth: " << i << " | score: " << score << " " << chess::uci::moveToUci(best_move) << "\n";
+		//std::cout << "--------------------\n";
 	}
 	end_depth = prev_end_depth;
 
@@ -659,6 +677,8 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 
 	if (board.sideToMove() == chess::Color::BLACK)
 		score *= -1;
+
+	std::cout << "ms per 1mio forward feed: " << (ms_per_forward_feed_sum * 1000000) / forward_feed_count << std::endl;
 
 	std::cout << "transposition table size: " << tt.size()
 		<< " | transpositions: " << transpositions_count

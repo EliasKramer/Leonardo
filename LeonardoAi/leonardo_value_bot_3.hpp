@@ -17,6 +17,12 @@ public:
 class leonardo_value_bot_3 : public chess_player
 {
 private:
+	size_t ms_per_move = 1000;
+
+	float ms_per_forward_feed_sum = 0;
+	float forward_feed_count = 1;
+	//std::chrono::time_point start_point = 0;
+
 	int end_depth;
 
 	int pruned = 0;
