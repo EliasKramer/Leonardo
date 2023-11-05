@@ -1,13 +1,13 @@
 #include "leonardo_value_bot_3.hpp"
 #include "leonardo_util.hpp"
 
-int leonardo_value_bot_3::probe_tt(chess::U64 hash, int depth_from_root, int alpha, int beta, chess::Move& best_move)
+int leonardo_value_bot_3::probe_tt(chess::U64 hash, int depth, int alpha, int beta, chess::Move& best_move)
 {
 	tt_item& item = tt[hash % tt.size()];
 
 	if (item.key == hash) //entry is acutally the same
 	{
-		if (item.depth >= depth_from_root)
+		if (item.depth >= depth)
 		{
 			if (item.flags == TT_ITEM_TYPE::exact)
 				return item.value;
@@ -27,7 +27,7 @@ int leonardo_value_bot_3::probe_tt(chess::U64 hash, int depth_from_root, int alp
 
 void leonardo_value_bot_3::record_tt(
 	chess::U64 hash,
-	int depth_from_root,
+	int depth,
 	int value,
 	TT_ITEM_TYPE flags,
 	const chess::Move& best_move)
@@ -38,7 +38,8 @@ void leonardo_value_bot_3::record_tt(
 	item.best_move = best_move;
 	item.value = value;
 	item.flags = flags;
-	item.depth = depth_from_root;
+	item.depth = depth - 1;
+	tt_inserts++;
 }
 
 bool leonardo_value_bot_3::time_over()
@@ -409,9 +410,9 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 		leaf_nodes_evaluated_nnet++;
 	}
 
-	leaf_nodes++;
+	//leaf_nodes++;
 
-	return score / 100;
+	return score;
 }
 
 int leonardo_value_bot_3::recursive_eval(
@@ -428,20 +429,21 @@ int leonardo_value_bot_3::recursive_eval(
 	nodes_visited++;
 
 	TT_ITEM_TYPE tt_flag = TT_ITEM_TYPE::alpha;
-	//int value = probe_tt(board.hash(), ply_from_root, alpha, beta, best_move);
-	//if(value != tt_item::unknown_eval)
-	//{
-		//transpositions_count++;
-		//return value;
-	//}
+	int value = probe_tt(board.hash(), ply_remaining, alpha, beta, best_move);
+	if(value != tt_item::unknown_eval && !board.isRepetition())
+	{
+		transpositions_count++;
+		return value;
+	}
 
 	chess::Movelist moves;
 	chess::movegen::legalmoves(moves, board);
 
 	if (ply_remaining == 0)
 	{
+		leaf_nodes++;
 		int evaluation = eval(board, moves, ply_from_root);
-		//record_tt(board.hash(), ply_from_root, evaluation, TT_ITEM_TYPE::exact, best_move);
+		record_tt(board.hash(), ply_remaining, evaluation, TT_ITEM_TYPE::exact, best_move);
 		return evaluation;
 	}
 
@@ -456,15 +458,9 @@ int leonardo_value_bot_3::recursive_eval(
 
 	for (chess::Move move : moves)
 	{
-		//leonardo_util::make_move(board, input_matrix, move, value_nnet);
 		board.makeMove(move);
-		if (ply_from_root == 0 && chess::uci::moveToUci(move) == "e2e4")
-		{
-			std::cout << "e2e4\n";
-		}
 		float score = -recursive_eval(ply_remaining - 1, ply_from_root + 1, board, -beta, -alpha, best_move);
 		board.unmakeMove(move);
-		//leonardo_util::unmake_move(board, input_matrix, move, value_nnet);
 
 		if (time_over())
 			return 0;
@@ -473,6 +469,7 @@ int leonardo_value_bot_3::recursive_eval(
 		{
 			//store lower bound
 			//maye killer move
+			record_tt(board.hash(), ply_remaining, beta, TT_ITEM_TYPE::beta, best_move); // BEST LOCAL MOVE
 			pruned++;
 			return beta;
 		}
@@ -481,21 +478,15 @@ int leonardo_value_bot_3::recursive_eval(
 			//tt exact?
 			//set best move
 			alpha = score;
+			tt_flag = TT_ITEM_TYPE::exact;
 			if (ply_from_root == 0)
 			{
-				//std::cout << "set best move " << chess::uci::moveToUci(move) << " " << alpha << "\n";
 				best_move = move;
-			}
-		}
-		else {
-			if (ply_from_root == 0)
-			{
-				//std::cout << "other_val: " << chess::uci::moveToUci(move) << " " << score << "\n";
 			}
 		}
 	}
 
-	//record_tt(board.hash(), ply_from_root, alpha, tt_flag, best_move);
+	record_tt(board.hash(), ply_remaining, alpha, tt_flag, best_move); //best local move TODOODODODODOODODO
 
 	return alpha;
 }
@@ -575,6 +566,11 @@ leonardo_value_bot_3::leonardo_value_bot_3(int ms_per_move, bool given_use_nnet)
 	load_openings();
 	value_nnet = neural_network("643216.parameters");
 	input_matrix = matrix(leonardo_util::get_pawn_input_format());
+
+	const size_t tt_item_size = sizeof(tt_item); // in byte
+	const size_t tt_desired_size = 200; // in MB
+	const size_t tt_size = tt_desired_size * 1024 * 1024 / tt_item_size;
+	tt.resize(tt_size);
 }
 void leonardo_value_bot_3::sort_move_list(chess::Movelist& moves, chess::Board& board)
 {
@@ -631,11 +627,8 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		return openings[opening_move_idx].second;
 	}
 
-	const size_t tt_item_size = sizeof(tt_item); // in byte
-	const size_t tt_desired_size = 200; // in MB
-	const size_t tt_size = tt_desired_size * 1024 * 1024 / tt_item_size;
-	//tt.resize(tt_size);
 
+	tt_inserts = 0;
 	pruned = 0;
 	nodes_visited = 0;
 
@@ -698,8 +691,8 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 
 	std::cout << "use nnet: " << use_nnet << "\n";
 	std::cout << "transposition table size: " << tt.size()
-		<< " | transpositions: " << transpositions_count
-		<< "\n";
+		<< " | transpositions: " << transpositions_count 
+		<< " | tt inserts: " << tt_inserts << "\n";
 	std::cout << "ms: " << ms_taken << "\n";
 	std::cout << "moves/ms " << tt.size() / (ms_taken + 1) << "\n";
 	std::cout << "reached_depth: " << reached_depth << "\n";

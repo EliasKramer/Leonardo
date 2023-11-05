@@ -42,6 +42,7 @@ private:
 	bool use_nnet = false;
 	int print_count = 0;
 	int transpositions_count = 0;
+	int tt_inserts = 0;
 	int ms_per_move = 100;
 	std::chrono::steady_clock::time_point start_time;
 
@@ -57,8 +58,8 @@ private:
 	neural_network value_nnet;
 	matrix input_matrix;
 
-	int probe_tt(chess::U64 hash, int depth_from_root, int alpha, int beta, chess::Move& best_move);
-	void record_tt(chess::U64 hash, int depth_from_root, int value, TT_ITEM_TYPE flags, const chess::Move& best_move);
+	int probe_tt(chess::U64 hash, int depth, int alpha, int beta, chess::Move& best_move);
+	void record_tt(chess::U64 hash, int depth, int value, TT_ITEM_TYPE flags, const chess::Move& best_move);
 
 	bool time_over();
 
