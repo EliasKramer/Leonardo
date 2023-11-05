@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 #include <cassert>
+#include "nnet_table.hpp"
 
 namespace leonardo_util
 {
@@ -36,7 +37,10 @@ namespace leonardo_util
 	void set_board_matrix(matrix& m, int z_idx, float val, chess::Bitboard bb);
 
 	vector3 get_pawn_input_format();
+	vector3 get_pawn_white_turn_pos();
+	vector3 get_pawn_black_turn_pos();
 	void encode_pawn_matrix(const chess::Board& board, matrix& input);
+	void encode_pawn_matrix(chess::Bitboard w_pawns, chess::Bitboard b_pawns, matrix& input, bool white_to_move);
 	void set_pawn_matrix_value(matrix& output, float value, chess::Color side_to_move);
 	void set_pawn_matrix_value(matrix& output, float value);
 	float get_pawn_matrix_value(matrix& output, chess::Color side_to_move);
@@ -49,4 +53,20 @@ namespace leonardo_util
 
 	bool board_material_equal(chess::Board& board);
 	std::string get_pawn_structure_str(chess::Board& board);
+
+	chess::Square get_random_square(chess::Bitboard bb);
+	void remove_random_pawns(chess::Board& board);
+
+	std::string pawn_board_to_str(const matrix& pawn_board);
+
+	int get_board_val(
+		chess::Bitboard curr_white_bb, 
+		chess::Bitboard curr_black_bb, 
+		chess::Bitboard& prev_white_bb, 
+		chess::Bitboard& prev_black_bb, 
+		neural_network& pawn_nnet,
+		matrix& curr_input,
+		nnet_table& table,
+		bool white_to_move
+	);
 }

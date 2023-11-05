@@ -32,52 +32,18 @@ leonardo_overlord::leonardo_overlord(
 ) : name(name)
 {
 	std::cout << "initalizing overlord " << name << "\n";
-	//print curret directory
 	std::filesystem::path p = std::filesystem::current_path();
-	std::cout << "looking for nnets in " << p << '\n';
+	std::cout << "dir: " << p << '\n';
 
-	//best_value_nnet = neural_network("value.parameters");
-	//best_policy_nnet = neural_network("policy.parameters");
-
-
-
-	best_value_nnet.set_input_format(leonardo_util::get_input_format());
-	//best_value_nnet.add_fully_connected_layer(96, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(24, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(24, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(12, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(12, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(6, leaky_relu_fn);
-	//best_value_nnet.add_fully_connected_layer(6, leaky_relu_fn);
+	best_value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
+	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
 
-	//best_value_nnet = neural_network("C:\\Users\\Elias\\Desktop\\4small_epoch\\4small_epoch_2652200\\value.parameters");
-
-	//best_value_nnet = neural_network("C:\\Users\\Elias\\Desktop\\all\\coding\\c_c++\\Leonardo\\x64\\Release\\models\\pre_calced_dataset_epoch_178200\\value.parameters");
-
-	best_policy_nnet.set_input_format(leonardo_util::get_input_format());
-	best_policy_nnet.add_fully_connected_layer(200, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(200, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(100, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(100, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(50, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(50, leaky_relu_fn);
-	best_policy_nnet.add_fully_connected_layer(leonardo_util::get_policy_output_format(), leaky_relu_fn);
-	best_policy_nnet.xavier_initialization();
-
-	//best_value_nnet = neural_network("value.parameters");
-
 	new_policy_nnet = neural_network(best_policy_nnet);
 	new_value_nnet = neural_network(best_value_nnet);
-
-	if (gpu_mode)
-	{
-		best_policy_nnet.enable_gpu_mode();
-		best_value_nnet.enable_gpu_mode();
-		new_policy_nnet.enable_gpu_mode();
-		new_value_nnet.enable_gpu_mode();
-	}
 }
 static std::vector<std::string> read_file_lines(const std::string& filename) {
 	std::vector<std::string> lines;
@@ -438,7 +404,7 @@ static bool get_pawn_moves(chess::Board& board, chess::Movelist& moves)
 	return has_moves;
 }
 
-static float pawn_eval(chess::Board& board, int depth)
+static float pawn_eval(chess::Board& board, int depth, bool only_win)
 {
 	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
 	chess::Bitboard white_bb = board.us(chess::Color::WHITE);
@@ -455,6 +421,11 @@ static float pawn_eval(chess::Board& board, int depth)
 		{
 			return -20 + depth; //black won
 		}
+	}
+
+	if (only_win)
+	{
+		return 0;
 	}
 
 	float score = 0;
@@ -498,7 +469,7 @@ float best_pawn_move_rec(
 
 	if (curr_depth >= max_depth || queen_on_board(board))
 	{
-		return pawn_eval(board, curr_depth);
+		return pawn_eval(board, curr_depth, false);
 	}
 
 	if (!pawn_moves_available)
@@ -583,10 +554,10 @@ static void play_pawn_game(
 			FLT_MAX);
 
 		leonardo_util::encode_pawn_matrix(board, board_matrix);
-		float board_eval = pawn_eval(board, 0);
 
+		float board_eval = pawn_eval(board, 0, false);
 		input_matrices.push_back(board_matrix);
-		scores.push_back(board_eval);
+		scores.push_back(board_eval / 20);
 
 		if (best_move == chess::Move::NULL_MOVE)
 		{
@@ -613,7 +584,7 @@ static void play_pawn_game(
 		//std::cout << board << std::endl;
 	} while (best_move != chess::Move::NULL_MOVE);
 
-	float discount_factor = 0.9f;
+	float discount_factor = 0.8f;
 	std::vector<float> discounted_scores;
 	discounted_scores.resize(scores.size());
 	discounted_scores[scores.size() - 1] = scores[scores.size() - 1];
@@ -622,25 +593,29 @@ static void play_pawn_game(
 		float curr_score = scores[i];
 		float next_score = discounted_scores[i + 1];
 
-		discounted_scores[i] = curr_score + discount_factor * next_score;
+		discounted_scores[i] = (curr_score + discount_factor * next_score);
 	}
 
 	matrix label(leonardo_util::get_value_nnet_output_format());
 	for (int i = 0; i < scores.size(); i++)
 	{
-		discounted_scores[i] /= 20;
+
 		discounted_scores[i] = std::clamp(discounted_scores[i], -1.0f, 1.0f);
 		leonardo_util::set_pawn_matrix_value(label, discounted_scores[i]); // normalize
 		output_matrices.push_back(label);
+		/*
+		std::cout << leonardo_util::pawn_board_to_str(input_matrices[i]) << "\n";
+		
+		std::cout << "score: " << scores[i] <<
+			" discounted score: " << discounted_scores[i] << "\n";
 
-		//std::cout << "score: " << scores[i] <<
-		//	" discounted score: " << discounted_scores[i] << "\n";
+		std::cout << "------------\n";
+		*/
 	}
 	//important. the last move is always a win loss or a draw
 	//win loss is a queen on either board. a pawn matrix cannot represent this
 	output_matrices.pop_back();
 	input_matrices.pop_back();
-
 }
 
 static chess::Board random_pawn_board()
@@ -652,7 +627,8 @@ static chess::Board random_pawn_board()
 
 	chess::Move chosen_move = chess::Move::NULL_MOVE;
 
-	//number between 0 and 4
+	leonardo_util::remove_random_pawns(board);
+
 	std::uniform_int_distribution<> dis(0, 3);
 	int rnd_depth = dis(gen);
 
@@ -691,16 +667,15 @@ static chess::Board random_pawn_board()
 
 void leonardo_overlord::reinforcement_learning_pawns()
 {
-	best_value_nnet = neural_network(); //reset the best nnet
-	best_value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
-	best_value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
-	best_value_nnet.xavier_initialization();
+	//best_value_nnet = neural_network("256.parameters");
 
-	const int games_per_learning = 1000;
+	const int games_per_learning = 100;
 	long long position_count = 0;
 	long long games_count = 0;
 	auto start = std::chrono::high_resolution_clock::now();
+
+	int learning_cycels = 0;
+
 	for (long long iteration = 0; ; iteration++)
 	{
 		std::vector<matrix> input_matrices;
@@ -738,23 +713,35 @@ void leonardo_overlord::reinforcement_learning_pawns()
 
 			position_count += ds.get_item_count();
 
-			if (iteration % 100 == 0)
+			if ((iteration) % 100 == 0)
 			{
-				test_result test_res = best_value_nnet.test_on_ds(ds);
-				std::cout << "test_result: \n" << test_res.to_string() << "\n";
+				auto stop = std::chrono::high_resolution_clock::now();
+				long long duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
 
+				test_result test_res = best_value_nnet.test_on_ds(ds);
+				std::cout << "\ntest_result: \n" << test_res.to_string() << "\n";
 				best_value_nnet.learn_on_ds(ds, 1, 1, 0.0001f, false);
 
 				save_best_to_file(iteration, true, false);
-			}
 
-			auto stop = std::chrono::high_resolution_clock::now();
-			long long duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
-			std::cout << get_current_time_str() << "\n";
-			std::cout << "duration: " << ms_to_str(duration_ms) << "\n";
-			std::cout << "games: " << games_count << "\n";
-			std::cout << "position count: " << position_count << "\n";
-			std::cout << "--------\n";
+				std::cout << "duration: " << ms_to_str(duration_ms) << "\n";
+				std::cout << "games: " << games_count << "\n";
+				std::cout << "position count: " << position_count << "\n";
+				std::cout << get_current_time_str() << "\n";
+				learning_cycels++;
+			}
+			if (false && learning_cycels > 2)
+			{
+				for (int j = 0; j < 100; j++)
+				{
+					std::cout << leonardo_util::pawn_board_to_str(input_matrices[j]);
+					std::cout << "actual: " << output_matrices[j].get_at_flat_host(0) << "\n";
+					best_value_nnet.forward_propagation(input_matrices[j]);
+					std::cout << "value nnet output: " << best_value_nnet.get_output().get_at_flat_host(0) << "\n";
+					std::cout << "------------\n";
+				}
+			}
+			std::cout << ".";
 		}
 	}
 }
