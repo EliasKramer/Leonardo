@@ -11,8 +11,8 @@ typedef enum _TT_ITEM_TYPE : uint8_t
 {
 	empty = 0,
 	exact = 1,
-	alpha = 2,
-	beta = 3
+	upper_bound = 2,
+	lower_bound = 3
 } TT_ITEM_TYPE;
 
 class tt_item
@@ -35,6 +35,7 @@ public:
 class leonardo_value_bot_3 : public chess_player
 {
 private:
+	bool we_are_white = true;
 	int pruned = 0;
 	int nodes_visited = 0;
 	int leaf_nodes = 0;
@@ -58,7 +59,8 @@ private:
 	neural_network value_nnet;
 	matrix input_matrix;
 
-	int probe_tt(chess::U64 hash, int depth, int alpha, int beta, chess::Move& best_move);
+	int probe_tt(chess::U64 hash, int depth, int alpha, int beta);
+	const chess::Move& tt_get_move(chess::U64 hash);
 	void record_tt(chess::U64 hash, int depth, int value, TT_ITEM_TYPE flags, const chess::Move& best_move);
 
 	bool time_over();
@@ -67,6 +69,8 @@ private:
 
 	int eval(chess::Board& board, chess::Movelist& moves, int depth);
 
+	bool stored_move_is_repetition(chess::Board& board, int ply_from_root);
+	
 	int recursive_eval(
 		int ply_remaining,
 		int ply_from_root,

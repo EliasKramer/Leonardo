@@ -155,7 +155,7 @@ void train()
 }
 void play_pawn()
 {
-	leonardo_overlord ov("nanopawn_reinforcement_128__");
+	leonardo_overlord ov("643216");
 
 	ov.reinforcement_learning_pawns();
 }
@@ -163,7 +163,8 @@ void play_pawn()
 void play(int* scores, std::mutex& m)
 {
 	leonardo_value_bot_3 player1(-1, false); // debug
-	abp_player player2(5);
+	//leonardo_value_bot_3 player2(-1, false); // debug
+	abp_player player2(4);
 
 	chess_game game(
 		&player1,

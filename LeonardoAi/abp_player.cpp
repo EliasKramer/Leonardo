@@ -179,7 +179,7 @@ static float eval(chess::Board& board, int depth)
 			val = -100000 - depth;
 			break;
 		case chess::GameResult::DRAW:
-			val = -1000.0f - depth;
+			val = -10000.0f - depth;
 			break;
 		}
 		if (board.sideToMove() == chess::Color::BLACK)
@@ -374,12 +374,13 @@ chess::Move abp_player::get_move(chess::Board& board)
 	chess::movegen::legalmoves(moves, board);
 	for (chess::Move move : moves)
 	{
+
 		board.makeMove(move);
 		float score = recursive_eval(start_depth - 1, board, board.sideToMove() == chess::Color::WHITE, -FLT_MAX, FLT_MAX);
 		//std::cout << "move: " << chess::uci::moveToUci(move) << ": " << score << "\n";
-		if (board.sideToMove() == chess::Color::WHITE)
-			score *= -1;
 		board.unmakeMove(move);
+		if (black)
+			score *= -1;
 		#ifdef DEBUG_PRINT
 		std::cout << chess::uci::moveToUci(move) << " " << score << "\n";
 		#endif
