@@ -1,6 +1,10 @@
 #include "leonardo_value_bot_3.hpp"
 #include "leonardo_util.hpp"
 
+#define MATE_SCORE 10000000
+#define DRAW_SCORE  -100000
+#define MAX_DEPTH		256
+
 int leonardo_value_bot_3::probe_tt(chess::U64 hash, int depth, int alpha, int beta)
 {
 	tt_item& item = tt[hash % tt.size()];
@@ -68,7 +72,6 @@ bool leonardo_value_bot_3::time_over()
 	std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
 	long long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count();
 
-	return false; //TEMP for DEBUG
 	return ms_taken > ms_per_move;
 }
 
@@ -284,7 +287,7 @@ static inline int is_double_pawn(int sq, chess::Bitboard our_pawns)
 	return (our_pawns & file_mask) != 0 ? 1 : 0;
 }
 
-int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int depth)
+int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int depth) //depth remaining
 {
 	int score = 0.0f;
 	int side_mult = board.sideToMove() == chess::Color::WHITE ? 1 : -1;
@@ -296,13 +299,13 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 		switch (res.second)
 		{
 		case chess::GameResult::WIN:
-			val = 10000000 - depth;
+			val = MATE_SCORE + depth;
 			break;
 		case chess::GameResult::LOSE:
-			val = -10000000 + depth;
+			val = -MATE_SCORE - depth;
 			break;
 		case chess::GameResult::DRAW:
-			val = -100000.0f + depth;
+			val = DRAW_SCORE - depth;
 			break;
 		}
 
@@ -471,6 +474,12 @@ int leonardo_value_bot_3::recursive_eval(
 
 	nodes_visited++;
 
+	if (board.isRepetition() || board.isHalfMoveDraw())
+	{
+		chess::Movelist moves;
+		chess::movegen::legalmoves(moves, board);
+		return eval(board, moves, ply_from_root);
+	}
 	TT_ITEM_TYPE tt_flag = TT_ITEM_TYPE::upper_bound;
 	int value = probe_tt(board.hash(), ply_remaining, alpha, beta);
 	if (value != tt_item::unknown_eval
@@ -491,10 +500,10 @@ int leonardo_value_bot_3::recursive_eval(
 	chess::Movelist moves;
 	chess::movegen::legalmoves(moves, board);
 
-	if (ply_remaining == 0 || moves.size() == 0 || board.isRepetition())
+	if (ply_remaining == 0 || moves.size() == 0)
 	{
 		leaf_nodes++;
-		int evaluation = eval(board, moves, ply_from_root);
+		int evaluation = eval(board, moves, ply_remaining);
 		//record_tt(board.hash(), ply_remaining, evaluation, TT_ITEM_TYPE::exact, best_move);
 		return evaluation;
 	}
@@ -516,6 +525,13 @@ int leonardo_value_bot_3::recursive_eval(
 			//maye killer move
 			record_tt(board.hash(), ply_remaining, beta, TT_ITEM_TYPE::lower_bound, move); // BEST LOCAL MOVE
 			pruned++;
+
+			if (ply_from_root == 0)
+			{
+				//will never occur? right?
+				std::cout << "beta cutoff at 0: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
+			}
+
 			return beta;
 		}
 		if (score > alpha)
@@ -527,6 +543,7 @@ int leonardo_value_bot_3::recursive_eval(
 			if (ply_from_root == 0)
 			{
 				best_move = move;
+				std::cout << "best move atm: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
 			}
 			best_current_move = move;
 		}
@@ -675,7 +692,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		std::cout << "opening move found\n\n";
 #endif
 		return openings[opening_move_idx].second;
-}
+	}
 
 
 	tt_inserts = 0;
@@ -704,10 +721,8 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	int reached_depth = 0;
 	chess::Move best_move = chess::Move::NULL_MOVE;
 	int transpositions_last = 0;
-	for (int search_depth = 5; !time_over(); search_depth++)
+	for (int search_depth = 1; !time_over() && search_depth < MAX_DEPTH; search_depth++)
 	{
-		//tt.clear();
-		//tt.resize(tt_size); //inefficient
 		transpositions_count = 0;
 		chess::Move tmp = chess::Move::NULL_MOVE;
 
@@ -729,9 +744,22 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 			std::cout << "--------------\n";
 			transpositions_last = transpositions_count;
 		}
-		if (search_depth == 5) break; //DEBUG
 	}
 	transpositions_count = transpositions_last;
+
+	if (best_move == chess::Move::NULL_MOVE)
+	{
+		best_move = moves[0];
+		std::cout << "move was null\n";
+		score = recursive_eval(
+			5,
+			0,
+			board,
+			-1000000000,
+			1000000000,
+			best_move);
+		exit(1);
+	}
 
 	auto end = std::chrono::high_resolution_clock::now();
 	long long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
