@@ -287,12 +287,12 @@ static inline int is_double_pawn(int sq, chess::Bitboard our_pawns)
 	return (our_pawns & file_mask) != 0 ? 1 : 0;
 }
 
-int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int depth) //depth remaining
+int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int depth, bool only_caputes_in_moves) //depth remaining
 {
 	int score = 0.0f;
 	int side_mult = board.sideToMove() == chess::Color::WHITE ? 1 : -1;
 
-	std::pair<chess::GameResultReason, chess::GameResult> res = board.isGameOver(moves);
+	std::pair<chess::GameResultReason, chess::GameResult> res = only_caputes_in_moves ? board.isGameOver() : board.isGameOver(moves);
 	if (res.first != chess::GameResultReason::NONE)
 	{
 		int val = 0.0f;
@@ -461,6 +461,46 @@ bool leonardo_value_bot_3::stored_move_is_repetition(chess::Board& board, int pl
 	return ret_val;
 }
 
+int leonardo_value_bot_3::quiescene(chess::Board& board, int alpha, int beta)
+{
+	if (time_over())
+	{
+		return 0;
+	}
+
+	chess::Movelist moves;
+	chess::movegen::legalmoves<chess::MoveGenType::CAPTURE>(moves, board);
+
+	int score = eval(board, moves, -MAX_DEPTH, true);
+
+	if (score >= beta)
+	{
+		return beta;
+	}
+	if (score > alpha)
+	{
+		alpha = score;
+	}
+
+	for (chess::Move& move : moves)
+	{
+		board.makeMove(move);
+		score = -quiescene(board, -beta, -alpha);
+		board.unmakeMove(move);
+
+		if (score >= beta)
+		{
+			return beta;
+		}
+		if (score > alpha)
+		{
+			alpha = score;
+		}
+	}
+
+	return alpha;
+}
+
 int leonardo_value_bot_3::recursive_eval(
 	int ply_remaining,
 	int ply_from_root,
@@ -478,8 +518,9 @@ int leonardo_value_bot_3::recursive_eval(
 	{
 		chess::Movelist moves;
 		chess::movegen::legalmoves(moves, board);
-		return eval(board, moves, ply_from_root);
+		return eval(board, moves, ply_from_root, false);
 	}
+
 	TT_ITEM_TYPE tt_flag = TT_ITEM_TYPE::upper_bound;
 	int value = probe_tt(board.hash(), ply_remaining, alpha, beta);
 	if (value != tt_item::unknown_eval
@@ -500,12 +541,16 @@ int leonardo_value_bot_3::recursive_eval(
 	chess::Movelist moves;
 	chess::movegen::legalmoves(moves, board);
 
+	if (moves.size() == 0)
+	{
+		leaf_nodes++;
+		return eval(board, moves, ply_remaining, false);
+	}
+
 	if (ply_remaining == 0 || moves.size() == 0)
 	{
 		leaf_nodes++;
-		int evaluation = eval(board, moves, ply_remaining);
-		//record_tt(board.hash(), ply_remaining, evaluation, TT_ITEM_TYPE::exact, best_move);
-		return evaluation;
+		return quiescene(board, alpha, beta);
 	}
 
 	//sort_move_list(moves, board);

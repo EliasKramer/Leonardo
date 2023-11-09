@@ -67,10 +67,12 @@ private:
 
 	void load_openings();
 
-	int eval(chess::Board& board, chess::Movelist& moves, int depth);
+	int eval(chess::Board& board, chess::Movelist& moves, int depth, bool only_caputes_in_moves);
 
 	bool stored_move_is_repetition(chess::Board& board, int ply_from_root);
 	
+	int quiescene(chess::Board& board, int alpha, int beta);
+
 	int recursive_eval(
 		int ply_remaining,
 		int ply_from_root,
