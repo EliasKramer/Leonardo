@@ -182,7 +182,7 @@ void async_play()
 {
 	std::mutex m;
 	int scores[3] = { 0,0,0 };
-	int thread_count = 1;
+	int thread_count = 10;
 	std::vector<std::thread> threads;
 	for (int i = 0; i < thread_count; i++)
 	{

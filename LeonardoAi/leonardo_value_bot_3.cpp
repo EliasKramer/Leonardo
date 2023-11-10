@@ -549,8 +549,8 @@ int leonardo_value_bot_3::get_opening_move(size_t hash)
 		return -1;
 	}
 
-	//std::random_device rd;
-	std::mt19937 gen(42); // for reproducibility
+	std::random_device rd;
+	std::mt19937 gen(rd()); // for reproducibility
 	std::uniform_int_distribution<> dis(0, indices.size() - 1);
 
 	return indices[dis(gen)];
@@ -639,7 +639,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	chess::Movelist moves;
 	chess::movegen::legalmoves(moves, board);
 
-	std::cout << board << "\n";
+	//std::cout << board << "\n";
 
 	print_count = 0;
 	transpositions_count = 0;
@@ -673,10 +673,11 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		{
 			reached_depth = search_depth;
 			best_move = tmp;
+			/*
 			std::cout << "--------------\n";
 			std::cout << "score: " << score << "\n";
 			std::cout << "best_move: " << chess::uci::moveToUci(best_move) << "\n";
-			std::cout << "--------------\n";
+			std::cout << "--------------\n";*/
 			transpositions_last = transpositions_count;
 		}
 		if (search_depth == 5) break; //DEBUG
@@ -688,7 +689,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 
 	if (board.sideToMove() == chess::Color::BLACK)
 		score *= -1;
-
+	/*
 	std::cout << "use nnet: " << use_nnet << "\n";
 	std::cout << "transposition table size: " << tt.size()
 		<< " | transpositions: " << transpositions_count 
@@ -709,6 +710,6 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		<< score << "\n";
 	std::cout << "----------------\n\n\n";
 	//tt.clear();
-
+	*/
 	return best_move;
 }
