@@ -547,13 +547,13 @@ int leonardo_value_bot_3::recursive_eval(
 		return eval(board, moves, ply_remaining, false);
 	}
 
-	if (ply_remaining == 0 || moves.size() == 0)
+	if (ply_remaining == 0)
 	{
 		leaf_nodes++;
 		return quiescene(board, alpha, beta);
 	}
 
-	//sort_move_list(moves, board);
+	sort_move_list(moves, board);
 	chess::Move& best_current_move = moves[0];
 	for (chess::Move move : moves)
 	{
@@ -589,6 +589,7 @@ int leonardo_value_bot_3::recursive_eval(
 			{
 				best_move = move;
 				std::cout << "best move atm: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
+				searched_at_least_one_move = true;
 			}
 			best_current_move = move;
 		}
@@ -682,29 +683,36 @@ leonardo_value_bot_3::leonardo_value_bot_3(int ms_per_move, bool given_use_nnet)
 }
 void leonardo_value_bot_3::sort_move_list(chess::Movelist& moves, chess::Board& board)
 {
-	/*
+	chess::Move tt_move = tt_get_move(board.hash());
+
 	for (chess::Move& move : moves)
 	{
-		board.makeMove(move);
-		size_t hash = board.hash();
-		board.unmakeMove(move);
-		tt_item* stored_tt_item = tt_get(board, INT_MAX);
-		if (stored_tt_item != nullptr)
+		if (move == tt_move)
 		{
-			float val = stored_tt_item->value * 1000;
-			val *= board.sideToMove() == chess::Color::WHITE ? 1 : -1;
-			move.setScore(stored_tt_item->value * 1000); //always in front of the capture moves
+			move.setScore(10000);
 		}
-		else if (board.isCapture(move))
-		{
-			chess::PieceType from_type = board.at<chess::PieceType>(move.from());
-			chess::PieceType to_type = board.at<chess::PieceType>(move.to());
+		/*
+			board.makeMove(move);
+			size_t hash = board.hash();
+			board.unmakeMove(move);
+			tt_item* stored_tt_item = tt_get(board, INT_MAX);
+			if (stored_tt_item != nullptr)
+			{
+				float val = stored_tt_item->value * 1000;
+				val *= board.sideToMove() == chess::Color::WHITE ? 1 : -1;
+				move.setScore(stored_tt_item->value * 1000); //always in front of the capture moves
+			}
+			else if (board.isCapture(move))
+			{
+				chess::PieceType from_type = board.at<chess::PieceType>(move.from());
+				chess::PieceType to_type = board.at<chess::PieceType>(move.to());
 
-			move.setScore((PIECE_EVAL[(int)to_type] - PIECE_EVAL[(int)from_type]) / 100);
-		}
+				move.setScore((PIECE_EVAL[(int)to_type] - PIECE_EVAL[(int)from_type]) / 100);
+			}
+			*/
 	}
 
-	moves.sort();*/
+	moves.sort();
 }
 
 void leonardo_value_bot_3::setup_nnet_for_move(const chess::Board& board)
@@ -739,7 +747,6 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		return openings[opening_move_idx].second;
 	}
 
-
 	tt_inserts = 0;
 	pruned = 0;
 	nodes_visited = 0;
@@ -768,6 +775,8 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	int transpositions_last = 0;
 	for (int search_depth = 1; !time_over() && search_depth < MAX_DEPTH; search_depth++)
 	{
+		searched_at_least_one_move = false;
+
 		transpositions_count = 0;
 		chess::Move tmp = chess::Move::NULL_MOVE;
 
@@ -783,11 +792,23 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		{
 			reached_depth = search_depth;
 			best_move = tmp;
-			std::cout << "--------------\n";
+			std::cout << "--------------d: " << search_depth << "\n";
 			std::cout << "score: " << score << "\n";
 			std::cout << "best_move: " << chess::uci::moveToUci(best_move) << "\n";
 			std::cout << "--------------\n";
 			transpositions_last = transpositions_count;
+		}
+		else 
+		{
+			if (searched_at_least_one_move)
+			{
+				best_move = tmp;
+				std::cout << "--------------d: " << search_depth << "\n";
+				std::cout << "partial search\n";
+				std::cout << "score: " << score << "\n";
+				std::cout << "best_move: " << chess::uci::moveToUci(best_move) << "\n";
+				std::cout << "--------------\n";
+			}
 		}
 	}
 	transpositions_count = transpositions_last;

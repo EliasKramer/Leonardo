@@ -45,6 +45,7 @@ private:
 	int transpositions_count = 0;
 	int tt_inserts = 0;
 	int ms_per_move = 100;
+	bool searched_at_least_one_move = false;
 	std::chrono::steady_clock::time_point start_time;
 
 	nnet_table pawn_nnet_table;
