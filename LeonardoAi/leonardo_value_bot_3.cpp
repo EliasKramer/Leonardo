@@ -517,7 +517,7 @@ int leonardo_value_bot_3::recursive_eval(
 
 	nodes_visited++;
 
-	if (board.isRepetition() || board.isHalfMoveDraw())
+	if (board.isRepetition() || board.isHalfMoveDraw() || stored_move_is_repetition(board, ply_from_root))
 	{
 		chess::Movelist moves1;
 		chess::movegen::legalmoves(moves1, board);
@@ -534,11 +534,11 @@ int leonardo_value_bot_3::recursive_eval(
 		{
 			bool stuff = stored_move_is_repetition(board, ply_from_root);
 			//std::cout << "stored move is rep: " << stuff << "\n";
-			//best_move = tt_get_move(board.hash());
+			best_move = tt_get_move(board.hash());
 		}
 
 		transpositions_count++;
-		//return value;
+		return value;
 	}
 
 	chess::Movelist moves;
