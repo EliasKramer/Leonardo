@@ -562,7 +562,7 @@ int leonardo_value_bot_3::recursive_eval(
 	{
 		if (ply_from_root == 0)
 		{
-			bool stuff = stored_move_is_draw(board, ply_from_root);
+			//bool stuff = stored_move_is_draw(board, ply_from_root);
 			//std::cout << "stored move is rep: " << stuff << "\n";
 			best_move = tt_get_move(board.hash());
 		}
@@ -586,8 +586,8 @@ int leonardo_value_bot_3::recursive_eval(
 	if (ply_remaining == 0)
 	{
 		leaf_nodes++;
-		return eval(board, moves, ply_remaining, false);
 		return quiescene(board, alpha, beta);
+		return eval(board, moves, ply_remaining, false);
 		return use_nnet ? quiescene(board, alpha, beta) : eval(board, moves, ply_remaining, false);
 	}
 
