@@ -71,8 +71,9 @@ private:
 
 	int eval(chess::Board& board, chess::Movelist& moves, int depth, bool only_caputes_in_moves);
 
-	bool stored_move_is_repetition(chess::Board& board, int ply_from_root);
+	bool stored_move_is_draw(chess::Board& board, int ply_from_root);
 	
+	void order_moves_quiescene(chess::Movelist& moves, chess::Board& board);
 	int quiescene(chess::Board& board, int alpha, int beta);
 
 	int recursive_eval(

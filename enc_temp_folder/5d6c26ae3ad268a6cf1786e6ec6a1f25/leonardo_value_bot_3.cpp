@@ -442,7 +442,7 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 	return score * side_mult;
 }
 
-bool leonardo_value_bot_3::stored_move_is_draw(chess::Board& board, int ply_from_root)
+bool leonardo_value_bot_3::stored_move_is_repetition(chess::Board& board, int ply_from_root)
 {
 	if (ply_from_root != 0)
 	{
@@ -558,11 +558,11 @@ int leonardo_value_bot_3::recursive_eval(
 		&& !board.isRepetition() 
 		&& !board.isHalfMoveDraw()
 		&& !board.isInsufficientMaterial()
-		&& !stored_move_is_draw(board, ply_from_root))
+		&& !stored_move_is_repetition(board, ply_from_root))
 	{
 		if (ply_from_root == 0)
 		{
-			bool stuff = stored_move_is_draw(board, ply_from_root);
+			bool stuff = stored_move_is_repetition(board, ply_from_root);
 			//std::cout << "stored move is rep: " << stuff << "\n";
 			best_move = tt_get_move(board.hash());
 		}
