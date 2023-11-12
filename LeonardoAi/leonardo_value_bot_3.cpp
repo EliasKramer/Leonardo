@@ -4,6 +4,7 @@
 #define MATE_SCORE 10000000
 #define DRAW_SCORE  -100000
 #define MAX_DEPTH		256
+#define MIN_DEPTH		  6
 
 int leonardo_value_bot_3::probe_tt(chess::U64 hash, int depth, int alpha, int beta)
 {
@@ -67,12 +68,14 @@ void leonardo_value_bot_3::record_tt(
 	tt_inserts++;
 }
 
-bool leonardo_value_bot_3::time_over()
+bool leonardo_value_bot_3::search_cancelled()
 {
 	std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
 	long long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count();
 
-	return ms_taken > ms_per_move;
+	return 
+		ms_taken > ms_per_move &&				//search time over
+		iterative_deepening_depth > MIN_DEPTH; //we have searched at least a bit
 }
 
 //PAWN, KNIGHT, BISHOP, ROOK, QUEEN
@@ -368,7 +371,7 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 	}
 
 
-	return score * side_mult;
+	//return score * side_mult;
 
 	int game_duration_state_white = non_pawn_count_white < 3 ? 1 : 0;
 	int game_duration_state_black = non_pawn_count_black < 3 ? 1 : 0;
@@ -395,11 +398,11 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 
 		score -= king_manhatten_distance / 2;
 	}
+	*/
 	score += covered_pawn_count * 5.0f;
 	score += passed_pawn_count * 50.0f;
 	//double pawns get counted twice. triple pawns are not that much more important
 	score += ((float)double_pawn_count / 2) * 15.0f;
-	*/
 	score += king_score;
 
 	//evaluate with nnet
@@ -436,7 +439,7 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 
 	//leaf_nodes++;
 
-	return score;
+	return score * side_mult;
 }
 
 bool leonardo_value_bot_3::stored_move_is_repetition(chess::Board& board, int ply_from_root)
@@ -454,7 +457,7 @@ bool leonardo_value_bot_3::stored_move_is_repetition(chess::Board& board, int pl
 	}
 
 	board.makeMove(cached_move);
-	std::cout << "is draw: " << board.isHalfMoveDraw() << " is rep: " << board.isRepetition() << "\n";
+	//std::cout << "is draw: " << board.isHalfMoveDraw() << " is rep: " << board.isRepetition() << "\n";
 	bool ret_val = board.isHalfMoveDraw() || board.isRepetition();
 	board.unmakeMove(cached_move);
 
@@ -463,7 +466,7 @@ bool leonardo_value_bot_3::stored_move_is_repetition(chess::Board& board, int pl
 
 int leonardo_value_bot_3::quiescene(chess::Board& board, int alpha, int beta)
 {
-	if (time_over())
+	if (search_cancelled())
 	{
 		return 0;
 	}
@@ -509,16 +512,16 @@ int leonardo_value_bot_3::recursive_eval(
 	int beta,
 	chess::Move& best_move)
 {
-	if (time_over())
+	if (search_cancelled())
 		return 0;
 
 	nodes_visited++;
 
 	if (board.isRepetition() || board.isHalfMoveDraw())
 	{
-		chess::Movelist moves;
-		chess::movegen::legalmoves(moves, board);
-		return eval(board, moves, ply_from_root, false);
+		chess::Movelist moves1;
+		chess::movegen::legalmoves(moves1, board);
+		return eval(board, moves1, ply_remaining, false);
 	}
 
 	TT_ITEM_TYPE tt_flag = TT_ITEM_TYPE::upper_bound;
@@ -530,12 +533,12 @@ int leonardo_value_bot_3::recursive_eval(
 		if (ply_from_root == 0)
 		{
 			bool stuff = stored_move_is_repetition(board, ply_from_root);
-			std::cout << "stuff: " << stuff << "\n";
-			best_move = tt_get_move(board.hash());
+			//std::cout << "stored move is rep: " << stuff << "\n";
+			//best_move = tt_get_move(board.hash());
 		}
 
 		transpositions_count++;
-		return value;
+		//return value;
 	}
 
 	chess::Movelist moves;
@@ -550,7 +553,8 @@ int leonardo_value_bot_3::recursive_eval(
 	if (ply_remaining == 0)
 	{
 		leaf_nodes++;
-		return quiescene(board, alpha, beta);
+		return eval(board, moves, ply_remaining, false);
+		//return quiescene(board, alpha, beta);
 	}
 
 	sort_move_list(moves, board);
@@ -558,10 +562,10 @@ int leonardo_value_bot_3::recursive_eval(
 	for (chess::Move move : moves)
 	{
 		board.makeMove(move);
-		float score = -recursive_eval(ply_remaining - 1, ply_from_root + 1, board, -beta, -alpha, best_move);
+		int score = -recursive_eval(ply_remaining - 1, ply_from_root + 1, board, -beta, -alpha, best_move);
 		board.unmakeMove(move);
 
-		if (time_over())
+		if (search_cancelled())
 			return 0;
 
 		if (score >= beta)
@@ -592,6 +596,13 @@ int leonardo_value_bot_3::recursive_eval(
 				searched_at_least_one_move = true;
 			}
 			best_current_move = move;
+		}
+		else 
+		{
+			if (ply_from_root == 0)
+			{
+				std::cout << "move_score: " << chess::uci::moveToUci(move) << " " << score << "\n";
+			}
 		}
 	}
 
@@ -658,8 +669,6 @@ int leonardo_value_bot_3::get_opening_move(size_t hash)
 		return -1;
 	}
 
-	std::random_device rd;
-	std::mt19937 gen(rd()); // for reproducibility
 	std::random_device rd;
 	std::mt19937 gen(rd()); // for reproducibility
 	std::uniform_int_distribution<> dis(0, indices.size() - 1);
@@ -739,7 +748,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	//tt.clear();
 	//tt.resize(10048583);
 
-	use_nnet = false; //DEBUG
+	//use_nnet = false; //DEBUG
 	int opening_move_idx = get_opening_move(board.hash());
 	if (opening_move_idx != -1)
 	{
@@ -775,7 +784,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	int reached_depth = 0;
 	chess::Move best_move = chess::Move::NULL_MOVE;
 	int transpositions_last = 0;
-	for (int search_depth = 1; !time_over() && search_depth < MAX_DEPTH; search_depth++)
+	for (iterative_deepening_depth = 1; !search_cancelled() && iterative_deepening_depth < MAX_DEPTH; iterative_deepening_depth++)
 	{
 		searched_at_least_one_move = false;
 
@@ -783,34 +792,38 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		chess::Move tmp = chess::Move::NULL_MOVE;
 
 		score = recursive_eval(
-			search_depth,
+			iterative_deepening_depth,
 			0,
 			board,
 			-1000000000,
 			1000000000,
 			tmp);
 
-		if (!time_over())
+		if (!search_cancelled())
 		{
-			reached_depth = search_depth;
+			reached_depth = iterative_deepening_depth;
 			best_move = tmp;
+			std::cout << "--------------d: " << iterative_deepening_depth << "\n";
 			/*
-			std::cout << "--------------\n";
 			std::cout << "score: " << score << "\n";
 			std::cout << "best_move: " << chess::uci::moveToUci(best_move) << "\n";
-			std::cout << "--------------\n";*/
+			std::cout << "--------------\n";
+			*/
 			transpositions_last = transpositions_count;
+		
 		}
 		else 
 		{
 			if (searched_at_least_one_move)
 			{
 				best_move = tmp;
-				std::cout << "--------------d: " << search_depth << "\n";
+				/*
+				std::cout << "--------------d: " << iterative_deepening_depth << "\n";
 				std::cout << "partial search\n";
 				std::cout << "score: " << score << "\n";
 				std::cout << "best_move: " << chess::uci::moveToUci(best_move) << "\n";
 				std::cout << "--------------\n";
+				*/
 			}
 		}
 	}
@@ -820,6 +833,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	{
 		best_move = moves[0];
 		std::cout << "move was null\n";
+		/*
 		score = recursive_eval(
 			5,
 			0,
@@ -827,7 +841,8 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 			-1000000000,
 			1000000000,
 			best_move);
-		exit(1);
+		std::cout << "---------------------\n";
+		*/
 	}
 
 	auto end = std::chrono::high_resolution_clock::now();
@@ -835,7 +850,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 
 	if (board.sideToMove() == chess::Color::BLACK)
 		score *= -1;
-	/*
+	
 	std::cout << "use nnet: " << use_nnet << "\n";
 	std::cout << "transposition table size: " << tt.size()
 		<< " | transpositions: " << transpositions_count
@@ -855,7 +870,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		<< "chosen move: " << chess::uci::moveToUci(best_move) << " "
 		<< score << "\n";
 	std::cout << "----------------\n\n\n";
-	//tt.clear();
-	*/
+	
+	
 	return best_move;
 }

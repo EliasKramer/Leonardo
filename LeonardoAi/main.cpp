@@ -162,9 +162,10 @@ void play_pawn()
 
 void play(int* scores, std::mutex& m)
 {
-	leonardo_value_bot_3 player1(2000, false); // debug
+	leonardo_value_bot_3 player1(1000, false); // debug
+	leonardo_value_bot_3 player2(1000, false); // debug
 	//leonardo_value_bot_3 player2(-1, false); // debug
-	abp_player player2(5);
+	//abp_player player1(5);
 
 	chess_game game(
 		&player1,
@@ -183,7 +184,7 @@ void async_play()
 {
 	std::mutex m;
 	int scores[3] = { 0,0,0 };
-	int thread_count = 10;
+	int thread_count = 1;
 	std::vector<std::thread> threads;
 	for (int i = 0; i < thread_count; i++)
 	{

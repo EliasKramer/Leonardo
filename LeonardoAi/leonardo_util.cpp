@@ -619,7 +619,7 @@ static void partial_forward_diff(
 		unsigned int sq = chess::builtin::poplsb(bb);
 		change_idx.x = sq % 8;
 		change_idx.y = (sq / 8) - 1;
-		std::cout << "change " << change_idx.to_string() << " to " << change_value << std::endl;
+		//std::cout << "change " << change_idx.to_string() << " to " << change_value << std::endl;
 
 		nn.partial_forward_prop(curr_input, change_value, change_idx);
 		curr_input.set_at_host(change_idx, change_value);
@@ -660,6 +660,7 @@ int leonardo_util::get_board_val(
 	nnet_table& table,
 	bool white_to_move)
 {
+	/*
 	std::cout
 		<< "call count: " << call_count
 		<< " arguemnt wtm: " << white_to_move
@@ -669,17 +670,18 @@ int leonardo_util::get_board_val(
 		<< " table overriding percent: " << table.percent_overridden() * 100 << "%"
 		<< " false store: " << false_store
 		<< "\n";
+	*/
 	call_count++;
 
 	int table_value = table.get(curr_white_bb, curr_black_bb, white_to_move);
 	if (table_value != nnet_table::not_found)
 	{
 		table_hit++;
-		//return table_value;
+		return table_value;
 	}
 
-	std::cout << "\nprev m: \n"
-		<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
+	//std::cout << "\nprev m: \n"
+	//	<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
 
 	update_turn(pawn_nnet, curr_input, white_to_move);
 	chess::Bitboard added_black_pieces = all_added_values(curr_black_bb, prev_black_bb);
@@ -687,11 +689,11 @@ int leonardo_util::get_board_val(
 	chess::Bitboard added_white_pieces = all_added_values(curr_white_bb, prev_white_bb);
 	chess::Bitboard removed_white_pieces = all_removed_values(curr_white_bb, prev_white_bb);
 
-	std::cout << "after m: \n"
-		<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
+	//std::cout << "after m: \n"
+	//	<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
 
 	vector3 change_idx(0, 0, 0);
-	std::cout << "out prev: " << (int)std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f) << "\n";
+	//std::cout << "out prev: " << (int)std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f) << "\n";
 
 	partial_forward_diff(added_white_pieces, pawn_nnet, curr_input, 1, change_idx);
 	partial_forward_diff(removed_white_pieces, pawn_nnet, curr_input, 0, change_idx);
@@ -703,13 +705,14 @@ int leonardo_util::get_board_val(
 	pawn_nnet.rest_partial_forward_prop();
 	int output = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f);
 
-	matrix m(get_pawn_input_format());
+	//matrix m(get_pawn_input_format());
 	//throw std::runtime_error("not implemented");
-	leonardo_util::encode_pawn_matrix(curr_white_bb, curr_black_bb, m, white_to_move);
+	//leonardo_util::encode_pawn_matrix(curr_white_bb, curr_black_bb, m, white_to_move);
 
-	pawn_nnet.forward_propagation(m);
-	int sec_out = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f);
+	//pawn_nnet.forward_propagation(m);
+	//int sec_out = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f);
 
+	/*
 	std::cout << "matrix: \n"
 		<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
 	//<< curr_input.get_string() << "\n";
@@ -749,10 +752,10 @@ int leonardo_util::get_board_val(
 		std::cout << "output: " << (int)output << " table value: " << table_value << "\n";
 		false_store++;
 	}
+	*/
 
-
-	if (table_value == nnet_table::not_found)
-		table.insert(curr_white_bb, curr_black_bb, white_to_move, output);
+	//if (table_value == nnet_table::not_found)
+	table.insert(curr_white_bb, curr_black_bb, white_to_move, output);
 
 	prev_black_bb = curr_black_bb;
 	prev_white_bb = curr_white_bb;

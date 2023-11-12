@@ -46,6 +46,7 @@ private:
 	int tt_inserts = 0;
 	int ms_per_move = 100;
 	bool searched_at_least_one_move = false;
+	int iterative_deepening_depth = 1;
 	std::chrono::steady_clock::time_point start_time;
 
 	nnet_table pawn_nnet_table;
@@ -64,7 +65,7 @@ private:
 	const chess::Move& tt_get_move(chess::U64 hash);
 	void record_tt(chess::U64 hash, int depth, int value, TT_ITEM_TYPE flags, const chess::Move& best_move);
 
-	bool time_over();
+	bool search_cancelled();
 
 	void load_openings();
 
