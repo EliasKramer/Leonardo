@@ -398,15 +398,15 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 
 		score -= king_manhatten_distance / 2;
 	}
-	*/
 	score += covered_pawn_count * 5.0f;
 	score += passed_pawn_count * 50.0f;
 	//double pawns get counted twice. triple pawns are not that much more important
 	score += ((float)double_pawn_count / 2) * 15.0f;
 	score += king_score;
+	*/
 
 	//evaluate with nnet
-	if (false && use_nnet)//if (board_material_equal_score == 0 && !board.inCheck())
+	if (use_nnet)//if (board_material_equal_score == 0 && !board.inCheck())
 	{
 		int nnet_score = leonardo_util::get_board_val(
 			pawns_bb & white_bb,
@@ -587,8 +587,8 @@ int leonardo_value_bot_3::recursive_eval(
 	{
 		leaf_nodes++;
 		return quiescene(board, alpha, beta);
-		return eval(board, moves, ply_remaining, false);
-		return use_nnet ? quiescene(board, alpha, beta) : eval(board, moves, ply_remaining, false);
+		//return eval(board, moves, ply_remaining, false);
+		//return use_nnet ? quiescene(board, alpha, beta) : eval(board, moves, ply_remaining, false);
 	}
 
 	sort_move_list(moves, board);
@@ -626,7 +626,7 @@ int leonardo_value_bot_3::recursive_eval(
 			if (ply_from_root == 0)
 			{
 				best_move = move;
-				std::cout << "best move atm: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
+				//std::cout << "best move atm: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
 				searched_at_least_one_move = true;
 			}
 			best_current_move = move;
@@ -884,7 +884,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 
 	if (board.sideToMove() == chess::Color::BLACK)
 		score *= -1;
-
+	/*
 	std::cout << "use nnet: " << use_nnet << "\n";
 	std::cout << "transposition table size: " << tt.size()
 		<< " | transpositions: " << transpositions_count
@@ -904,7 +904,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		<< "chosen move: " << chess::uci::moveToUci(best_move) << " "
 		<< score << "\n";
 	std::cout << "----------------\n\n\n";
-
+	*/
 
 	return best_move;
 }

@@ -49,6 +49,8 @@ private:
 	int iterative_deepening_depth = 1;
 	std::chrono::steady_clock::time_point start_time;
 
+	//int nnet_mult = 1;
+
 	nnet_table pawn_nnet_table;
 	chess::Bitboard pawn_w_bb;
 	chess::Bitboard pawn_b_bb;
