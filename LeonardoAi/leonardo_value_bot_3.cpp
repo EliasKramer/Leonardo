@@ -398,12 +398,12 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 
 		score -= king_manhatten_distance / 2;
 	}
+	*/
 	score += covered_pawn_count * 5.0f;
 	score += passed_pawn_count * 50.0f;
 	//double pawns get counted twice. triple pawns are not that much more important
 	score += ((float)double_pawn_count / 2) * 15.0f;
 	score += king_score;
-	*/
 
 	//evaluate with nnet
 	if (use_nnet)//if (board_material_equal_score == 0 && !board.inCheck())
@@ -555,7 +555,7 @@ int leonardo_value_bot_3::recursive_eval(
 	TT_ITEM_TYPE tt_flag = TT_ITEM_TYPE::upper_bound;
 	int value = probe_tt(board.hash(), ply_remaining, alpha, beta);
 	if (value != tt_item::unknown_eval
-		&& !board.isRepetition() 
+		&& !board.isRepetition()
 		&& !board.isHalfMoveDraw()
 		&& !board.isInsufficientMaterial()
 		&& !stored_move_is_draw(board, ply_from_root))
@@ -734,27 +734,20 @@ void leonardo_value_bot_3::sort_move_list(chess::Movelist& moves, chess::Board& 
 	{
 		if (move == tt_move)
 		{
-			move.setScore(10000);
+			move.setScore(1000000);
+			break;
+		}
+		if (board.isCapture(move))
+		{
+			chess::PieceType from_piece_type = board.at<chess::PieceType>(move.from());
+			chess::PieceType to_piece_type = board.at<chess::PieceType>(move.to());
+
+			move.setScore(PIECE_EVAL[(int)to_piece_type] - PIECE_EVAL[(int)from_piece_type]);
+			break;
 		}
 		/*
-			board.makeMove(move);
-			size_t hash = board.hash();
-			board.unmakeMove(move);
-			tt_item* stored_tt_item = tt_get(board, INT_MAX);
-			if (stored_tt_item != nullptr)
-			{
-				float val = stored_tt_item->value * 1000;
-				val *= board.sideToMove() == chess::Color::WHITE ? 1 : -1;
-				move.setScore(stored_tt_item->value * 1000); //always in front of the capture moves
-			}
-			else if (board.isCapture(move))
-			{
-				chess::PieceType from_type = board.at<chess::PieceType>(move.from());
-				chess::PieceType to_type = board.at<chess::PieceType>(move.to());
+		*/
 
-				move.setScore((PIECE_EVAL[(int)to_type] - PIECE_EVAL[(int)from_type]) / 100);
-			}
-			*/
 	}
 
 	moves.sort();
@@ -837,11 +830,11 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		{
 			reached_depth = iterative_deepening_depth;
 			best_move = tmp;
-			/*
 			std::cout << "--------------d: " << iterative_deepening_depth << "\n";
 			std::cout << "score: " << score << "\n";
 			std::cout << "best_move: " << chess::uci::moveToUci(best_move) << "\n";
 			std::cout << "--------------\n";
+			/*
 			*/
 			transpositions_last = transpositions_count;
 
@@ -851,12 +844,12 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 			if (searched_at_least_one_move)
 			{
 				best_move = tmp;
-				/*
 				std::cout << "--------------d: " << iterative_deepening_depth << "\n";
 				std::cout << "partial search\n";
 				std::cout << "score: " << score << "\n";
 				std::cout << "best_move: " << chess::uci::moveToUci(best_move) << "\n";
 				std::cout << "--------------\n";
+				/*
 				*/
 			}
 		}
@@ -905,6 +898,9 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		<< score << "\n";
 	std::cout << "----------------\n\n\n";
 	*/
+	std::cout << "----------------\n";
+	std::cout << "leonardo's choice: " << chess::uci::moveToUci(best_move) << "\n";
+	std::cout << "----------------\n";
 
 	return best_move;
 }
