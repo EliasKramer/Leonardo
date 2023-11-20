@@ -155,9 +155,10 @@ void train()
 }
 void play_pawn()
 {
-	leonardo_overlord ov("643216");
+	leonardo_overlord ov("superv");
 
-	ov.reinforcement_learning_pawns();
+	//ov.reinforcement_learning_pawns();
+	ov.train_value_nnet();
 }
 
 void play(int* scores, std::mutex& m)
@@ -199,6 +200,6 @@ void async_play()
 
 int main()
 {
-	async_play();
-	//play_pawn();
+	play_pawn();
+	//async_play();
 }
