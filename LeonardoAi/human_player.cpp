@@ -5,6 +5,8 @@ chess::Move human_player::get_move(chess::Board& pos)
 	chess::Movelist moves;
 	chess::movegen::legalmoves(moves, pos);
 
+	std::cout << pos;
+
 	std::string input = "";
 	while (true)
 	{

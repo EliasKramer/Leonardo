@@ -36,9 +36,10 @@ leonardo_overlord::leonardo_overlord(
 	std::cout << "dir: " << p << '\n';
 
 	best_value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
+	best_value_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
-	best_value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
+	best_value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
 	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
 	best_value_nnet.xavier_initialization();
 
@@ -138,14 +139,6 @@ static void convert_dataset(
 
 void leonardo_overlord::train_value_nnet()
 {
-	best_value_nnet = neural_network(); //reset the best nnet
-	best_value_nnet.set_input_format(leonardo_util::get_pawn_input_format()); //2880
-	best_value_nnet.add_fully_connected_layer(200, leaky_relu_fn); //900
-	best_value_nnet.add_fully_connected_layer(100, leaky_relu_fn); //900
-	best_value_nnet.add_fully_connected_layer(50, leaky_relu_fn); //900
-	best_value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
-	best_value_nnet.xavier_initialization();
-
 	std::cout << "read data\n";
 	std::vector<std::string> lines = read_file_lines("dataset.txt");
 	std::cout << "finished reading data\n";
@@ -161,7 +154,7 @@ void leonardo_overlord::train_value_nnet()
 		return;
 	}
 
-	const int games_per_training = 1000;
+	const int games_per_training = 100;
 
 	matrix input(leonardo_util::get_pawn_input_format());
 	matrix label(leonardo_util::get_value_nnet_output_format());
@@ -169,6 +162,8 @@ void leonardo_overlord::train_value_nnet()
 	std::vector<matrix> inputs;
 	std::vector<matrix> labels;
 	auto start = std::chrono::high_resolution_clock::now();
+	long positions = 0;
+	long used_positions = 0;
 	for (int i = 0; i < game_moves.size(); i++)
 	{
 		std::vector<std::string>& moves_uci = game_moves[i];
@@ -194,9 +189,10 @@ void leonardo_overlord::train_value_nnet()
 				if (uci_move == chess::uci::moveToUci(move))
 				{
 					board.makeMove(move);
-
-					if (leonardo_util::board_material_equal(board))
+					positions++;
+					if (leonardo_util::use_position(board))
 					{
+						used_positions++;
 						value /= 10;
 						leonardo_util::encode_pawn_matrix(board, input);
 						inputs.push_back(input);
@@ -244,6 +240,7 @@ void leonardo_overlord::train_value_nnet()
 			long remaining_ms = remaining_time(duration_ms, i, game_moves.size());
 
 			std::cout << (i + 1) << "/" << game_moves.size() << " games  " << ((((float)i + 1) / (float)game_moves.size()) * 100.0f) << "%\n";
+			std::cout << "positions: " << positions << " used: " << used_positions << " (" << ((float)used_positions/ (std::max(1.0f, (float)positions)))*100 << "%)\n";
 			std::cout << "elapsed: " << ms_to_str(duration_ms) << " remaining: " << ms_to_str(remaining_ms) << "\n";
 			std::cout << "---------------\n";
 		}

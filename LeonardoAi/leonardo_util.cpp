@@ -432,7 +432,7 @@ void leonardo_util::unmake_move(chess::Board& board, matrix& pawn_board, const c
 	board.unmakeMove(move);
 }
 
-bool leonardo_util::board_material_equal(chess::Board& board)
+bool leonardo_util::use_position(chess::Board& board)
 {
 	static const float PIECE_EVAL[5] = { 100.0f, 300.0f, 300.0f, 500.0f, 900.0f };
 	//only consider pieces, not pawns
@@ -440,6 +440,7 @@ bool leonardo_util::board_material_equal(chess::Board& board)
 	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
 	chess::Bitboard white_bb = board.us(chess::Color::WHITE);
 	float score = 0;
+	int non_pawn_count = 0;
 	for (int i = 0; i < 5; i++)
 	{
 		chess::Bitboard curr_bb = board.pieces(chess::PieceType(i));
@@ -456,10 +457,12 @@ bool leonardo_util::board_material_equal(chess::Board& board)
 			{
 				score += PIECE_EVAL[i];
 			}
+			if(i != 0)
+				non_pawn_count++;
 		}
 	}
 
-	return score == 0 && !board.inCheck();
+	return score == 0 && !board.inCheck() && non_pawn_count > 10; // default is 14
 }
 
 std::string leonardo_util::get_pawn_structure_str(chess::Board& board)

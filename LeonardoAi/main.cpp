@@ -155,15 +155,17 @@ void train()
 }
 void play_pawn()
 {
-	leonardo_overlord ov("643216");
+	leonardo_overlord ov("superv");
 
-	ov.reinforcement_learning_pawns();
+	//ov.reinforcement_learning_pawns();
+	ov.train_value_nnet();
 }
 
 void play(int* scores, std::mutex& m)
 {
 	leonardo_value_bot_3 player1(1000, true); // debug
-	leonardo_value_bot_3 player2(1000, false); // debug
+	human_player player2;
+	//leonardo_value_bot_3 player2(1000, false); // debug
 	//leonardo_value_bot_3 player2(-1, false); // debug
 	//abp_player player1(5);
 
@@ -198,6 +200,6 @@ void async_play()
 
 int main()
 {
-	async_play();
-	//play_pawn();
+	play_pawn();
+	//async_play();
 }
