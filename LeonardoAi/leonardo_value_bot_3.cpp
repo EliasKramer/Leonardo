@@ -398,12 +398,12 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 
 		score -= king_manhatten_distance / 2;
 	}
+	*/
 	score += covered_pawn_count * 5.0f;
 	score += passed_pawn_count * 50.0f;
 	//double pawns get counted twice. triple pawns are not that much more important
 	score += ((float)double_pawn_count / 2) * 15.0f;
 	score += king_score;
-	*/
 
 	//evaluate with nnet
 	if (use_nnet)//if (board_material_equal_score == 0 && !board.inCheck())
@@ -418,7 +418,7 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 			pawn_nnet_table,
 			board.sideToMove() == chess::Color::WHITE);
 
-		score += nnet_score;
+		score += nnet_score * 2;
 
 		if (print_count > 0)
 		{
