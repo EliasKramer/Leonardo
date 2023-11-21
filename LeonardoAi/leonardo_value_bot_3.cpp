@@ -418,7 +418,7 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 			pawn_nnet_table,
 			board.sideToMove() == chess::Color::WHITE);
 
-		score += nnet_score;
+		score += nnet_score * 2;
 
 		if (print_count > 0)
 		{
