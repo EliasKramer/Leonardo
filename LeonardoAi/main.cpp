@@ -163,11 +163,8 @@ void play_pawn()
 
 void play(int* scores, std::mutex& m)
 {
-	leonardo_value_bot_3 player1(1000, true); // debug
-	human_player player2;
-	//leonardo_value_bot_3 player2(1000, false); // debug
-	//leonardo_value_bot_3 player2(-1, false); // debug
-	//abp_player player1(5);
+	leonardo_value_bot_3 player1(1000, 1);
+	leonardo_value_bot_3 player2(1000, 0);
 
 	chess_game game(
 		&player1,
@@ -200,6 +197,6 @@ void async_play()
 
 int main()
 {
-	play_pawn();
-	//async_play();
+	async_play();
 }
+//play_pawn();

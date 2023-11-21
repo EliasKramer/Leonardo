@@ -40,7 +40,7 @@ private:
 	int nodes_visited = 0;
 	int leaf_nodes = 0;
 	int leaf_nodes_evaluated_nnet = 0;
-	bool use_nnet = false;
+	float nnet_mult = 0;
 	int print_count = 0;
 	int transpositions_count = 0;
 	int tt_inserts = 0;
@@ -93,7 +93,7 @@ private:
 	void setup_nnet_for_move(const chess::Board& board);
 public:
 	leonardo_value_bot_3();
-	leonardo_value_bot_3(int ms_per_move, bool given_use_nnet);
+	leonardo_value_bot_3(int ms_per_move, float nnet_mult);
 
 	chess::Move get_move(chess::Board& board) override;
 };
