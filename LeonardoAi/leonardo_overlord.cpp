@@ -154,7 +154,7 @@ void leonardo_overlord::train_value_nnet()
 		return;
 	}
 
-	const int games_per_training = 100;
+	const int games_per_training = 1000;
 
 	matrix input(leonardo_util::get_pawn_input_format());
 	matrix label(leonardo_util::get_value_nnet_output_format());
