@@ -34,7 +34,7 @@ vector3 leonardo_util::get_value_nnet_output_format()
 void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix& m, chess::Color col)
 {
 	smart_assert(m.host_data_is_updated());
-	smart_assert(matrix::equal_format(m.get_format(), leonardo_util::get_input_format()));
+	smart_assert(vector3::are_equal(m.get_format(), leonardo_util::get_input_format()));
 
 	//BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
 
@@ -74,7 +74,7 @@ void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix
 void leonardo_util::set_matrix_from_chessboard_one_hot(const chess::Board& board, matrix& m, chess::Color col)
 {
 	smart_assert(m.host_data_is_updated());
-	smart_assert(matrix::equal_format(m.get_format(), leonardo_util::get_input_format_one_hot()));
+	smart_assert(vector3::are_equal(m.get_format(), leonardo_util::get_input_format_one_hot()));
 
 	//BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
 
@@ -435,7 +435,6 @@ void leonardo_util::unmake_move(chess::Board& board, matrix& pawn_board, const c
 bool leonardo_util::use_position(chess::Board& board)
 {
 	static const float PIECE_EVAL[5] = { 100.0f, 300.0f, 300.0f, 500.0f, 900.0f };
-	//only consider pieces, not pawns
 
 	chess::Bitboard black_bb = board.us(chess::Color::BLACK);
 	chess::Bitboard white_bb = board.us(chess::Color::WHITE);
@@ -462,7 +461,7 @@ bool leonardo_util::use_position(chess::Board& board)
 		}
 	}
 
-	return score == 0 && !board.inCheck() && non_pawn_count > 10; // default is 14
+	return score == 0 && !board.inCheck() && non_pawn_count >= 10; // default is 14
 }
 
 std::string leonardo_util::get_pawn_structure_str(chess::Board& board)
@@ -680,7 +679,7 @@ int leonardo_util::get_board_val(
 	if (table_value != nnet_table::not_found)
 	{
 		table_hit++;
-		return table_value;
+		//return table_value;
 	}
 
 	//std::cout << "\nprev m: \n"
@@ -708,20 +707,13 @@ int leonardo_util::get_board_val(
 	pawn_nnet.rest_partial_forward_prop();
 	int output = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f);
 
-	//matrix m(get_pawn_input_format());
+	matrix m(get_pawn_input_format());
 	//throw std::runtime_error("not implemented");
-	//leonardo_util::encode_pawn_matrix(curr_white_bb, curr_black_bb, m, white_to_move);
+	leonardo_util::encode_pawn_matrix(curr_white_bb, curr_black_bb, m, white_to_move);
 
-	//pawn_nnet.forward_propagation(m);
-	//int sec_out = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f);
-
-	/*
-	std::cout << "matrix: \n"
-		<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
-	//<< curr_input.get_string() << "\n";
-	std::cout << "curr_black_bb " << curr_black_bb << " ";
-	std::cout << "curr_white_bb " << curr_white_bb << "\n";
-
+	neural_network nn_cpy = pawn_nnet;
+	nn_cpy.forward_propagation(m);
+	int sec_out = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f);
 
 	if (!matrix::are_equal(m, curr_input))
 	{
@@ -732,14 +724,13 @@ int leonardo_util::get_board_val(
 			<< leonardo_util::pawn_board_to_str(curr_input) << "\n";
 
 	}
-	if (std::abs(sec_out - output) > 1)
+	if (std::abs(sec_out - output) > 3)
 	{
 		std::cout << "diff out";
 	}
-	std::cout << "val: " << output << "\n";
-	std::cout << "------------\n";
-
-	if (table_value != nnet_table::not_found && std::abs(output - table_value) > 1)
+	
+	/*
+	if (table_value != nnet_table::not_found && std::abs(output - table_value) > 3)
 	{
 		std::cout << leonardo_util::pawn_board_to_str(m) << "\n";
 		std::cout << "+++++++++++++++++++\n";
@@ -750,15 +741,21 @@ int leonardo_util::get_board_val(
 		std::cout << curr_input.get_string() << "\n";
 		std::cout << "+++++++++++++++++++\n";
 		int table_value_tmp = table.get(curr_white_bb, curr_black_bb, white_to_move);
-		bool eq = matrix::are_equal(m, curr_input);
+		//bool eq = matrix::are_equal(m, curr_input);
 		std::cout << "false store\n";
 		std::cout << "output: " << (int)output << " table value: " << table_value << "\n";
 		false_store++;
 	}
 	*/
+	if (table_value != nnet_table::not_found)
+	{
+		//if(std::abs(output - table_value) != 0)
+	//		std::cout << std::abs(output - table_value) << "\n";
+	}
+	
 
-	//if (table_value == nnet_table::not_found)
-	table.insert(curr_white_bb, curr_black_bb, white_to_move, output);
+	if (table_value == nnet_table::not_found)
+		table.insert(curr_white_bb, curr_black_bb, white_to_move, output);
 
 	prev_black_bb = curr_black_bb;
 	prev_white_bb = curr_white_bb;

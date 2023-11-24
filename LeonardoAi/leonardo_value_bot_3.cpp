@@ -4,7 +4,7 @@
 #define MATE_SCORE 10000000
 #define DRAW_SCORE  -1000
 #define MAX_DEPTH		256
-#define MIN_DEPTH		  6
+#define MIN_DEPTH		  5
 
 int leonardo_value_bot_3::probe_tt(chess::U64 hash, int depth, int alpha, int beta)
 {
@@ -716,7 +716,14 @@ leonardo_value_bot_3::leonardo_value_bot_3(int ms_per_move, float nnet_mult)
 	pawn_nnet_table(500) //in megabyte
 {
 	load_openings();
-	value_nnet = neural_network("643216.parameters");
+	//value_nnet = neural_network("128_64_32_32_three_layers.parameters");
+	value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
+	value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
+	value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
+	value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
+	value_nnet.xavier_initialization();
+	//std::cout << value_nnet.parameter_analysis();
 	input_matrix = matrix(leonardo_util::get_pawn_input_format());
 
 	const size_t tt_item_size = sizeof(tt_item); // in byte
