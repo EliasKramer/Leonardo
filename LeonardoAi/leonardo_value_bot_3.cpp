@@ -1,10 +1,11 @@
 #include "leonardo_value_bot_3.hpp"
 #include "leonardo_util.hpp"
+#include <filesystem>
 
 #define MATE_SCORE 10000000
 #define DRAW_SCORE  -1000
 #define MAX_DEPTH		256
-#define MIN_DEPTH		  6
+#define MIN_DEPTH		  5
 
 int leonardo_value_bot_3::probe_tt(chess::U64 hash, int depth, int alpha, int beta)
 {
@@ -74,8 +75,8 @@ bool leonardo_value_bot_3::search_cancelled()
 	long long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count();
 
 	return
-		ms_taken > ms_per_move &&				//search time over
-		iterative_deepening_depth > MIN_DEPTH; //we have searched at least a bit
+		ms_taken > ms_per_move;//&&				//search time over
+	//iterative_deepening_depth > MIN_DEPTH; //we have searched at least a bit
 }
 
 //PAWN, KNIGHT, BISHOP, ROOK, QUEEN
@@ -588,6 +589,13 @@ int leonardo_value_bot_3::recursive_eval(
 		return quiescene(board, alpha, beta);
 	}
 
+	if (ply_from_root == 0)
+	{
+		print = true;
+		sort_move_list(moves, board);
+		print = false;
+	}
+
 	sort_move_list(moves, board);
 	chess::Move& best_current_move = moves[0];
 	for (chess::Move move : moves)
@@ -623,7 +631,7 @@ int leonardo_value_bot_3::recursive_eval(
 			if (ply_from_root == 0)
 			{
 				best_move = move;
-				//std::cout << "best move atm: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
+				std::cout << "best move atm: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
 				searched_at_least_one_move = true;
 			}
 			best_current_move = move;
@@ -637,6 +645,10 @@ int leonardo_value_bot_3::recursive_eval(
 		}
 	}
 
+	if (ply_from_root == 0)
+	{
+		std::cout << "best current move: " << chess::uci::moveToUci(best_current_move) << "\n";
+	}
 	record_tt(board.hash(), ply_remaining, alpha, tt_flag, best_current_move); //best local move TODOODODODODOODODO
 
 	return alpha;
@@ -649,6 +661,8 @@ void leonardo_value_bot_3::load_openings()
 	if (!file)
 	{
 		std::cout << "opening file not found\n";
+		std::cout << "current dir: " << std::filesystem::current_path() << "\n";
+
 		return;
 	}
 
@@ -701,7 +715,7 @@ int leonardo_value_bot_3::get_opening_move(size_t hash)
 	}
 
 	std::random_device rd;
-	std::mt19937 gen(rd()); // for reproducibility
+	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> dis(0, indices.size() - 1);
 
 	return indices[dis(gen)];
@@ -715,7 +729,20 @@ leonardo_value_bot_3::leonardo_value_bot_3(int ms_per_move, float nnet_mult)
 	pawn_nnet_table(500) //in megabyte
 {
 	load_openings();
+<<<<<<< HEAD
 	value_nnet = neural_network("nanopawn.parameters");
+=======
+	value_nnet = neural_network("128_64_32_32_three_layers.parameters");
+	/*
+	value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
+	value_nnet.add_fully_connected_layer(64, leaky_relu_fn);
+	value_nnet.add_fully_connected_layer(32, leaky_relu_fn);
+	value_nnet.add_fully_connected_layer(16, leaky_relu_fn);
+	value_nnet.add_fully_connected_layer(leonardo_util::get_value_nnet_output_format(), identity_fn);
+	value_nnet.xavier_initialization();
+	*/
+	//std::cout << value_nnet.parameter_analysis();
+>>>>>>> e667236c69d672e18bb642d5e5c556e0b67c977c
 	input_matrix = matrix(leonardo_util::get_pawn_input_format());
 
 	const size_t tt_item_size = sizeof(tt_item); // in byte
@@ -727,10 +754,27 @@ void leonardo_value_bot_3::sort_move_list(chess::Movelist& moves, chess::Board& 
 {
 	chess::Move tt_move = tt_get_move(board.hash());
 
+	if (print && chess::uci::moveToUci(tt_move) == "d4d5")
+	{
+		int x = 0;
+	}
+
 	for (chess::Move& move : moves)
 	{
+		std::string curr_str = chess::uci::moveToUci(move);
+		std::string tt_str = chess::uci::moveToUci(tt_move);
+		if (curr_str == tt_str)
+		{
+			if (print)
+				std::cout << "match str\n";
+			int x = 0;
+		}
 		if (move == tt_move)
 		{
+			if (print)
+			{
+				std::cout << "setting score of:"<< chess::uci::moveToUci(move) << "\n";
+			}
 			move.setScore(1000000);
 			break;
 		}
@@ -742,12 +786,20 @@ void leonardo_value_bot_3::sort_move_list(chess::Movelist& moves, chess::Board& 
 			move.setScore(PIECE_EVAL[(int)to_piece_type] - PIECE_EVAL[(int)from_piece_type]);
 			break;
 		}
-		/*
-		*/
-
 	}
 
 	moves.sort();
+
+	if (print)
+	{
+		std::cout << "stored move: " << chess::uci::moveToUci(tt_move) << "\n";
+		//print moves with score
+		std::cout << "moves: \n";
+		for (chess::Move& m : moves)
+		{
+			std::cout << chess::uci::moveToUci(m) << " " << m.score() << "\n";
+		}
+	}
 }
 
 void leonardo_value_bot_3::setup_nnet_for_move(const chess::Board& board)
@@ -822,10 +874,12 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		{
 			reached_depth = iterative_deepening_depth;
 			best_move = tmp;
+			std::cout
+				<< "d " << iterative_deepening_depth
+				<< " best_move: " << chess::uci::moveToUci(best_move)
+				<< " score: " << score << "\n";
 			/*
 			std::cout << "--------------d: " << iterative_deepening_depth << "\n";
-			std::cout << "score: " << score << "\n";
-			std::cout << "best_move: " << chess::uci::moveToUci(best_move) << "\n";
 			std::cout << "--------------\n";
 			*/
 			transpositions_last = transpositions_count;
@@ -835,12 +889,14 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		{
 			if (searched_at_least_one_move)
 			{
-				best_move = tmp;
+				best_move = tmp; //DOESNT WORK?!
+				std::cout
+					<< "partial search d " << iterative_deepening_depth
+					<< " best_move: " << chess::uci::moveToUci(best_move)
+					<< " score: " << score << "\n";
 				/*
 				std::cout << "--------------d: " << iterative_deepening_depth << "\n";
-				std::cout << "partial search\n";
 				std::cout << "score: " << score << "\n";
-				std::cout << "best_move: " << chess::uci::moveToUci(best_move) << "\n";
 				std::cout << "--------------\n";
 				*/
 			}

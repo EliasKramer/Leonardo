@@ -29,7 +29,7 @@ private:
 	unsigned int inserted_items_count = 0;
 
 	chess::U64 make_key(chess::Bitboard white_bb, chess::Bitboard black_bb, bool white_to_move) const;
-
+	chess::U64 black_bb_from(chess::U64 hash, chess::Bitboard white_bb, bool white_to_move) const;
 public:
 	const static int not_found = -987654321;
 

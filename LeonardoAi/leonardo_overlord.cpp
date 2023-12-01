@@ -46,6 +46,7 @@ leonardo_overlord::leonardo_overlord(
 	new_policy_nnet = neural_network(best_policy_nnet);
 	new_value_nnet = neural_network(best_value_nnet);
 }
+
 static std::vector<std::string> read_file_lines(const std::string& filename) {
 	std::vector<std::string> lines;
 	std::ifstream file(filename);
@@ -240,7 +241,7 @@ void leonardo_overlord::train_value_nnet()
 			long remaining_ms = remaining_time(duration_ms, i, game_moves.size());
 
 			std::cout << (i + 1) << "/" << game_moves.size() << " games  " << ((((float)i + 1) / (float)game_moves.size()) * 100.0f) << "%\n";
-			std::cout << "positions: " << positions << " used: " << used_positions << " (" << ((float)used_positions/ (std::max(1.0f, (float)positions)))*100 << "%)\n";
+			std::cout << "positions: " << positions << " used: " << used_positions << " (" << ((float)used_positions / (std::max(1.0f, (float)positions))) * 100 << "%)\n";
 			std::cout << "elapsed: " << ms_to_str(duration_ms) << " remaining: " << ms_to_str(remaining_ms) << "\n";
 			std::cout << "---------------\n";
 		}
@@ -252,7 +253,7 @@ void leonardo_overlord::train_value_nnet()
 void leonardo_overlord::test_value_nnet_single(std::string& game)
 {
 	std::vector<std::string> master_moves = split_string(game, ' ');
-	matrix input = leonardo_util::get_input_format();
+	matrix input(leonardo_util::get_input_format());
 
 	chess::Board board = chess::Board(DEFAULT_FEN);
 	float diff_sum = 0;
@@ -602,7 +603,7 @@ static void play_pawn_game(
 		output_matrices.push_back(label);
 		/*
 		std::cout << leonardo_util::pawn_board_to_str(input_matrices[i]) << "\n";
-		
+
 		std::cout << "score: " << scores[i] <<
 			" discounted score: " << discounted_scores[i] << "\n";
 

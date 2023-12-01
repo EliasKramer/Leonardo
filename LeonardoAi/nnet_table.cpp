@@ -2,7 +2,16 @@
 
 chess::U64 nnet_table::make_key(chess::Bitboard white_bb, chess::Bitboard black_bb, bool white_to_move) const
 {
-	return (black_bb ^ random_hash_b) ^ (white_bb ^ random_hash_w) ^ (white_to_move ? random_hash_turn_w : random_hash_turn_b);
+	return
+		(black_bb ^ random_hash_b) ^
+		(white_bb ^ random_hash_w) ^
+		(white_to_move ? random_hash_turn_w : random_hash_turn_b);
+}
+
+chess::U64 nnet_table::black_bb_from(chess::U64 hash, chess::Bitboard white_bb, bool white_to_move) const
+{
+	chess::U64 color_bb = white_to_move ? random_hash_turn_w : random_hash_turn_b;
+	return hash ^ color_bb ^ (white_bb ^ random_hash_w) ^ random_hash_b;
 }
 
 nnet_table::nnet_table(size_t table_size_mb)
@@ -23,8 +32,8 @@ nnet_table::nnet_table(size_t table_size_mb)
 }
 
 void nnet_table::insert(
-	chess::Bitboard white_bb, 
-	chess::Bitboard black_bb, 
+	chess::Bitboard white_bb,
+	chess::Bitboard black_bb,
 	bool white_to_move,
 	int value)
 {
@@ -48,12 +57,23 @@ int nnet_table::get(chess::Bitboard white_bb, chess::Bitboard black_bb, bool whi
 {
 	chess::U64 key = make_key(white_bb, black_bb, white_to_move);
 	int idx = key % table.size();
-	if (table[idx].key == key && 
-		table[idx].b == black_bb &&
-		table[idx].w == white_bb &&
-		table[idx].white_to_move == white_to_move)
+	if (table[idx].key == key &&
+		table[idx].b == black_bb)
 	{
+		if (table[idx].b != black_bb)
+			std::cout << "black false\n";
 
+		if (table[idx].w != white_bb)
+			std::cout << "white false\n";
+
+		if (table[idx].white_to_move != white_to_move)
+			std::cout << "turn false\n";
+
+
+		if (black_bb_from(key, table[idx].w, table[idx].white_to_move) != table[idx].b)
+		{
+			std::cout << "yeeeeeeeeeeeeeeeeee\n";
+		}
 		return table[idx].value;
 	}
 	else

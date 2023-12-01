@@ -189,6 +189,9 @@
     <ClCompile Include="nnet_table.cpp">
       <Filter>source\leonardo_value_bot</Filter>
     </ClCompile>
+    <ClCompile Include="uci_handler.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NeuroFox\convolutional_layer.hpp">
@@ -379,6 +382,9 @@
     </ClInclude>
     <ClInclude Include="nnet_table.hpp">
       <Filter>header\chess_util\leonardo_value_bot</Filter>
+    </ClInclude>
+    <ClInclude Include="uci_handler.hpp">
+      <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

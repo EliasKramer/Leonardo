@@ -508,7 +508,7 @@ struct Move {
 
    private:
     uint16_t move_;
-    float score_;
+    int score_;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Move &move) {
