@@ -589,13 +589,6 @@ int leonardo_value_bot_3::recursive_eval(
 		return quiescene(board, alpha, beta);
 	}
 
-	if (ply_from_root == 0)
-	{
-		print = true;
-		sort_move_list(moves, board);
-		print = false;
-	}
-
 	sort_move_list(moves, board);
 	chess::Move& best_current_move = moves[0];
 	for (chess::Move move : moves)
@@ -729,9 +722,7 @@ leonardo_value_bot_3::leonardo_value_bot_3(int ms_per_move, float nnet_mult)
 	pawn_nnet_table(500) //in megabyte
 {
 	load_openings();
-<<<<<<< HEAD
-	value_nnet = neural_network("nanopawn.parameters");
-=======
+
 	value_nnet = neural_network("128_64_32_32_three_layers.parameters");
 	/*
 	value_nnet.set_input_format(leonardo_util::get_pawn_input_format());
@@ -742,7 +733,6 @@ leonardo_value_bot_3::leonardo_value_bot_3(int ms_per_move, float nnet_mult)
 	value_nnet.xavier_initialization();
 	*/
 	//std::cout << value_nnet.parameter_analysis();
->>>>>>> e667236c69d672e18bb642d5e5c556e0b67c977c
 	input_matrix = matrix(leonardo_util::get_pawn_input_format());
 
 	const size_t tt_item_size = sizeof(tt_item); // in byte
@@ -754,52 +744,22 @@ void leonardo_value_bot_3::sort_move_list(chess::Movelist& moves, chess::Board& 
 {
 	chess::Move tt_move = tt_get_move(board.hash());
 
-	if (print && chess::uci::moveToUci(tt_move) == "d4d5")
-	{
-		int x = 0;
-	}
-
 	for (chess::Move& move : moves)
 	{
-		std::string curr_str = chess::uci::moveToUci(move);
-		std::string tt_str = chess::uci::moveToUci(tt_move);
-		if (curr_str == tt_str)
-		{
-			if (print)
-				std::cout << "match str\n";
-			int x = 0;
-		}
 		if (move == tt_move)
 		{
-			if (print)
-			{
-				std::cout << "setting score of:"<< chess::uci::moveToUci(move) << "\n";
-			}
 			move.setScore(1000000);
-			break;
 		}
-		if (board.isCapture(move))
+		else if (board.isCapture(move))
 		{
 			chess::PieceType from_piece_type = board.at<chess::PieceType>(move.from());
 			chess::PieceType to_piece_type = board.at<chess::PieceType>(move.to());
 
 			move.setScore(PIECE_EVAL[(int)to_piece_type] - PIECE_EVAL[(int)from_piece_type]);
-			break;
 		}
 	}
 
 	moves.sort();
-
-	if (print)
-	{
-		std::cout << "stored move: " << chess::uci::moveToUci(tt_move) << "\n";
-		//print moves with score
-		std::cout << "moves: \n";
-		for (chess::Move& m : moves)
-		{
-			std::cout << chess::uci::moveToUci(m) << " " << m.score() << "\n";
-		}
-	}
 }
 
 void leonardo_value_bot_3::setup_nnet_for_move(const chess::Board& board)

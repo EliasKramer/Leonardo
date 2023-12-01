@@ -164,13 +164,8 @@ void play_pawn()
 
 void play(int* scores, std::mutex& m)
 {
-<<<<<<< HEAD
 	leonardo_value_bot_3 player1(1000, .5);
 	leonardo_value_bot_3 player2(1000, 0);
-=======
-	leonardo_value_bot_3 player1(1000, 1);
-	leonardo_value_bot_3 player2(1000, 1);
->>>>>>> e667236c69d672e18bb642d5e5c556e0b67c977c
 
 	chess_game game(
 		&player1,

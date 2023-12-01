@@ -82,7 +82,14 @@ void uci_handler::receive_command(std::string& message)
 	//Console.WriteLine(message);
 	//std::cout << "Command received: " + message;
 	//message = message.Trim();
+
 	std::vector<std::string> tokens = split(message);
+	if (tokens.size() == 0)
+	{
+		log("Error: empty command");
+		return;
+	}
+	
 	std::string messageType = tokens[0];
 
 	if (messageType == "uci")

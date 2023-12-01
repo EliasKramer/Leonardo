@@ -47,7 +47,6 @@ private:
 	int ms_per_move = 100;
 	bool searched_at_least_one_move = false;
 	int iterative_deepening_depth = 1;
-	bool print = false;
 	std::chrono::steady_clock::time_point start_time;
 
 	//int nnet_mult = 1;
