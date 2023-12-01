@@ -418,7 +418,7 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 			pawn_nnet_table,
 			board.sideToMove() == chess::Color::WHITE);
 
-		score += nnet_score * 2;
+		score += ((float)nnet_score * nnet_mult);
 
 		if (print_count > 0)
 		{
@@ -432,7 +432,6 @@ int leonardo_value_bot_3::eval(chess::Board& board, chess::Movelist& moves, int 
 			std::cout << "----------\n";
 			print_count--;
 		}
-
 
 		leaf_nodes_evaluated_nnet++;
 	}
@@ -716,7 +715,7 @@ leonardo_value_bot_3::leonardo_value_bot_3(int ms_per_move, float nnet_mult)
 	pawn_nnet_table(500) //in megabyte
 {
 	load_openings();
-	value_nnet = neural_network("643216.parameters");
+	value_nnet = neural_network("nanopawn.parameters");
 	input_matrix = matrix(leonardo_util::get_pawn_input_format());
 
 	const size_t tt_item_size = sizeof(tt_item); // in byte
@@ -774,9 +773,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	int opening_move_idx = get_opening_move(board.hash());
 	if (opening_move_idx != -1)
 	{
-#ifdef DEBUG_PRINT
-		std::cout << "opening move found\n\n";
-#endif
+		//std::cout << "opening move found\n\n";
 		return openings[opening_move_idx].second;
 	}
 
@@ -787,7 +784,6 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	leaf_nodes = 0;
 	leaf_nodes_evaluated_nnet = 0;
 	start_time = std::chrono::high_resolution_clock::now();
-
 	chess::Movelist moves;
 	chess::movegen::legalmoves(moves, board);
 
@@ -808,6 +804,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	int transpositions_last = 0;
 	for (iterative_deepening_depth = 1; !search_cancelled() && iterative_deepening_depth < MAX_DEPTH; iterative_deepening_depth++)
 	{
+
 		searched_at_least_one_move = false;
 
 		transpositions_count = 0;

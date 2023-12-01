@@ -41,6 +41,7 @@ int chess_game::play()
 			white_player->get_move(board) :
 			black_player->get_move(board);
 		auto end = std::chrono::high_resolution_clock::now();
+
 		/*
 		chess::Move move_other = !white_to_move ?
 			white_player->get_move(board) :
