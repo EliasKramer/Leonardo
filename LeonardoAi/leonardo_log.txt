@@ -1,0 +1,384 @@
+28.11 18:49: Started Uci Loop
+28.11 18:49: Waiting for command
+28.11 18:49: Command received: uci
+28.11 18:49: Waiting for command
+28.11 18:49: Command received: ucinewgame
+28.11 18:49: setup default position
+28.11 18:49: Waiting for command
+28.11 18:49: Command received: isreadyok
+28.11 18:49: unrecognized command: isreadyok
+28.11 18:49: Waiting for command
+28.11 18:49: Command received: isready
+28.11 18:49: Waiting for command
+28.11 18:49: Command received: position
+28.11 18:49: unrecognized position command: position
+28.11 18:49: Waiting for command
+28.11 18:49: Command received: startpos
+28.11 18:49: unrecognized command: startpos
+28.11 18:49: Waiting for command
+28.11 18:49: Command received: go
+28.11 18:49: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+28.11 18:49: Waiting for command
+28.11 18:49: Command received: wtime
+28.11 18:49: unrecognized command: wtime
+28.11 18:49: Waiting for command
+28.11 18:49: Command received: 60000
+28.11 18:49: unrecognized command: 60000
+28.11 18:49: Waiting for command
+28.11 18:49: Command received: btime
+28.11 18:49: unrecognized command: btime
+28.11 18:49: Waiting for command
+28.11 18:49: Command received: 60000
+28.11 18:49: unrecognized command: 60000
+28.11 18:49: Waiting for command
+28.11 18:50: Command received: position
+28.11 18:50: unrecognized position command: position
+28.11 18:50: Waiting for command
+28.11 18:50: Command received: startpos
+28.11 18:50: unrecognized command: startpos
+28.11 18:50: Waiting for command
+28.11 18:50: Command received: moves
+28.11 18:50: unrecognized command: moves
+28.11 18:50: Waiting for command
+28.11 18:50: Command received: e2e4
+28.11 18:50: unrecognized command: e2e4
+28.11 18:50: Waiting for command
+28.11 18:50: Command received: g8f6
+28.11 18:50: unrecognized command: g8f6
+28.11 18:50: Waiting for command
+28.11 18:50: Command received: go
+28.11 18:50: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: d2d4
+28.11 18:50: Waiting for command
+28.11 18:50: Command received: wtime
+28.11 18:50: unrecognized command: wtime
+28.11 18:50: Waiting for command
+28.11 18:50: Command received: 59000
+28.11 18:50: unrecognized command: 59000
+28.11 18:50: Waiting for command
+28.11 18:50: Command received: btime
+28.11 18:50: unrecognized command: btime
+28.11 18:50: Waiting for command
+28.11 18:50: Command received: 58000
+28.11 18:50: unrecognized command: 58000
+28.11 18:50: Waiting for command
+28.11 18:55: Started Uci Loop
+28.11 18:55: Waiting for command
+28.11 18:55: Command received: uci
+28.11 18:55: Waiting for command
+28.11 18:55: Command received: ucinewgame
+28.11 18:55: setup default position
+28.11 18:55: Waiting for command
+28.11 18:56: Command received: isreadyok
+28.11 18:56: unrecognized command: isreadyok
+28.11 18:56: Waiting for command
+28.11 18:56: Command received: isready
+28.11 18:56: Waiting for command
+28.11 18:56: Command received: position
+28.11 18:56: Started Uci Loop
+28.11 18:56: Waiting for command
+28.11 18:56: Command received: uci
+28.11 18:56: Waiting for command
+28.11 18:56: Command received: ucinewgame
+28.11 18:56: setup default position
+28.11 18:56: Waiting for command
+28.11 18:57: Command received: isready
+28.11 18:57: Waiting for command
+28.11 18:57: Command received: position
+28.11 18:58: Started Uci Loop
+28.11 18:58: Waiting for command
+28.11 18:58: Command received: uci
+28.11 18:58: Waiting for command
+28.11 18:58: Command received: isready
+28.11 18:58: Waiting for command
+28.11 18:58: Command received: position
+28.11 18:58: Error: position command has no arguments
+28.11 18:58: Waiting for command
+28.11 18:58: Command received: startpos
+28.11 18:58: unrecognized command: startpos
+28.11 18:58: Waiting for command
+28.11 19:01: Started Uci Loop
+28.11 19:01: Waiting for command
+28.11 19:02: Started Uci Loop
+28.11 19:02: Waiting for command
+28.11 19:02: Command received: uci
+28.11 19:02: Waiting for command
+28.11 19:03: Command received: position startpos
+28.11 19:03: set pos: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+28.11 19:03: Waiting for command
+28.11 19:03: Command received: go wtime 60000 btime 60000
+28.11 19:03: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: d2d4
+28.11 19:03: Waiting for command
+28.11 19:03: Command received: position startpos moves d2d4 g8f6
+28.11 19:03: set pos: rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2
+28.11 19:03: Waiting for command
+28.11 19:04: Command received: go wtime 59000 btime 58000
+28.11 19:04: made move. fen: rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2 move: c2c4
+28.11 19:04: Waiting for command
+28.11 19:07: Started Uci Loop
+28.11 19:07: Waiting for command
+28.11 19:07: Started Uci Loop
+28.11 19:07: Waiting for command
+28.11 19:08: Started Uci Loop
+28.11 19:08: Waiting for command
+28.11 19:09: Started Uci Loop
+28.11 19:09: Waiting for command
+28.11 19:12: Started Uci Loop
+28.11 19:12: Waiting for command
+28.11 19:12: Started Uci Loop
+28.11 19:12: Waiting for command
+28.11 19:12: Command received: uci
+28.11 19:12: Waiting for command
+28.11 19:12: Command received: isready
+28.11 19:12: Waiting for command
+28.11 19:25: Started Uci Loop
+28.11 19:25: Waiting for command
+28.11 19:26: Started Uci Loop
+28.11 19:26: Waiting for command
+28.11 19:54: Started Uci Loop
+28.11 19:54: Waiting for command
+28.11 19:59: Started Uci Loop
+28.11 19:59: Waiting for command
+28.11 20:19: Started Uci Loop
+28.11 20:19: Waiting for command
+28.11 20:19: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5 h2h3 g5g4
+28.11 20:19: set pos: r1bqkb1r/pppnn3/3p1p2/4p2p/3PP1p1/2NBBN1P/PPP2PP1/R2Q1RK1 w kq - 0 9
+28.11 20:19: Waiting for command
+28.11 20:19: Command received: go
+28.11 20:19: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p2p/3PP1p1/2NBBN1P/PPP2PP1/R2Q1RK1 w kq - 0 9 move: h3g4
+28.11 20:19: Waiting for command
+28.11 20:19: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 
+28.11 20:19: Error: move not found: 
+28.11 20:19: fen: r1bqkb1r/pppnn2p/3p1p2/4p1p1/3PP3/2NB1N2/PPP2PPP/R1BQ1RK1 w kq - 0 7
+28.11 20:19: moves:
+28.11 20:19: g1h1
+28.11 20:19: d4e5
+28.11 20:19: a2a3
+28.11 20:19: b2b3
+28.11 20:19: g2g3
+28.11 20:19: h2h3
+28.11 20:19: d4d5
+28.11 20:19: a2a4
+28.11 20:19: b2b4
+28.11 20:19: g2g4
+28.11 20:19: h2h4
+28.11 20:19: c3b1
+28.11 20:19: c3e2
+28.11 20:19: c3a4
+28.11 20:19: c3b5
+28.11 20:19: c3d5
+28.11 20:19: f3e1
+28.11 20:19: f3d2
+28.11 20:19: f3h4
+28.11 20:19: f3e5
+28.11 20:19: f3g5
+28.11 20:19: c1d2
+28.11 20:19: c1e3
+28.11 20:19: c1f4
+28.11 20:19: c1g5
+28.11 20:19: d3e2
+28.11 20:19: d3c4
+28.11 20:19: d3b5
+28.11 20:19: d3a6
+28.11 20:19: a1b1
+28.11 20:19: f1e1
+28.11 20:19: d1e1
+28.11 20:19: d1d2
+28.11 20:19: d1e2
+28.11 20:19: Started Uci Loop
+28.11 20:19: Waiting for command
+28.11 20:19: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 20:19: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:19: Waiting for command
+28.11 20:19: Command received: go
+28.11 20:19: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: d4e5
+28.11 20:19: Waiting for command
+28.11 20:25: Started Uci Loop
+28.11 20:25: Waiting for command
+28.11 20:25: Started Uci Loop
+28.11 20:25: Waiting for command
+28.11 20:25: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5 
+28.11 20:25: Error: move not found: 
+28.11 20:25: fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:25: moves:
+28.11 20:25: g1h1
+28.11 20:25: d4e5
+28.11 20:25: a2a3
+28.11 20:25: b2b3
+28.11 20:25: g2g3
+28.11 20:25: h2h3
+28.11 20:25: d4d5
+28.11 20:25: a2a4
+28.11 20:25: b2b4
+28.11 20:25: g2g4
+28.11 20:25: h2h4
+28.11 20:25: c3b1
+28.11 20:25: c3e2
+28.11 20:25: c3a4
+28.11 20:25: c3b5
+28.11 20:25: c3d5
+28.11 20:25: f3e1
+28.11 20:25: f3d2
+28.11 20:25: f3h4
+28.11 20:25: f3e5
+28.11 20:25: f3g5
+28.11 20:25: d3e2
+28.11 20:25: d3c4
+28.11 20:25: d3b5
+28.11 20:25: d3a6
+28.11 20:25: e3c1
+28.11 20:25: e3d2
+28.11 20:25: e3f4
+28.11 20:25: e3g5
+28.11 20:25: a1b1
+28.11 20:25: a1c1
+28.11 20:25: f1e1
+28.11 20:25: d1b1
+28.11 20:25: d1c1
+28.11 20:25: d1e1
+28.11 20:25: d1d2
+28.11 20:25: d1e2
+28.11 20:26: Started Uci Loop
+28.11 20:26: Waiting for command
+28.11 20:26: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 20:26: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:26: Waiting for command
+28.11 20:26: Command received: go
+28.11 20:26: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: d4d5
+28.11 20:26: Waiting for command
+28.11 20:26: Started Uci Loop
+28.11 20:26: Waiting for command
+28.11 20:26: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 20:26: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:26: Waiting for command
+28.11 20:26: Command received: go
+28.11 20:27: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: d4d5
+28.11 20:27: Waiting for command
+28.11 20:27: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 20:27: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:27: Waiting for command
+28.11 20:27: Command received: go
+28.11 20:27: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: d4d5
+28.11 20:27: Waiting for command
+28.11 20:31: Started Uci Loop
+28.11 20:31: Waiting for command
+28.11 20:31: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 20:31: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:31: Waiting for command
+28.11 20:31: Command received: go
+28.11 20:31: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: d4e5
+28.11 20:31: Waiting for command
+28.11 20:34: Started Uci Loop
+28.11 20:34: Waiting for command
+28.11 20:34: Command received: //print moves with score
+28.11 20:34: unrecognized command: //print moves with score
+28.11 20:34: Waiting for command
+28.11 20:34: Command received: std::cout << "moves: \n";
+28.11 20:34: unrecognized command: std::cout << "moves: \n";
+28.11 20:34: Waiting for command
+28.11 20:34: Command received: for (chess::Move& m : moves)
+28.11 20:34: unrecognized command: for (chess::Move& m : moves)
+28.11 20:34: Waiting for command
+28.11 20:34: Command received: {
+28.11 20:34: unrecognized command: {
+28.11 20:34: Waiting for command
+28.11 20:34: Command received: std::cout << chess::uci::moveToUci(m) << " " << m.score() << "\n";
+28.11 20:34: unrecognized command: std::cout << chess::uci::moveToUci(m) << " " << m.score() << "\n";
+28.11 20:34: Waiting for command
+28.11 20:34: Command received: #
+28.11 20:34: unrecognized command: #
+28.11 20:34: Waiting for command
+28.11 20:34: Command received: 
+28.11 20:34: Started Uci Loop
+28.11 20:34: Waiting for command
+28.11 20:34: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 20:34: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:34: Waiting for command
+28.11 20:34: Command received: go
+28.11 20:34: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: d4d5
+28.11 20:34: Waiting for command
+28.11 20:49: Command received: 
+28.11 20:49: Started Uci Loop
+28.11 20:49: Waiting for command
+28.11 20:49: Started Uci Loop
+28.11 20:49: Waiting for command
+28.11 20:49: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 20:49: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:49: Waiting for command
+28.11 20:49: Command received: go
+28.11 20:50: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: a2a3
+28.11 20:50: Waiting for command
+28.11 20:53: Started Uci Loop
+28.11 20:53: Waiting for command
+28.11 20:53: Command received: goposition startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5go
+28.11 20:53: unrecognized command: goposition startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5go
+28.11 20:53: Waiting for command
+28.11 20:53: Command received: 
+28.11 20:53: Started Uci Loop
+28.11 20:53: Waiting for command
+28.11 20:53: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 20:53: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:53: Waiting for command
+28.11 20:53: Command received: go
+28.11 20:55: Started Uci Loop
+28.11 20:55: Waiting for command
+28.11 20:55: Command received: 
+28.11 20:55: Started Uci Loop
+28.11 20:55: Waiting for command
+28.11 20:55: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 20:55: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:55: Waiting for command
+28.11 20:55: Command received: go
+28.11 20:56: Started Uci Loop
+28.11 20:56: Waiting for command
+28.11 20:56: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 20:56: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:56: Waiting for command
+28.11 20:56: Command received: go
+28.11 20:56: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: g1h1
+28.11 20:56: Waiting for command
+28.11 20:57: Started Uci Loop
+28.11 20:57: Waiting for command
+28.11 20:57: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 20:57: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 20:57: Waiting for command
+28.11 20:57: Command received: go
+28.11 20:58: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: d4d5
+28.11 20:58: Waiting for command
+28.11 21:00: Started Uci Loop
+28.11 21:00: Waiting for command
+28.11 21:00: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 21:00: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 21:00: Waiting for command
+28.11 21:00: Command received: go
+28.11 21:00: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: d4d5
+28.11 21:00: Waiting for command
+28.11 21:04: Started Uci Loop
+28.11 21:04: Waiting for command
+28.11 21:04: Started Uci Loop
+28.11 21:04: Waiting for command
+28.11 21:04: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 21:04: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 21:04: Waiting for command
+28.11 21:04: Command received: go
+28.11 21:04: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: d4d5
+28.11 21:04: Waiting for command
+28.11 21:07: Started Uci Loop
+28.11 21:07: Waiting for command
+28.11 21:08: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 21:08: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 21:08: Waiting for command
+28.11 21:08: Command received: go
+28.11 21:09: made move. fen: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8 move: d4d5
+28.11 21:09: Waiting for command
+28.11 21:09: Started Uci Loop
+28.11 21:09: Waiting for command
+28.11 21:10: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 21:10: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 21:10: Waiting for command
+28.11 21:10: Command received: go
+28.11 21:10: Started Uci Loop
+28.11 21:10: Waiting for command
+28.11 21:10: Command received: position startpos moves e2e4 e7e5 g1f3 d7d6 d2d4 f7f6 b1c3 b8d7 f1d3 g8e7 e1g1 g7g5 c1e3 h7h5
+28.11 21:10: set pos: r1bqkb1r/pppnn3/3p1p2/4p1pp/3PP3/2NBBN2/PPP2PPP/R2Q1RK1 w kq - 0 8
+28.11 21:10: Waiting for command
+28.11 21:10: Command received: go

@@ -10,6 +10,7 @@
 #include "leonardo_value_bot_1.hpp"
 #include "leonardo_value_bot_3.hpp"
 #include "leonardo_overlord.hpp"
+#include "uci_handler.hpp"
 
 uint64_t perft(chess::Board& board, int depth) {
 	chess::Movelist moves;
@@ -194,9 +195,15 @@ void async_play()
 		threads[i].join();
 	}
 }
+void uci()
+{
+	uci_handler uci;
+	uci.uci_loop();
+}
 
 int main()
 {
-	async_play();
+	uci();
+	//async_play();
 }
 //play_pawn();

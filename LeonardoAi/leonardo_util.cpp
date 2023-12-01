@@ -679,7 +679,7 @@ int leonardo_util::get_board_val(
 	if (table_value != nnet_table::not_found)
 	{
 		table_hit++;
-		//return table_value;
+		return table_value;
 	}
 
 	//std::cout << "\nprev m: \n"
@@ -707,6 +707,7 @@ int leonardo_util::get_board_val(
 	pawn_nnet.rest_partial_forward_prop();
 	int output = std::round(get_pawn_matrix_value(pawn_nnet.get_output()) * 100.0f);
 
+	/*
 	matrix m(get_pawn_input_format());
 	//throw std::runtime_error("not implemented");
 	leonardo_util::encode_pawn_matrix(curr_white_bb, curr_black_bb, m, white_to_move);
@@ -729,7 +730,6 @@ int leonardo_util::get_board_val(
 		std::cout << "diff out";
 	}
 	
-	/*
 	if (table_value != nnet_table::not_found && std::abs(output - table_value) > 3)
 	{
 		std::cout << leonardo_util::pawn_board_to_str(m) << "\n";
@@ -746,15 +746,15 @@ int leonardo_util::get_board_val(
 		std::cout << "output: " << (int)output << " table value: " << table_value << "\n";
 		false_store++;
 	}
-	*/
 	if (table_value != nnet_table::not_found)
 	{
 		//if(std::abs(output - table_value) != 0)
 	//		std::cout << std::abs(output - table_value) << "\n";
 	}
+	*/
 	
 
-	if (table_value == nnet_table::not_found)
+	//if (table_value == nnet_table::not_found)
 		table.insert(curr_white_bb, curr_black_bb, white_to_move, output);
 
 	prev_black_bb = curr_black_bb;

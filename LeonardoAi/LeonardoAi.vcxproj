@@ -60,6 +60,7 @@
     <ClCompile Include="nnet_table.cpp" />
     <ClCompile Include="random_player.cpp" />
     <ClCompile Include="stockfish_interface.cpp" />
+    <ClCompile Include="uci_handler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\StockFish\benchmark.h" />
@@ -125,6 +126,7 @@
     <ClInclude Include="nnet_table.hpp" />
     <ClInclude Include="random_player.hpp" />
     <ClInclude Include="stockfish_interface.hpp" />
+    <ClInclude Include="uci_handler.hpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="NeuroFox\gpu_math.cu" />
