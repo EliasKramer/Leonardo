@@ -75,8 +75,8 @@ bool leonardo_value_bot_3::search_cancelled()
 	long long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count();
 
 	return
-		ms_taken > ms_per_move;//&&				//search time over
-	//iterative_deepening_depth > MIN_DEPTH; //we have searched at least a bit
+		ms_taken > ms_per_move &&				//search time over
+		iterative_deepening_depth >= MIN_DEPTH; //we have searched at least a bit
 }
 
 //PAWN, KNIGHT, BISHOP, ROOK, QUEEN
@@ -624,7 +624,7 @@ int leonardo_value_bot_3::recursive_eval(
 			if (ply_from_root == 0)
 			{
 				best_move = move;
-				std::cout << "best move atm: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
+				//std::cout << "best move atm: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
 				searched_at_least_one_move = true;
 			}
 			best_current_move = move;
@@ -640,7 +640,7 @@ int leonardo_value_bot_3::recursive_eval(
 
 	if (ply_from_root == 0)
 	{
-		std::cout << "best current move: " << chess::uci::moveToUci(best_current_move) << "\n";
+		//std::cout << "best current move: " << chess::uci::moveToUci(best_current_move) << "\n";
 	}
 	record_tt(board.hash(), ply_remaining, alpha, tt_flag, best_current_move); //best local move TODOODODODODOODODO
 
@@ -740,6 +740,7 @@ leonardo_value_bot_3::leonardo_value_bot_3(int ms_per_move, float nnet_mult)
 	const size_t tt_size = tt_desired_size * 1024 * 1024 / tt_item_size;
 	tt.resize(10048583);// tt_size + 123);
 }
+static int last_iterative_printed = -1;
 void leonardo_value_bot_3::sort_move_list(chess::Movelist& moves, chess::Board& board)
 {
 	chess::Move tt_move = tt_get_move(board.hash());
@@ -755,7 +756,21 @@ void leonardo_value_bot_3::sort_move_list(chess::Movelist& moves, chess::Board& 
 			chess::PieceType from_piece_type = board.at<chess::PieceType>(move.from());
 			chess::PieceType to_piece_type = board.at<chess::PieceType>(move.to());
 
-			move.setScore(PIECE_EVAL[(int)to_piece_type] - PIECE_EVAL[(int)from_piece_type]);
+			move.setScore((PIECE_EVAL[(int)to_piece_type] - PIECE_EVAL[(int)from_piece_type]) * 2);
+		}
+		else if (move.typeOf() == chess::Move::PROMOTION)
+		{
+			move.setScore(PIECE_EVAL[(int)move.promotionType()] * 10);
+		}
+		else
+		{
+			if (board.isAttacked(move.to(), ~board.sideToMove()))
+			{
+				//discourages every move, that wants to move to a field, that is attacked
+				//except when it is a pawn, then it gets a small little buff
+				chess::PieceType from_piece_type = board.at<chess::PieceType>(move.from());
+				move.setScore(-PIECE_EVAL[(int)from_piece_type]);
+			}
 		}
 	}
 
@@ -814,6 +829,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	int reached_depth = 0;
 	chess::Move best_move = chess::Move::NULL_MOVE;
 	int transpositions_last = 0;
+	bool partial = false;
 	for (iterative_deepening_depth = 1; !search_cancelled() && iterative_deepening_depth < MAX_DEPTH; iterative_deepening_depth++)
 	{
 
@@ -834,27 +850,32 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		{
 			reached_depth = iterative_deepening_depth;
 			best_move = tmp;
+			transpositions_last = transpositions_count;
+			/*
 			std::cout
 				<< "d " << iterative_deepening_depth
 				<< " best_move: " << chess::uci::moveToUci(best_move)
 				<< " score: " << score << "\n";
-			/*
 			std::cout << "--------------d: " << iterative_deepening_depth << "\n";
 			std::cout << "--------------\n";
-			*/
-			transpositions_last = transpositions_count;
 
+
+			auto end = std::chrono::high_resolution_clock::now();
+			long long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+			std::cout << "time: " << ms_taken << "ms\n";
+			*/
 		}
 		else
 		{
 			if (searched_at_least_one_move)
 			{
-				best_move = tmp; //DOESNT WORK?!
+				best_move = tmp;				
+				partial = true;
+				/*
 				std::cout
 					<< "partial search d " << iterative_deepening_depth
 					<< " best_move: " << chess::uci::moveToUci(best_move)
 					<< " score: " << score << "\n";
-				/*
 				std::cout << "--------------d: " << iterative_deepening_depth << "\n";
 				std::cout << "score: " << score << "\n";
 				std::cout << "--------------\n";
@@ -862,6 +883,8 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 			}
 		}
 	}
+	std::cout << "depth reached: " << iterative_deepening_depth << (partial ? " partial" : "") << "\n";
+
 	transpositions_count = transpositions_last;
 
 	if (best_move == chess::Move::NULL_MOVE)
@@ -875,7 +898,9 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 
 	if (board.sideToMove() == chess::Color::BLACK)
 		score *= -1;
+
 	/*
+	std::cout << board;
 	std::cout << "transposition table size: " << tt.size()
 		<< " | transpositions: " << transpositions_count
 		<< " | tt inserts: " << tt_inserts << "\n";

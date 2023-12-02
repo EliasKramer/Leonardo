@@ -24,7 +24,7 @@ std::vector<std::string> split(std::string str, std::string token = " ")
 }
 
 uci_handler::uci_handler()
-	:bot(5000, 0),//1.5),
+	:bot(3000, 1),//1.5),
 	board(DEFAULT_FEN)
 {}
 

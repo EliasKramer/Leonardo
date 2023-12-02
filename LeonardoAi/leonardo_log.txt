@@ -560,3 +560,435 @@
 01.12 23:39: set pos: 4r2k/2Bq2bp/1p4p1/p2b4/P5P1/6QP/6B1/2R4K w - - 2 39
 01.12 23:39: Waiting for command
 01.12 23:39: Command received: go
+02.12 22:10: Started Uci Loop
+02.12 22:10: Waiting for command
+02.12 22:10: Command received: go
+02.12 22:10: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+02.12 22:10: Waiting for command
+02.12 22:10: Command received: go
+02.12 22:10: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+02.12 22:10: Waiting for command
+02.12 22:19: Started Uci Loop
+02.12 22:19: Waiting for command
+02.12 22:20: Started Uci Loop
+02.12 22:20: Waiting for command
+02.12 22:20: Command received: position startpos moves e2e4 g8f6 e4e5 f6d5 d2d4 d7d6 c2c4 d5b6 e5d6
+02.12 22:20: set pos: rnbqkb1r/ppp1pppp/1n1P4/8/2PP4/8/PP3PPP/RNBQKBNR b KQkq - 0 5
+02.12 22:20: Waiting for command
+02.12 22:20: Command received: go
+02.12 22:20: made move. fen: rnbqkb1r/ppp1pppp/1n1P4/8/2PP4/8/PP3PPP/RNBQKBNR b KQkq - 0 5 move: e7d6
+02.12 22:20: Waiting for command
+02.12 23:05: Started Uci Loop
+02.12 23:05: Waiting for command
+02.12 23:05: Command received: go
+02.12 23:05: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: b1c3
+02.12 23:05: Waiting for command
+02.12 23:06: Started Uci Loop
+02.12 23:06: Waiting for command
+02.12 23:06: Command received: go
+02.12 23:06: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+02.12 23:06: Waiting for command
+02.12 23:08: Started Uci Loop
+02.12 23:08: Waiting for command
+02.12 23:08: Command received: go
+02.12 23:08: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+02.12 23:08: Waiting for command
+02.12 23:08: Started Uci Loop
+02.12 23:08: Waiting for command
+02.12 23:09: Command received: go
+02.12 23:09: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e3
+02.12 23:09: Waiting for command
+02.12 23:09: Started Uci Loop
+02.12 23:09: Waiting for command
+02.12 23:09: Command received: go
+02.12 23:09: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+02.12 23:09: Waiting for command
+02.12 23:13: Command received: position startpos moves b2b3 g8f6 c1b2 g7g6 b2f6 e7f6 d2d4 f6f5 e2e3 f8g7 g2g3 d7d6 f1g2 b8d7 g1e2 d7f6 e1g1 h7h5 c2c4 h5h4 b1d2 f6g4 d2f3 h4g3 h2g3 c7c6 f1e1 c8d7 e2f4 d8a5 b3b4 a5b4 a1b1 b4a5 b1b7 d7c8 b7b2 e8g8 d1d2 a5a6 e1c1 c8d7 c4c5 d6c5 c1c5 a8b8 c5c1 b8b6 g2f1 a6a3 b2c2 f8b8 f1c4 a3d6 f3g5 d7e8 c4b3 g7f6 g5f3 f6e7 g1g2 g6g5 f4d3 g8g7 d3e5 f7f6 e5c4 d6d8 c4b6 a7b6 c2c6 e8c6 c1c6 e7d6 d2c2 f5f4 c2f5 g4h6 f5e6 d6f8 e3f4 g5f4 c6c1 f4g3 f2g3 d8d6 c1h1 b8d8 e6d6 f8d6 b3e6 d8a8 h1c1 b6b5 c1c6 a8d8 c6b6 f6f5 b6b5 g7f6 e6b3 d8c8 b5b6 c8d8 f3e5 f6g5 e5f3 g5f6 a2a4 f6e7 a4a5 h6g4 a5a6 d8b8 a6a7 b8b6
+02.12 23:13: set pos: 8/P3k3/1r1b4/5p2/3P2n1/1B3NP1/6K1/8 w - - 0 59
+02.12 23:13: Waiting for command
+02.12 23:13: Command received: go
+02.12 23:13: made move. fen: 8/P3k3/1r1b4/5p2/3P2n1/1B3NP1/6K1/8 w - - 0 59 move: a7a8q
+02.12 23:13: Waiting for command
+02.12 23:14: Started Uci Loop
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: position startpos moves b2b3 g8f6 c1b2 g7g6 b2f6 e7f6 d2d4 f6f5 e2e3 f8g7 g2g3 d7d6 f1g2 b8d7 g1e2 d7f6 e1g1 h7h5 c2c4 h5h4 b1d2 f6g4 d2f3 h4g3 h2g3 c7c6 f1e1 c8d7 e2f4 d8a5 b3b4 a5b4 a1b1 b4a5 b1b7 d7c8 b7b2 e8g8 d1d2 a5a6 e1c1 c8d7 c4c5 d6c5 c1c5 a8b8 c5c1 b8b6 g2f1 a6a3 b2c2 f8b8 f1c4 a3d6 f3g5 d7e8 c4b3 g7f6 g5f3 f6e7 g1g2 g6g5 f4d3 g8g7 d3e5 f7f6 e5c4 d6d8 c4b6 a7b6 c2c6 e8c6 c1c6 e7d6 d2c2 f5f4 c2f5 g4h6 f5e6 d6f8 e3f4 g5f4 c6c1 f4g3 f2g3 d8d6 c1h1 b8d8 e6d6 f8d6 b3e6 d8a8 h1c1 b6b5 c1c6 a8d8 c6b6 f6f5 b6b5 g7f6 e6b3 d8c8 b5b6 c8d8 f3e5 f6g5 e5f3 g5f6 a2a4 f6e7 a4a5 h6g4 a5a6 d8b8 a6a7 b8b6
+02.12 23:14: set pos: 8/P3k3/1r1b4/5p2/3P2n1/1B3NP1/6K1/8 w - - 0 59
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: go
+02.12 23:14: made move. fen: 8/P3k3/1r1b4/5p2/3P2n1/1B3NP1/6K1/8 w - - 0 59 move: a7a8q
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best move atm: a7a8q 180
+02.12 23:14: unrecognized command: best move atm: a7a8q 180
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best current move: a7a8q
+02.12 23:14: unrecognized command: best current move: a7a8q
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: d 1 best_move: a7a8q score: 180
+02.12 23:14: unrecognized command: d 1 best_move: a7a8q score: 180
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: time: 0ms
+02.12 23:14: unrecognized command: time: 0ms
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best move atm: a7a8q 180
+02.12 23:14: unrecognized command: best move atm: a7a8q 180
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best current move: a7a8q
+02.12 23:14: unrecognized command: best current move: a7a8q
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: d 2 best_move: a7a8q score: 180
+02.12 23:14: unrecognized command: d 2 best_move: a7a8q score: 180
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: time: 3ms
+02.12 23:14: unrecognized command: time: 3ms
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best move atm: a7a8q 200
+02.12 23:14: unrecognized command: best move atm: a7a8q 200
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best current move: a7a8q
+02.12 23:14: unrecognized command: best current move: a7a8q
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: d 3 best_move: a7a8q score: 200
+02.12 23:14: unrecognized command: d 3 best_move: a7a8q score: 200
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: time: 6ms
+02.12 23:14: unrecognized command: time: 6ms
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best move atm: a7a8q 195
+02.12 23:14: unrecognized command: best move atm: a7a8q 195
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best current move: a7a8q
+02.12 23:14: unrecognized command: best current move: a7a8q
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: d 4 best_move: a7a8q score: 195
+02.12 23:14: unrecognized command: d 4 best_move: a7a8q score: 195
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: time: 9ms
+02.12 23:14: unrecognized command: time: 9ms
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best move atm: a7a8q 205
+02.12 23:14: unrecognized command: best move atm: a7a8q 205
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best current move: a7a8q
+02.12 23:14: unrecognized command: best current move: a7a8q
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: d 5 best_move: a7a8q score: 205
+02.12 23:14: unrecognized command: d 5 best_move: a7a8q score: 205
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: time: 43ms
+02.12 23:14: unrecognized command: time: 43ms
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best move atm: a7a8q 195
+02.12 23:14: unrecognized command: best move atm: a7a8q 195
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best current move: a7a8q
+02.12 23:14: unrecognized command: best current move: a7a8q
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: d 6 best_move: a7a8q score: 195
+02.12 23:14: unrecognized command: d 6 best_move: a7a8q score: 195
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: time: 135ms
+02.12 23:14: unrecognized command: time: 135ms
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best move atm: a7a8q 200
+02.12 23:14: unrecognized command: best move atm: a7a8q 200
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best current move: a7a8q
+02.12 23:14: unrecognized command: best current move: a7a8q
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: d 7 best_move: a7a8q score: 200
+02.12 23:14: unrecognized command: d 7 best_move: a7a8q score: 200
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: time: 642ms
+02.12 23:14: unrecognized command: time: 642ms
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best move atm: a7a8q 195
+02.12 23:14: unrecognized command: best move atm: a7a8q 195
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: best current move: a7a8q
+02.12 23:14: unrecognized command: best current move: a7a8q
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: d 8 best_move: a7a8q score: 195
+02.12 23:14: unrecognized command: d 8 best_move: a7a8q score: 195
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: time: 3041ms
+02.12 23:14: unrecognized command: time: 3041ms
+02.12 23:14: Waiting for command
+02.12 23:14: Started Uci Loop
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: position startpos moves b2b3 g8f6 c1b2 g7g6 b2f6 e7f6 d2d4 f6f5 e2e3 f8g7 g2g3 d7d6 f1g2 b8d7 g1e2 d7f6 e1g1 h7h5 c2c4 h5h4 b1d2 f6g4 d2f3 h4g3 h2g3 c7c6 f1e1 c8d7 e2f4 d8a5 b3b4 a5b4 a1b1 b4a5 b1b7 d7c8 b7b2 e8g8 d1d2 a5a6 e1c1 c8d7 c4c5 d6c5 c1c5 a8b8 c5c1 b8b6 g2f1 a6a3 b2c2 f8b8 f1c4 a3d6 f3g5 d7e8 c4b3 g7f6 g5f3 f6e7 g1g2 g6g5 f4d3 g8g7 d3e5 f7f6 e5c4 d6d8 c4b6 a7b6 c2c6 e8c6 c1c6 e7d6 d2c2 f5f4 c2f5 g4h6 f5e6 d6f8 e3f4 g5f4 c6c1 f4g3 f2g3 d8d6 c1h1 b8d8 e6d6 f8d6 b3e6 d8a8 h1c1 b6b5 c1c6 a8d8 c6b6 f6f5 b6b5 g7f6 e6b3 d8c8 b5b6 c8d8 f3e5 f6g5 e5f3 g5f6 a2a4 f6e7 a4a5 h6g4 a5a6 d8b8 a6a7 b8b6
+02.12 23:14: set pos: 8/P3k3/1r1b4/5p2/3P2n1/1B3NP1/6K1/8 w - - 0 59
+02.12 23:14: Waiting for command
+02.12 23:14: Command received: go
+02.12 23:14: made move. fen: 8/P3k3/1r1b4/5p2/3P2n1/1B3NP1/6K1/8 w - - 0 59 move: a7a8q
+02.12 23:14: Waiting for command
+02.12 23:16: Started Uci Loop
+02.12 23:16: Waiting for command
+02.12 23:16: Command received: go
+02.12 23:16: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e3
+02.12 23:16: Waiting for command
+02.12 23:17: Started Uci Loop
+02.12 23:17: Waiting for command
+02.12 23:17: Command received: [Window Title]
+02.12 23:17: unrecognized command: [Window Title]
+02.12 23:17: Waiting for command
+02.12 23:17: Command received: Notepad
+02.12 23:17: unrecognized command: Notepad
+02.12 23:17: Waiting for command
+02.12 23:17: Command received: 
+02.12 23:17: Error: empty command
+02.12 23:17: Waiting for command
+02.12 23:17: Command received: [Main Instruction]
+02.12 23:17: unrecognized command: [Main Instruction]
+02.12 23:17: Waiting for command
+02.12 23:17: Command received: Do you want to save changes to Untitled?
+02.12 23:17: unrecognized command: Do you want to save changes to Untitled?
+02.12 23:17: Waiting for command
+02.12 23:17: Command received: 
+02.12 23:17: Error: empty command
+02.12 23:17: Waiting for command
+02.12 23:17: Command received: [Save] [Don't Save] [Cancel]
+02.12 23:17: unrecognized command: [Save] [Don't Save] [Cancel]
+02.12 23:17: Waiting for command
+02.12 23:17: Started Uci Loop
+02.12 23:17: Waiting for command
+02.12 23:18: Command received: position startpos moves b2b3 g8f6 c1b2 g7g6 b2f6 e7f6 d2d4 f6f5 e2e3 f8g7 g2g3 d7d6 f1g2 b8d7 g1e2 d7f6 e1g1 h7h5 c2c4 h5h4 b1d2 f6g4 d2f3 h4g3 h2g3 c7c6 f1e1 c8d7 e2f4 d8a5 b3b4 a5b4 a1b1 b4a5 b1b7 d7c8 b7b2 e8g8 d1d2 a5a6 e1c1 c8d7 c4c5 d6c5 c1c5 a8b8 c5c1 b8b6 g2f1 a6a3 b2c2 f8b8 f1c4 a3d6 f3g5 d7e8 c4b3 g7f6 g5f3 f6e7 g1g2 g6g5 f4d3 g8g7 d3e5 f7f6 e5c4 d6d8 c4b6 a7b6 c2c6 e8c6 c1c6 e7d6 d2c2 f5f4 c2f5 g4h6 f5e6 d6f8 e3f4 g5f4 c6c1 f4g3 f2g3 d8d6 c1h1 b8d8 e6d6 f8d6 b3e6 d8a8 h1c1 b6b5 c1c6 a8d8 c6b6 f6f5 b6b5 g7f6 e6b3 d8c8 b5b6 c8d8 f3e5 f6g5 e5f3 g5f6 a2a4 f6e7 a4a5 h6g4 a5a6 d8b8 a6a7 b8b6
+02.12 23:18: set pos: 8/P3k3/1r1b4/5p2/3P2n1/1B3NP1/6K1/8 w - - 0 59
+02.12 23:18: Waiting for command
+02.12 23:18: Command received: go
+02.12 23:18: made move. fen: 8/P3k3/1r1b4/5p2/3P2n1/1B3NP1/6K1/8 w - - 0 59 move: a7a8q
+02.12 23:18: Waiting for command
+02.12 23:19: Started Uci Loop
+02.12 23:19: Waiting for command
+02.12 23:19: Command received: go
+02.12 23:19: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e3
+02.12 23:19: Waiting for command
+02.12 23:19: Started Uci Loop
+02.12 23:19: Waiting for command
+02.12 23:19: Command received: go
+02.12 23:19: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e3
+02.12 23:19: Waiting for command
+02.12 23:19: Started Uci Loop
+02.12 23:19: Waiting for command
+02.12 23:19: Command received: go
+02.12 23:19: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+02.12 23:19: Waiting for command
+02.12 23:24: Started Uci Loop
+02.12 23:24: Waiting for command
+02.12 23:24: Command received: go
+02.12 23:24: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: d2d4
+02.12 23:24: Waiting for command
+02.12 23:27: Started Uci Loop
+02.12 23:27: Waiting for command
+02.12 23:27: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6 h2h1q
+02.12 23:27: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6k1/7q w - - 0 49
+02.12 23:27: Waiting for command
+02.12 23:27: Command received: go
+02.12 23:28: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6k1/7q w - - 0 49 move: h5h1
+02.12 23:28: Waiting for command
+02.12 23:28: Started Uci Loop
+02.12 23:28: Waiting for command
+02.12 23:28: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6 h2h1q
+02.12 23:28: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6k1/7q w - - 0 49
+02.12 23:28: Waiting for command
+02.12 23:28: Command received: go
+02.12 23:29: Started Uci Loop
+02.12 23:29: Waiting for command
+02.12 23:29: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:29: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:29: Waiting for command
+02.12 23:29: Command received: go
+02.12 23:30: Started Uci Loop
+02.12 23:30: Waiting for command
+02.12 23:30: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:30: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:30: Waiting for command
+02.12 23:30: Command received: go
+02.12 23:31: Started Uci Loop
+02.12 23:31: Waiting for command
+02.12 23:31: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:31: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:31: Waiting for command
+02.12 23:31: Command received: go
+02.12 23:32: Started Uci Loop
+02.12 23:32: Waiting for command
+02.12 23:32: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:32: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:32: Waiting for command
+02.12 23:32: Command received: go
+02.12 23:35: Started Uci Loop
+02.12 23:35: Waiting for command
+02.12 23:35: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:35: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:35: Waiting for command
+02.12 23:35: Command received: go
+02.12 23:35: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+02.12 23:35: Waiting for command
+02.12 23:36: Started Uci Loop
+02.12 23:36: Waiting for command
+02.12 23:36: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:36: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:36: Waiting for command
+02.12 23:36: Command received: go
+02.12 23:36: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+02.12 23:36: Waiting for command
+02.12 23:39: Started Uci Loop
+02.12 23:39: Waiting for command
+02.12 23:39: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:39: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:39: Waiting for command
+02.12 23:39: Command received: go
+02.12 23:39: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+02.12 23:39: Waiting for command
+02.12 23:41: Started Uci Loop
+02.12 23:41: Waiting for command
+02.12 23:41: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:41: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:41: Waiting for command
+02.12 23:41: Command received: go
+02.12 23:41: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+02.12 23:41: Waiting for command
+02.12 23:41: Started Uci Loop
+02.12 23:41: Waiting for command
+02.12 23:41: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:41: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:41: Waiting for command
+02.12 23:41: Command received: go
+02.12 23:41: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+02.12 23:41: Waiting for command
+02.12 23:49: Started Uci Loop
+02.12 23:49: Waiting for command
+02.12 23:50: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:50: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:50: Waiting for command
+02.12 23:50: Command received: go
+02.12 23:50: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+02.12 23:50: Waiting for command
+02.12 23:51: Started Uci Loop
+02.12 23:51: Waiting for command
+02.12 23:51: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:51: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:51: Waiting for command
+02.12 23:51: Command received: go
+02.12 23:51: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+02.12 23:51: Waiting for command
+02.12 23:54: Started Uci Loop
+02.12 23:54: Waiting for command
+02.12 23:54: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:54: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:54: Waiting for command
+02.12 23:54: Command received: go
+02.12 23:54: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+02.12 23:54: Waiting for command
+02.12 23:56: Started Uci Loop
+02.12 23:56: Waiting for command
+02.12 23:59: Started Uci Loop
+02.12 23:59: Waiting for command
+02.12 23:59: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+02.12 23:59: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+02.12 23:59: Waiting for command
+02.12 23:59: Command received: go
+02.12 23:59: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+02.12 23:59: Waiting for command
+03.12 00:01: Started Uci Loop
+03.12 00:01: Waiting for command
+03.12 00:01: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:01: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:01: Waiting for command
+03.12 00:01: Command received: go
+03.12 00:01: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:01: Waiting for command
+03.12 00:02: Started Uci Loop
+03.12 00:02: Waiting for command
+03.12 00:02: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:02: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:02: Waiting for command
+03.12 00:02: Command received: go
+03.12 00:02: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:02: Waiting for command
+03.12 00:03: Started Uci Loop
+03.12 00:03: Waiting for command
+03.12 00:03: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:03: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:03: Waiting for command
+03.12 00:03: Command received: go
+03.12 00:03: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:03: Waiting for command
+03.12 00:04: Started Uci Loop
+03.12 00:04: Waiting for command
+03.12 00:04: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:04: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:04: Waiting for command
+03.12 00:04: Command received: go
+03.12 00:05: Started Uci Loop
+03.12 00:05: Waiting for command
+03.12 00:05: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:05: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:05: Waiting for command
+03.12 00:05: Command received: go
+03.12 00:05: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:05: Waiting for command
+03.12 00:07: Started Uci Loop
+03.12 00:07: Waiting for command
+03.12 00:07: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:07: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:07: Waiting for command
+03.12 00:07: Command received: go
+03.12 00:07: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:07: Waiting for command
+03.12 00:11: Started Uci Loop
+03.12 00:11: Waiting for command
+03.12 00:11: Command received: go
+03.12 00:11: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: d2d4
+03.12 00:11: Waiting for command
+03.12 00:11: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:11: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:11: Waiting for command
+03.12 00:11: Command received: go
+03.12 00:11: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:11: Waiting for command
+03.12 00:11: Started Uci Loop
+03.12 00:11: Waiting for command
+03.12 00:11: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:11: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:11: Waiting for command
+03.12 00:11: Command received: go
+03.12 00:11: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:11: Waiting for command
+03.12 00:13: Started Uci Loop
+03.12 00:13: Waiting for command
+03.12 00:13: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:13: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:13: Waiting for command
+03.12 00:13: Command received: go
+03.12 00:13: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:13: Waiting for command
+03.12 00:14: Started Uci Loop
+03.12 00:14: Waiting for command
+03.12 00:14: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:14: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:14: Waiting for command
+03.12 00:14: Command received: go
+03.12 00:14: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:14: Waiting for command
+03.12 00:14: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:14: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:14: Waiting for command
+03.12 00:14: Command received: go
+03.12 00:14: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:14: Waiting for command
+03.12 00:14: Started Uci Loop
+03.12 00:14: Waiting for command
+03.12 00:14: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:14: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:14: Waiting for command
+03.12 00:14: Command received: go
+03.12 00:14: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:14: Waiting for command
+03.12 00:14: Started Uci Loop
+03.12 00:14: Waiting for command
+03.12 00:14: Command received: position startpos moves c2c4 e7e5 g2g3 c7c6 d2d4 e5e4 b1c3 d7d5 f1g2 g8f6 c4d5 c6d5 a2a3 f8d6 f2f3 b8d7 f3e4 d5e4 c3e4 f6e4 g2e4 e8g8 e4g2 f8e8 g1f3 d8e7 e2e3 d7f6 e1g1 c8d7 d1d3 d7c6 c1d2 c6e4 d3e2 f6d5 a1c1 f7f5 e2b5 g8h8 f3e5 d5f6 g2e4 f6e4 d2b4 g7g6 b4d6 e4d6 b5b4 h8g7 c1c2 d6f7 b4e7 e8e7 e5f7 g7f7 g1f2 a8e8 c2c3 f7f6 f2e2 e7e4 f1f4 e4e6 g3g4 e8e7 e2d2 b7b6 f4f3 e6e4 g4f5 g6f5 c3c6 f6g5 f3g3 e4g4 g3g4 g5g4 c6f6 h7h5 d2d3 h5h4 b2b4 e7g7 d4d5 g4h3 f6f5 h3h2 f5h5 h4h3 e3e4 h2g2 d3d4 h3h2 d5d6
+03.12 00:14: set pos: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48
+03.12 00:14: Waiting for command
+03.12 00:14: Command received: go
+03.12 00:15: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
+03.12 00:15: Waiting for command
