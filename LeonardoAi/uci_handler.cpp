@@ -89,7 +89,7 @@ void uci_handler::receive_command(std::string& message)
 		log("Error: empty command");
 		return;
 	}
-	
+
 	std::string messageType = tokens[0];
 
 	if (messageType == "uci")
@@ -153,7 +153,20 @@ void uci_handler::receive_command(std::string& message)
 	}
 	else if (messageType == "go")
 	{
-		chess::Move gotten_move = bot.get_move(board);
+		//go wtime 60000 btime 60000
+		chess::Move gotten_move = chess::Move::NULL_MOVE;
+		try {
+			std::string time_str = board.sideToMove() == chess::Color::WHITE ? tokens[2] : tokens[4];
+			int time = std::stoi(time_str);
+			std::string log_info = "";
+			gotten_move = bot.get_move(board, time, log_info);
+			log("chess log: " + log_info);
+		}
+		catch(std::runtime_error e)
+		{
+			log("error. reading time strings. msg: " + std::string(e.what()));
+			gotten_move = bot.get_move(board);
+		}
 		std::string selected_move = chess::uci::moveToUci(gotten_move);
 		std::cout << "bestmove " << selected_move << "\n";
 		log("made move. fen: " + board.getFen() + " move: " + selected_move);

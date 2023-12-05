@@ -992,3 +992,71 @@
 03.12 00:14: Command received: go
 03.12 00:15: made move. fen: 8/p5r1/1p1P4/7R/1P1KP3/P7/6kp/8 b - - 0 48 move: h2h1q
 03.12 00:15: Waiting for command
+03.12 22:11: Started Uci Loop
+03.12 22:11: Waiting for command
+03.12 22:11: Command received: uci
+03.12 22:11: Waiting for command
+03.12 23:13: Started Uci Loop
+03.12 23:13: Waiting for command
+04.12 22:42: Started Uci Loop
+04.12 22:42: Waiting for command
+04.12 22:42: Command received: uci
+04.12 22:42: Waiting for command
+05.12 13:38: Started Uci Loop
+05.12 13:38: Waiting for command
+05.12 13:39: Command received: go wtime 100 btime 100
+05.12 13:39: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: d2d4
+05.12 13:39: Waiting for command
+05.12 13:39: Command received: position startpos moves d2d4
+05.12 13:39: set pos: rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1
+05.12 13:39: Waiting for command
+05.12 13:39: Command received: go wtime 100 btime 100
+05.12 13:39: made move. fen: rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1 move: g8f6
+05.12 13:39: Waiting for command
+05.12 13:39: Command received: position startpos moves d2d4 g8f6
+05.12 13:39: set pos: rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2
+05.12 13:39: Waiting for command
+05.12 13:39: Command received: go wtime 100 btime 100
+05.12 13:39: made move. fen: rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2 move: c2c4
+05.12 13:39: Waiting for command
+05.12 13:39: Command received: position startpos moves d2d4 g8f6 c2c4
+05.12 13:39: set pos: rnbqkb1r/pppppppp/5n2/8/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2
+05.12 13:39: Waiting for command
+05.12 13:39: Command received: go wtime 100 btime 100
+05.12 13:39: made move. fen: rnbqkb1r/pppppppp/5n2/8/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2 move: g7g6
+05.12 13:39: Waiting for command
+05.12 13:40: Command received: position startpos moves d2d4 g8f6 c2c4 g7g6
+05.12 13:40: set pos: rnbqkb1r/pppppp1p/5np1/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3
+05.12 13:40: Waiting for command
+05.12 13:40: Command received: go wtime 100 btime 100
+05.12 13:40: made move. fen: rnbqkb1r/pppppp1p/5np1/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3 move: b1c3
+05.12 13:40: Waiting for command
+05.12 13:41: Command received: go wtime 100 btime 100
+05.12 13:41: made move. fen: rnbqkb1r/pppppp1p/5np1/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3 move: b1c3
+05.12 13:41: Waiting for command
+05.12 13:41: Command received: position startpos moves c2c4 e7e5 b1c3 b8c6 g2g3 f8c5 f1g2 d7d6 e2e3 h7h5 h2h4 a7a6 g1e2 c5a7 d2d4 g8f6 e1g1 e8g8 d4e5 c6e5 b2b3 c8g4 g2b7 c7c6 b7a8
+05.12 13:41: set pos: B2q1rk1/b4pp1/p1pp1n2/4n2p/2P3bP/1PN1P1P1/P3NP2/R1BQ1RK1 b - - 0 13
+05.12 13:41: Waiting for command
+05.12 13:41: Command received: go wtime 100 btime 100
+05.12 13:41: made move. fen: B2q1rk1/b4pp1/p1pp1n2/4n2p/2P3bP/1PN1P1P1/P3NP2/R1BQ1RK1 b - - 0 13 move: e5f3
+05.12 13:41: Waiting for command
+05.12 13:42: Command received: go wtime 40 btime 40
+05.12 13:42: made move. fen: B2q1rk1/b4pp1/p1pp1n2/4n2p/2P3bP/1PN1P1P1/P3NP2/R1BQ1RK1 b - - 0 13 move: e5f3
+05.12 13:42: Waiting for command
+05.12 13:42: Command received: go wtime 10 btime 10
+05.12 13:42: made move. fen: B2q1rk1/b4pp1/p1pp1n2/4n2p/2P3bP/1PN1P1P1/P3NP2/R1BQ1RK1 b - - 0 13 move: e5f3
+05.12 13:42: Waiting for command
+05.12 13:42: Command received: go wtime 1 btime 1
+05.12 13:42: made move. fen: B2q1rk1/b4pp1/p1pp1n2/4n2p/2P3bP/1PN1P1P1/P3NP2/R1BQ1RK1 b - - 0 13 move: e5f3
+05.12 13:42: Waiting for command
+05.12 13:46: Started Uci Loop
+05.12 13:46: Waiting for command
+05.12 13:46: Command received: position startpos moves c2c4 e7e5 b1c3 b8c6 g2g3 f8c5 f1g2 d7d6 e2e3 h7h5 h2h4 a7a6 g1e2 c5a7 d2d4 g8f6 e1g1 e8g8 d4e5 c6e5 b2b3 c8g4 g2b7 c7c6 b7a8
+05.12 13:46: set pos: B2q1rk1/b4pp1/p1pp1n2/4n2p/2P3bP/1PN1P1P1/P3NP2/R1BQ1RK1 b - - 0 13
+05.12 13:46: Waiting for command
+05.12 13:47: Command received: go wtime 1 btime 1
+05.12 13:47: chess log: depth reached: 5
+nodes visited: 129917
+
+05.12 13:47: made move. fen: B2q1rk1/b4pp1/p1pp1n2/4n2p/2P3bP/1PN1P1P1/P3NP2/R1BQ1RK1 b - - 0 13 move: e5f3
+05.12 13:47: Waiting for command

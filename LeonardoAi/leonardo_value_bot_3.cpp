@@ -795,11 +795,21 @@ void leonardo_value_bot_3::setup_nnet_for_move(const chess::Board& board)
 
 chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 {
+	std::string info = "";
+	return get_move(board, ms_per_move, info);
+}
+
+chess::Move leonardo_value_bot_3::get_move(chess::Board& board, int ms_left, std::string& info)
+{
+	int prev_ms_per_move = ms_per_move;
+	ms_per_move = std::min(ms_per_move, ms_left);
+
 	we_are_white = board.sideToMove() == chess::Color::WHITE;
 
 	int opening_move_idx = get_opening_move(board.hash());
 	if (opening_move_idx != -1)
 	{
+		ms_per_move = prev_ms_per_move;
 		//std::cout << "opening move found\n\n";
 		return openings[opening_move_idx].second;
 	}
@@ -869,7 +879,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 		{
 			if (searched_at_least_one_move)
 			{
-				best_move = tmp;				
+				best_move = tmp;
 				partial = true;
 				/*
 				std::cout
@@ -883,9 +893,10 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 			}
 		}
 	}
-	std::cout << "depth reached: " << iterative_deepening_depth << (partial ? " partial" : "") << "\n";
+	info = "depth reached: " + std::to_string(iterative_deepening_depth) + (partial ? " partial\n" : "\n") +
+		"nodes visited: " + std::to_string(nodes_visited) + "\n";
 
-	transpositions_count = transpositions_last;
+		transpositions_count = transpositions_last;
 
 	if (best_move == chess::Move::NULL_MOVE)
 	{
@@ -923,6 +934,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board)
 	std::cout << "leonardo's choice: " << chess::uci::moveToUci(best_move) << "\n";
 	std::cout << "----------------\n";
 	*/
+	ms_per_move = prev_ms_per_move;
 
 	return best_move;
 }

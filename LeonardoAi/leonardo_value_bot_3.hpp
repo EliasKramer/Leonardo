@@ -96,4 +96,5 @@ public:
 	leonardo_value_bot_3(int ms_per_move, float nnet_mult);
 
 	chess::Move get_move(chess::Board& board) override;
+	chess::Move get_move(chess::Board& board, int ms_left, std::string& info);
 };
