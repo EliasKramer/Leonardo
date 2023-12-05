@@ -77,6 +77,64 @@ bestmove e2e4
 position startpos moves e2e4 g8f6
 go wtime 59000 btime 58000
 bestmove d2d4*/
+
+static bool is_digit(const std::string& s)
+{
+	return !s.empty() && std::find_if(s.begin(),
+		s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
+}
+static int get_ms_to_make_move(int time, int inc)
+{
+	int result = 1;
+
+	if (time == -1)
+	{
+		return -1;
+	}
+
+
+	if (time < 1000)
+	{
+		result = time / 2;
+	}
+	else if (time < 2000)
+	{
+		result = time / 5;
+	}
+	else if (time < 5000)
+	{
+		result = time / 8;
+	}
+	else if (time < 60000)
+	{
+		result = time / 10;
+	}
+	else if (time < 300000)
+	{
+		result = time / 40;
+	}
+	else if (time < 600000)
+	{
+		result = time / 60;
+	}
+	else if (time < 1800000)
+	{
+		result = time / 80;
+	}
+	else
+	{
+		result = time / 100;
+	}
+
+
+	if (inc != -1)
+	{
+		result += inc;
+	}
+
+	return result;
+}
+
 void uci_handler::receive_command(std::string& message)
 {
 	//Console.WriteLine(message);
@@ -154,19 +212,51 @@ void uci_handler::receive_command(std::string& message)
 	else if (messageType == "go")
 	{
 		//go wtime 60000 btime 60000
-		chess::Move gotten_move = chess::Move::NULL_MOVE;
-		try {
-			std::string time_str = board.sideToMove() == chess::Color::WHITE ? tokens[2] : tokens[4];
-			int time = std::stoi(time_str);
-			std::string log_info = "";
-			gotten_move = bot.get_move(board, time, log_info);
-			log("chess log: " + log_info);
-		}
-		catch(std::runtime_error e)
+		int move_time = -1;
+		int time = -1;
+		int increment = -1;
+		for (int i = 1; i < tokens.size(); i++)
 		{
-			log("error. reading time strings. msg: " + std::string(e.what()));
-			gotten_move = bot.get_move(board);
+			if (i + 1 < tokens.size() && is_digit(tokens[i + 1]))
+			{
+				if (tokens[i] == "wtime" && board.sideToMove() == chess::Color::WHITE)
+				{
+					time = std::stoi(tokens[i + 1]);
+				}
+				else if (tokens[i] == "btime" && board.sideToMove() == chess::Color::BLACK)
+				{
+					time = std::stoi(tokens[i + 1]);
+				}
+				else if (tokens[i] == "winc" && board.sideToMove() == chess::Color::WHITE)
+				{
+					increment = std::stoi(tokens[i + 1]);
+				}
+				else if (tokens[i] == "binc" && board.sideToMove() == chess::Color::BLACK)
+				{
+					increment = std::stoi(tokens[i + 1]);
+				}
+				else if (tokens[i] == "movetime")
+				{
+					move_time = std::stoi(tokens[i + 1]);
+				}
+			}
 		}
+
+		int ms_given = move_time == -1 ? get_ms_to_make_move(time, increment) : move_time;
+		ms_given = std::max(ms_given, 1);
+
+		if (time == -1 && increment == -1 && ms_given == -1)
+		{
+			log("fall back to default 1000ms time");
+			ms_given = 1000;
+		}
+
+		log("time log: time:" + std::to_string(time) + " move_time:" + std::to_string(move_time) + " increment:" + std::to_string(increment) + " chosen_time:" + std::to_string(ms_given));
+
+		std::string log_output = "";
+		chess::Move gotten_move = bot.get_move(board, ms_given, log_output);
+		log("engine log: " + log_output);
+
 		std::string selected_move = chess::uci::moveToUci(gotten_move);
 		std::cout << "bestmove " << selected_move << "\n";
 		log("made move. fen: " + board.getFen() + " move: " + selected_move);

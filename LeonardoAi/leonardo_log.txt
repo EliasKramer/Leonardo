@@ -1060,3 +1060,81 @@ nodes visited: 129917
 
 05.12 13:47: made move. fen: B2q1rk1/b4pp1/p1pp1n2/4n2p/2P3bP/1PN1P1P1/P3NP2/R1BQ1RK1 b - - 0 13 move: e5f3
 05.12 13:47: Waiting for command
+05.12 14:31: Started Uci Loop
+05.12 14:31: Waiting for command
+05.12 16:06: Started Uci Loop
+05.12 16:06: Waiting for command
+05.12 16:06: Started Uci Loop
+05.12 16:06: Waiting for command
+05.12 16:07: Started Uci Loop
+05.12 16:07: Waiting for command
+05.12 16:07: Started Uci Loop
+05.12 16:07: Waiting for command
+05.12 16:07: Command received: go
+05.12 16:07: time log: time:-1 move_time:-1 increment:-1 chosen_time:-1
+05.12 16:07: engine log: 
+05.12 16:07: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: d2d4
+05.12 16:07: Waiting for command
+05.12 16:09: Started Uci Loop
+05.12 16:09: Waiting for command
+05.12 16:09: Command received: go wtime 60000 btime 60000
+05.12 16:09: time log: time:60000 move_time:-1 increment:-1 chosen_time:1
+05.12 16:09: engine log: 
+05.12 16:09: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+05.12 16:09: Waiting for command
+05.12 16:09: Started Uci Loop
+05.12 16:09: Waiting for command
+05.12 16:10: Command received: position startpos moves g1f3 d7d5 g2g3 g8f6 f1g2 c8g4 c2c4 e7e6 d1b3 b8c6 c4d5 f6d5 e1g1 a8b8 b1c3 f8e7
+05.12 16:10: set pos: 1r1qk2r/ppp1bppp/2n1p3/3n4/6b1/1QN2NP1/PP1PPPBP/R1B2RK1 w k - 4 9
+05.12 16:10: Waiting for command
+05.12 16:12: Command received: go wtime 123459 btime 101470 winc 1000 binc 1000
+05.12 16:12: time log: time:123459 move_time:-1 increment:1000 chosen_time:1
+05.12 16:12: engine log: depth reached: 5
+nodes visited: 157425
+
+05.12 16:12: made move. fen: 1r1qk2r/ppp1bppp/2n1p3/3n4/6b1/1QN2NP1/PP1PPPBP/R1B2RK1 w k - 4 9 move: e2e4
+05.12 16:12: Waiting for command
+05.12 16:13: Started Uci Loop
+05.12 16:13: Waiting for command
+05.12 16:13: Command received: 
+05.12 16:13: Error: empty command
+05.12 16:13: Waiting for command
+05.12 16:13: Command received: 
+05.12 16:13: Error: empty command
+05.12 16:13: Waiting for command
+05.12 16:13: Command received: 
+05.12 16:13: Error: empty command
+05.12 16:13: Waiting for command
+05.12 16:13: Command received: position startpos moves g1f3 d7d5 g2g3 g8f6 f1g2 c8g4 c2c4 e7e6 d1b3 b8c6 c4d5 f6d5 e1g1 a8b8 b1c3 f8e7
+05.12 16:13: set pos: 1r1qk2r/ppp1bppp/2n1p3/3n4/6b1/1QN2NP1/PP1PPPBP/R1B2RK1 w k - 4 9
+05.12 16:13: Waiting for command
+05.12 16:13: Command received: go wtime 123459 btime 101470 winc 1000 binc 1000
+05.12 16:13: time log: time:123459 move_time:-1 increment:1000 chosen_time:4086
+05.12 16:13: engine log: depth reached: 5
+nodes visited: 157425
+
+05.12 16:13: made move. fen: 1r1qk2r/ppp1bppp/2n1p3/3n4/6b1/1QN2NP1/PP1PPPBP/R1B2RK1 w k - 4 9 move: e2e4
+05.12 16:13: Waiting for command
+05.12 16:14: Command received: go wtime 1000 winc 1000
+05.12 16:14: time log: time:1000 move_time:-1 increment:1000 chosen_time:1200
+05.12 16:14: engine log: depth reached: 6
+nodes visited: 34848
+
+05.12 16:14: made move. fen: 1r1qk2r/ppp1bppp/2n1p3/3n4/6b1/1QN2NP1/PP1PPPBP/R1B2RK1 w k - 4 9 move: e2e4
+05.12 16:14: Waiting for command
+05.12 16:15: Command received: go movetime 1000
+05.12 16:15: time log: time:-1 move_time:1000 increment:-1 chosen_time:1000
+05.12 16:15: engine log: depth reached: 6 partial
+nodes visited: 27358
+
+05.12 16:15: made move. fen: 1r1qk2r/ppp1bppp/2n1p3/3n4/6b1/1QN2NP1/PP1PPPBP/R1B2RK1 w k - 4 9 move: e2e4
+05.12 16:15: Waiting for command
+05.12 16:15: Started Uci Loop
+05.12 16:15: Waiting for command
+05.12 16:15: Command received: go
+05.12 16:15: time log: time:-1 move_time:-1 increment:-1 chosen_time:1
+05.12 16:15: engine log: 
+05.12 16:15: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+05.12 16:15: Waiting for command
+05.12 16:15: Started Uci Loop
+05.12 16:15: Waiting for command
