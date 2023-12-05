@@ -31,6 +31,7 @@ public:
 	leonardo_overlord(std::string name);
 
 	void train_value_nnet();
+	void train_duration_nnet();
 
 	void test_value_nnet_single(std::string& game);
 	void test_value_nnet();
