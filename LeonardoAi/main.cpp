@@ -203,7 +203,7 @@ void uci()
 
 int main()
 {
-	leonardo_overlord ov("superv");
+	leonardo_overlord ov("pred_nnet");
 	ov.train_duration_nnet();
 	//uci();
 	//async_play();

@@ -278,7 +278,7 @@ void leonardo_overlord::train_duration_nnet()
 		return;
 	}
 
-	const int games_per_training = 100;
+	const int games_per_training = 1000;
 
 	matrix input(leonardo_util::get_input_format_one_hot());
 	matrix label(vector3(1, 1, 1));
