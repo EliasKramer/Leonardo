@@ -893,10 +893,10 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board, int ms_left, std
 			}
 		}
 	}
-	info = "depth reached: " + std::to_string(iterative_deepening_depth) + (partial ? " partial\n" : "\n") +
+	info = "l3 depth reached: " + std::to_string(iterative_deepening_depth) + (partial ? " partial\n" : "\n") +
 		"nodes visited: " + std::to_string(nodes_visited) + "\n";
 
-		transpositions_count = transpositions_last;
+	transpositions_count = transpositions_last;
 
 	if (best_move == chess::Move::NULL_MOVE)
 	{

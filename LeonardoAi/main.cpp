@@ -8,6 +8,7 @@
 #include "chess.hpp"
 #include "leonardo_value_bot.hpp"
 #include "leonardo_value_bot_1.hpp"
+#include "leonardo_value_bot_2.hpp"
 #include "leonardo_value_bot_3.hpp"
 #include "leonardo_overlord.hpp"
 #include "uci_handler.hpp"
@@ -164,8 +165,8 @@ void play_pawn()
 
 void play(int* scores, std::mutex& m)
 {
-	leonardo_value_bot_3 player1(1000, .5);
-	leonardo_value_bot_3 player2(1000, 0);
+	leonardo_value_bot_2 player1(1000, 1);
+	leonardo_value_bot_3 player2(1000, 1);
 
 	chess_game game(
 		&player1,
@@ -203,9 +204,9 @@ void uci()
 
 int main()
 {
-	leonardo_overlord ov("superv");
-	ov.train_duration_nnet();
+	//leonardo_overlord ov("superv");
+	//ov.train_duration_nnet();
 	//uci();
-	//async_play();
+	async_play();
 }
 //play_pawn();
