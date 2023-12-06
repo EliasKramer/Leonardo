@@ -259,7 +259,7 @@ void leonardo_overlord::train_duration_nnet()
 	std::vector <std::vector<float>> game_values;
 
 	neural_network duration_nnet;
-	duration_nnet.set_input_format(leonardo_util::get_input_format_one_hot());
+	duration_nnet.set_input_format(leonardo_util::get_input_format_duration_nnet());
 	duration_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	duration_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	duration_nnet.add_fully_connected_layer(64, leaky_relu_fn);
@@ -278,9 +278,9 @@ void leonardo_overlord::train_duration_nnet()
 		return;
 	}
 
-	const int games_per_training = 100;
+	const int games_per_training = 10;
 
-	matrix input(leonardo_util::get_input_format_one_hot());
+	matrix input(leonardo_util::get_input_format_duration_nnet());
 	matrix label(vector3(1, 1, 1));
 
 	std::vector<matrix> inputs;
@@ -323,7 +323,7 @@ void leonardo_overlord::train_duration_nnet()
 					//if (leonardo_util::use_position(board))
 					//{
 					used_positions++;
-					leonardo_util::set_matrix_from_chessboard_one_hot(board, input);
+					leonardo_util::set_matrix_from_chessboard_duration_nnet(board, input);
 					inputs.push_back(input);
 
 					label.set_at_flat_host(0, ((float)moves_uci.size() - (float)j) / 100);
@@ -349,7 +349,7 @@ void leonardo_overlord::train_duration_nnet()
 		if ((i + 1) % games_per_training == 0)
 		{
 			data_space ds(
-				leonardo_util::get_input_format_one_hot(),
+				leonardo_util::get_input_format_duration_nnet(),
 				vector3(1, 1, 1),
 				inputs,
 				labels);
