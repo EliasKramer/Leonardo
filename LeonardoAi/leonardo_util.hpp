@@ -13,6 +13,7 @@ namespace leonardo_util
 {
 	vector3 get_input_format();
 	vector3 get_input_format_one_hot();
+	vector3 get_input_format_duration_nnet();
 
 	vector3 get_policy_output_format();
 	vector3 get_value_nnet_output_format();
@@ -22,6 +23,7 @@ namespace leonardo_util
 
 	void set_matrix_from_chessboard_one_hot(const chess::Board& board, matrix& input, chess::Color col);
 	void set_matrix_from_chessboard_one_hot(const chess::Board& board, matrix& input);
+	void set_matrix_from_chessboard_duration_nnet(const chess::Board& board, matrix& input);
 
 	std::vector<std::string> split_string(const std::string& input, char separator);
 
@@ -69,4 +71,12 @@ namespace leonardo_util
 		nnet_table& table,
 		bool white_to_move
 	);
+
+	int get_ms_to_think(
+		neural_network& duration_nnet,
+		matrix& input,
+		chess::Board& board,
+		int time_to_move,
+		int time_remaining,
+		int time_increment);
 }

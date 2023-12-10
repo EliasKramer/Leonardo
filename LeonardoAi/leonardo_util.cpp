@@ -18,6 +18,11 @@ vector3 leonardo_util::get_input_format_one_hot()
 	return vector3(8, 8, 12);
 }
 
+vector3 leonardo_util::get_input_format_duration_nnet()
+{
+	return vector3(8, 8, 13);
+}
+
 vector3 leonardo_util::get_policy_output_format()
 {
 	//z0 is the start field of the move
@@ -74,7 +79,7 @@ void leonardo_util::set_matrix_from_chessboard(const chess::Board& board, matrix
 void leonardo_util::set_matrix_from_chessboard_one_hot(const chess::Board& board, matrix& m, chess::Color col)
 {
 	smart_assert(m.host_data_is_updated());
-	smart_assert(vector3::are_equal(m.get_format(), leonardo_util::get_input_format_one_hot()));
+	//smart_assert(vector3::are_equal(m.get_format(), leonardo_util::get_input_format_one_hot()));
 
 	//BitBoard all_pieces = board.getBoardRepresentation().AllPieces;
 
@@ -115,6 +120,17 @@ void leonardo_util::set_matrix_from_chessboard_one_hot(const chess::Board& board
 void leonardo_util::set_matrix_from_chessboard_one_hot(const chess::Board& board, matrix& input)
 {
 	set_matrix_from_chessboard_one_hot(board, input, board.sideToMove());
+}
+
+void leonardo_util::set_matrix_from_chessboard_duration_nnet(const chess::Board& board, matrix& input)
+{
+	set_matrix_from_chessboard_one_hot(board, input, board.sideToMove());
+	const vector3 b_turn_pos = vector3(0, 0, 12);
+	const vector3 w_turn_pos = vector3(1, 0, 12);
+	const vector3 moves_done_pos = vector3(0, 1, 12);
+
+	input.set_at_host(board.sideToMove() == chess::Color::BLACK ? b_turn_pos : w_turn_pos, 1);
+	input.set_at_host(moves_done_pos, ((float)board.plies_played_) / 100.0f);
 }
 
 
@@ -456,7 +472,7 @@ bool leonardo_util::use_position(chess::Board& board)
 			{
 				score += PIECE_EVAL[i];
 			}
-			if(i != 0)
+			if (i != 0)
 				non_pawn_count++;
 		}
 	}
@@ -729,7 +745,7 @@ int leonardo_util::get_board_val(
 	{
 		std::cout << "diff out";
 	}
-	
+
 	if (table_value != nnet_table::not_found && std::abs(output - table_value) > 3)
 	{
 		std::cout << leonardo_util::pawn_board_to_str(m) << "\n";
@@ -752,13 +768,43 @@ int leonardo_util::get_board_val(
 	//		std::cout << std::abs(output - table_value) << "\n";
 	}
 	*/
-	
+
 
 	//if (table_value == nnet_table::not_found)
-		table.insert(curr_white_bb, curr_black_bb, white_to_move, output);
+	table.insert(curr_white_bb, curr_black_bb, white_to_move, output);
 
 	prev_black_bb = curr_black_bb;
 	prev_white_bb = curr_white_bb;
 
 	return output;
+}
+
+int leonardo_util::get_ms_to_think(
+	neural_network& duration_nnet,
+	matrix& input,
+	chess::Board& board,
+	int time_to_move,
+	int time_remaining,
+	int time_increment)
+{
+	if (time_to_move != -1)
+		return time_to_move;
+
+	time_increment = time_increment == -1 ? 0 : time_increment;
+
+	time_remaining = std::max(20, time_remaining);
+
+	int total_time_remaining = time_remaining + time_increment;
+	if (total_time_remaining < 1000 || board.plies_played_ < 10)
+		return (time_remaining / 20) + time_increment;
+
+	set_matrix_from_chessboard_duration_nnet(board, input);
+	duration_nnet.forward_propagation(input);
+	int remaining_moves = std::round(duration_nnet.get_output().get_at_flat_host(0) * 100.0f);
+
+	remaining_moves = std::clamp(remaining_moves, 5, 80);
+
+	int ms_to_think = (total_time_remaining / remaining_moves) + time_increment;
+
+	return std::clamp(ms_to_think, 1, 25000);
 }

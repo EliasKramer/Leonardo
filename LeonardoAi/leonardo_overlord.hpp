@@ -32,6 +32,7 @@ public:
 
 	void train_value_nnet();
 	void train_duration_nnet();
+	void test_duration_nnet();
 
 	void test_value_nnet_single(std::string& game);
 	void test_value_nnet();
