@@ -80,9 +80,9 @@ bool leonardo_value_bot_2::search_cancelled()
 }
 
 //PAWN, KNIGHT, BISHOP, ROOK, QUEEN
-const int PIECE_EVAL[5] = { 100.0f, 320.0f, 330.0f, 500.0f, 900.0f };
+const int PIECE_EVAL[5] = { 100, 320, 330, 500, 900 };
 //helps determin if a position is equal if you only count piece values and skip pawns
-const int PIECE_VALUE_EQL_POSITIONS[5] = { 100, 300.0f, 300.0f, 500.0f, 900.0f };
+const int PIECE_VALUE_EQL_POSITIONS[5] = { 100, 300, 300, 500, 900 };
 
 const int POSITION_VALUE[2][5][64]
 {
@@ -509,6 +509,12 @@ int leonardo_value_bot_2::quiescene(chess::Board& board, int alpha, int beta)
 
 	for (chess::Move& move : moves)
 	{
+		//dont consider queen takes pawn 
+		//should consider bishop takes knight as possible capture
+		if (move.score() < -10)
+			continue;
+		std::cout << move.score() << std::endl;
+
 		board.makeMove(move);
 		score = -quiescene(board, -beta, -alpha);
 		board.unmakeMove(move);
@@ -531,8 +537,8 @@ int leonardo_value_bot_2::recursive_eval(
 	int ply_remaining,
 	int ply_from_root,
 	chess::Board& board,
-	int alpha,
-	int beta,
+	int alpha, // alpha is the best value that the maximizing player can guarantee at that level or above.
+	int beta, // beta is the best value that the minimizing player can guarantee at that level or above.
 	chess::Move& best_move)
 {
 	if (search_cancelled())
@@ -577,35 +583,45 @@ int leonardo_value_bot_2::recursive_eval(
 		return quiescene(board, alpha, beta);
 	}
 
-	if (!is_pv && ply_remaining >= 3 && !board.inCheck()) // nmp - null move pruning
+	if (!is_pv && ply_from_root > 1 && ply_remaining >= 3 && !board.inCheck()) // nmp - null move pruning
 	{
 		board.makeNullMove();
 
-		//int score = -eval(board, moves, ply_remaining, false);
-		//chess::Movelist moves;
-		//chess::movegen::legalmoves(moves, board);
-
-		int score = INT_MIN;
-
-		score = -eval(board, moves, ply_remaining, false);
-		//if(moves.size() != 0)
-			//score = -recursive_eval(false, ply_remaining - 3 - (ply_remaining / 3), ply_from_root + 1, board, -beta, -beta + 1, best_move);
+		//the score represents the value of the position after the null move
+		int score = -recursive_eval(false, ply_remaining - 3 - (ply_remaining / 3), ply_from_root + 1, board, -beta, -alpha, best_move);
 
 		board.unmakeNullMove();
 
+		//if we get a score that causes a cutoff even after skipping a move
+		//we can assume that our advantage is so high, that we can just return that score
 		if (score >= beta)
 		{
-			std::cout << board;
 			nmp_pruned++;
 			return beta;
 		}
 	}
 
-	sort_move_list(moves, board);
+	sort_move_list(moves, board, ply_from_root);
 	chess::Move& best_current_move = moves[0];
 	chess::Move pv = tt_get_move(board.hash());
 	for (chess::Move move : moves)
 	{
+		throw std::exception("SEE is bs in this form");
+		if (board.isCapture(move))
+		{
+			chess::PieceType from_piece_type = board.at<chess::PieceType>(move.from());
+			chess::PieceType to_piece_type = board.at<chess::PieceType>(move.to());
+
+			int see_threshold = -10;
+			see_threshold -= (10 * (ply_remaining));
+			if ((PIECE_EVAL[(int)to_piece_type] - PIECE_EVAL[(int)from_piece_type]) < see_threshold)
+			{
+				std::cout << board << "\nsee pruned " << chess::uci::moveToUci(move) << "\n";
+				std::cout << "______________________\n";
+				continue;
+			}
+		}
+
 		board.makeMove(move);
 		int score = -recursive_eval(move == pv, ply_remaining - 1, ply_from_root + 1, board, -beta, -alpha, best_move);
 		board.unmakeMove(move);
@@ -613,6 +629,8 @@ int leonardo_value_bot_2::recursive_eval(
 		if (search_cancelled())
 			return 0;
 
+		//the opponent will not allow us to get a score higher than their best score
+		//if we have a score higher than their alpha, we can return that score
 		if (score >= beta)
 		{
 			//store lower bound
@@ -620,41 +638,32 @@ int leonardo_value_bot_2::recursive_eval(
 			record_tt(board.hash(), ply_remaining, beta, TT_ITEM_TYPE::lower_bound, move); // BEST LOCAL MOVE
 			pruned++;
 
-			if (ply_from_root == 0)
+			if (!board.isCapture(move))
 			{
-				//will never occur? right?
-				std::cout << "beta cutoff at 0: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
+				if (ply_from_root < max_killer_ply)
+				{
+					killer_moves[ply_from_root].add(move);
+				}
+				int historyScore = ply_remaining * ply_remaining;
+				//some people say this makes random noise when deep search depths are reached. luckily we are not doing that
+				history[(int)board.sideToMove()][move.from()][move.to()] += historyScore;
 			}
 
 			return beta;
 		}
 		if (score > alpha)
 		{
-			//tt exact?
-			//set best move
 			alpha = score;
 			tt_flag = TT_ITEM_TYPE::exact;
 			if (ply_from_root == 0)
 			{
 				best_move = move;
-				//std::cout << "best move atm: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
 				searched_at_least_one_move = true;
 			}
 			best_current_move = move;
 		}
-		else
-		{
-			if (ply_from_root == 0)
-			{
-				//std::cout << "move_score: " << chess::uci::moveToUci(move) << " " << score << "\n";
-			}
-		}
 	}
 
-	if (ply_from_root == 0)
-	{
-		//std::cout << "best current move: " << chess::uci::moveToUci(best_current_move) << "\n";
-	}
 	record_tt(board.hash(), ply_remaining, alpha, tt_flag, best_current_move); //best local move TODOODODODODOODODO
 
 	return alpha;
@@ -753,8 +762,8 @@ leonardo_value_bot_2::leonardo_value_bot_2(int ms_per_move, float nnet_mult)
 	const size_t tt_size = tt_desired_size * 1024 * 1024 / tt_item_size;
 	tt.resize(10048583);// tt_size + 123);
 }
-static int last_iterative_printed = -1;
-void leonardo_value_bot_2::sort_move_list(chess::Movelist& moves, chess::Board& board)
+
+void leonardo_value_bot_2::sort_move_list(chess::Movelist& moves, chess::Board& board, int ply_from_root)
 {
 	chess::Move tt_move = tt_get_move(board.hash());
 
@@ -764,26 +773,36 @@ void leonardo_value_bot_2::sort_move_list(chess::Movelist& moves, chess::Board& 
 		{
 			move.setScore(1000000);
 		}
+		else if (move.typeOf() == chess::Move::PROMOTION)
+		{
+			move.setScore(PIECE_EVAL[(int)move.promotionType()] * 10);
+		}
 		else if (board.isCapture(move))
 		{
 			chess::PieceType from_piece_type = board.at<chess::PieceType>(move.from());
 			chess::PieceType to_piece_type = board.at<chess::PieceType>(move.to());
 
-			move.setScore((PIECE_EVAL[(int)to_piece_type] - PIECE_EVAL[(int)from_piece_type]) * 2);
-		}
-		else if (move.typeOf() == chess::Move::PROMOTION)
-		{
-			move.setScore(PIECE_EVAL[(int)move.promotionType()] * 10);
+			//some bias that is added if the opponent does not attack this current square 
+			int no_recapture_bias = !board.isAttacked(move.to(), ~board.sideToMove()) ? 5 : 0;
+			move.setScore(((PIECE_EVAL[(int)to_piece_type] - PIECE_EVAL[(int)from_piece_type]) * 2) + no_recapture_bias);
 		}
 		else
 		{
+			int score = 0;
 			if (board.isAttacked(move.to(), ~board.sideToMove()))
 			{
 				//discourages every move, that wants to move to a field, that is attacked
-				//except when it is a pawn, then it gets a small little buff
 				chess::PieceType from_piece_type = board.at<chess::PieceType>(move.from());
-				move.setScore(-PIECE_EVAL[(int)from_piece_type]);
+				score += -PIECE_EVAL[(int)from_piece_type / 2];
 			}
+
+			//if a move caused a cutoff previously, it is likely to be a good move now
+			bool is_killer = ply_from_root < max_killer_ply && killer_moves[ply_from_root].match(move);
+			score += is_killer ? 2000 : 0;
+
+			score += history[(int)board.sideToMove()][move.from()][move.to()];
+
+			move.setScore(score);
 		}
 	}
 
@@ -841,6 +860,23 @@ chess::Move leonardo_value_bot_2::get_move(chess::Board& board, int ms_left, std
 
 	print_count = 0;
 	transpositions_count = 0;
+
+	//maybe reallocate this on the heap
+	//could be faster
+	for (int c = 0; c < 2; c++)
+	{
+		for (int i = 0; i < 64; i++)
+		{
+			for (int j = 0; j < 64; j++)
+			{
+				history[c][i][j] = 0;
+			}
+		}
+	}
+	for (int i = 0; i < max_killer_ply; i++)
+	{
+		killer_moves[i].reset();
+	}
 
 	bool maximizing = board.sideToMove() == chess::Color::WHITE;
 
@@ -926,6 +962,9 @@ chess::Move leonardo_value_bot_2::get_move(chess::Board& board, int ms_left, std
 		score *= -1;
 
 	std::cout << "nmp: " << nmp_pruned << "\n";
+	std::cout << "nodes: " << nodes_visited << "\n";
+	std::cout << info;
+	std::cout << "--------------------\n";
 
 	/*
 	std::cout << board;

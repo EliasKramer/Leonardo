@@ -204,10 +204,11 @@ void uci()
 
 int main()
 {
+	async_play();
 	//leonardo_overlord ov("pred_nnet");
 	//ov.train_duration_nnet();
 	//ov.test_duration_nnet();
-	uci();
+	//uci();
 	//async_play();
 }
 //play_pawn();

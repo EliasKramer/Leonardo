@@ -509,7 +509,6 @@ int leonardo_value_bot_3::quiescene(chess::Board& board, int alpha, int beta)
 
 	for (chess::Move& move : moves)
 	{
-
 		board.makeMove(move);
 		score = -quiescene(board, -beta, -alpha);
 		board.unmakeMove(move);
