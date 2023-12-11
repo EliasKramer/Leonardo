@@ -581,19 +581,13 @@ int leonardo_value_bot_2::recursive_eval(
 	{
 		board.makeNullMove();
 
-		//int score = -eval(board, moves, ply_remaining, false);
-		//chess::Movelist moves;
-		//chess::movegen::legalmoves(moves, board);
-
-		int score = INT_MIN;
-
-		score = -eval(board, moves, ply_remaining, false);
-		//if(moves.size() != 0)
-			//score = -recursive_eval(false, ply_remaining - 3 - (ply_remaining / 3), ply_from_root + 1, board, -beta, -beta + 1, best_move);
+		int score = -recursive_eval(false, ply_remaining - 3 - (ply_remaining / 3), ply_from_root + 1, board, -beta, -beta + 1, best_move);
 
 		board.unmakeNullMove();
 
-		if (score >= beta)
+		//if we skip a move and our opponent can't beat our score, then we can skip the move
+		//beta is the best score we can achieve, so if our opponent can't beat it, then we can skip the move
+		if (score >= beta) 
 		{
 			std::cout << board;
 			nmp_pruned++;
@@ -613,18 +607,14 @@ int leonardo_value_bot_2::recursive_eval(
 		if (search_cancelled())
 			return 0;
 
-		if (score >= beta)
+
+		//current score is better than our opponent can achieve. our opponent will not pick this path
+		if (score >= beta) 
 		{
 			//store lower bound
 			//maye killer move
 			record_tt(board.hash(), ply_remaining, beta, TT_ITEM_TYPE::lower_bound, move); // BEST LOCAL MOVE
 			pruned++;
-
-			if (ply_from_root == 0)
-			{
-				//will never occur? right?
-				std::cout << "beta cutoff at 0: " << chess::uci::moveToUci(best_move) << " " << score << "\n";
-			}
 
 			return beta;
 		}
