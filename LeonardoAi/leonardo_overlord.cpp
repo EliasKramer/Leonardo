@@ -260,14 +260,14 @@ void leonardo_overlord::train_duration_nnet()
 
 	neural_network duration_nnet;
 	duration_nnet.set_input_format(leonardo_util::get_input_format_duration_nnet());
+	//duration_nnet.add_fully_connected_layer(1024, leaky_relu_fn);
+	//duration_nnet.add_fully_connected_layer(64, leaky_relu_fn);
 	duration_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	duration_nnet.add_fully_connected_layer(128, leaky_relu_fn);
 	duration_nnet.add_fully_connected_layer(64, leaky_relu_fn);
-	duration_nnet.add_fully_connected_layer(32, leaky_relu_fn);
-	duration_nnet.add_fully_connected_layer(32, leaky_relu_fn);
-	duration_nnet.add_fully_connected_layer(16, leaky_relu_fn);
-	duration_nnet.add_fully_connected_layer(16, leaky_relu_fn);
+	//duration_nnet.add_fully_connected_layer(512, leaky_relu_fn);
 	duration_nnet.add_fully_connected_layer(1, identity_fn);
+	duration_nnet.xavier_initialization();
 
 	convert_dataset(lines, game_moves, game_values);
 	lines.clear();
@@ -278,7 +278,7 @@ void leonardo_overlord::train_duration_nnet()
 		return;
 	}
 
-	const int games_per_training = 10;
+	const int games_per_training = 1000;
 
 	matrix input(leonardo_util::get_input_format_duration_nnet());
 	matrix label(vector3(1, 1, 1));
@@ -298,7 +298,142 @@ void leonardo_overlord::train_duration_nnet()
 		}
 	}
 
-	std::wcout << "longest_game: " << longest_game << "\n";
+	std::cout << "longest_game: " << longest_game << "\n";
+
+	for (int i = 0; i < game_moves.size(); i++)
+	{
+		std::vector<std::string>& moves_uci = game_moves[i];
+
+		chess::Board board = chess::Board(DEFAULT_FEN);
+
+		for (int j = 0; j < moves_uci.size(); j++) //iterate over given string vector of moves
+		{
+			std::string uci_move = moves_uci[j];
+
+			chess::Movelist moves;
+			chess::movegen::legalmoves(moves, board);
+			bool move_found = false;
+			for (int m = 0; m < moves.size(); m++) //iterate over chess moves
+			{
+				chess::Move move = moves[m];
+				if (uci_move == chess::uci::moveToUci(move))
+				{
+					board.makeMove(move);
+					positions++;
+
+					int moves_remaining_count = moves_uci.size() - j;
+
+					if (j > 10 && moves_remaining_count < 100)
+					{
+						used_positions++;
+						leonardo_util::set_matrix_from_chessboard_duration_nnet(board, input);
+						inputs.push_back(input);
+
+						label.set_at_flat_host(0, ((float)moves_remaining_count) / 100.0f);
+						//std::cout << label.get_at_flat_host(0) << "\n";
+						labels.push_back(label);
+					}
+					move_found = true;
+					break;
+				}
+			}
+			if (!move_found)
+			{
+				std::cout << "error in dataset line " << i << " move not found\n";
+			}
+		}
+
+		if (inputs.size() == 0 || labels.size() == 0)
+		{
+			std::cout << "error in dataset line " << i << " no data\n";
+			continue;
+		}
+
+		if ((i + 1) % games_per_training == 0)
+		{
+			data_space ds(
+				leonardo_util::get_input_format_duration_nnet(),
+				vector3(1, 1, 1),
+				inputs,
+				labels);
+
+			std::cout << "testing\n";
+			test_result res = duration_nnet.test_on_ds(ds);
+			std::cout << res.to_string() << "\n";
+			std::cout << "learning \n";
+			duration_nnet.learn_on_ds(ds, 1, 128, 0.0001f, false);
+
+			inputs.clear();
+			labels.clear();
+
+			if (!std::filesystem::exists("models"))
+			{
+				std::filesystem::create_directory("models");
+			}
+			std::string folder_name = "models/duration_" + name + "_epoch_" + std::to_string(i);
+			if (!std::filesystem::exists(folder_name))
+			{
+				std::filesystem::create_directory(folder_name);
+			}
+			std::string path = folder_name + "/duration.parameters";
+			duration_nnet.save_to_file(path);
+
+
+			auto stop = std::chrono::high_resolution_clock::now();
+			long duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
+			long remaining_ms = remaining_time(duration_ms, i, game_moves.size());
+
+			std::cout << (i + 1) << "/" << game_moves.size() << " games  " << ((((float)i + 1) / (float)game_moves.size()) * 100.0f) << "%\n";
+			std::cout << "positions: " << positions << " used: " << used_positions << " (" << ((float)used_positions / (std::max(1.0f, (float)positions))) * 100 << "%)\n";
+			std::cout << "elapsed: " << ms_to_str(duration_ms) << " remaining: " << ms_to_str(remaining_ms) << "\n";
+			std::cout << "---------------\n";
+		}
+	}
+
+	return;
+}
+
+void leonardo_overlord::test_duration_nnet()
+{
+	std::cout << "read data\n";
+	std::vector<std::string> lines = read_file_lines("dataset.txt");
+	std::cout << "finished reading data\n";
+	std::vector <std::vector<std::string>> game_moves;
+	std::vector <std::vector<float>> game_values;
+
+	neural_network duration_nnet("duration.parameters");
+	std::cout << duration_nnet.parameter_analysis();
+
+	convert_dataset(lines, game_moves, game_values);
+	lines.clear();
+
+	if (game_moves.size() != game_values.size())
+	{
+		std::cout << "error in dataset\n";
+		return;
+	}
+
+	const int games_per_test = 10;
+
+	matrix input(leonardo_util::get_input_format_duration_nnet());
+	matrix label(vector3(1, 1, 1));
+
+	std::vector<matrix> inputs;
+	std::vector<matrix> labels;
+	auto start = std::chrono::high_resolution_clock::now();
+	long positions = 0;
+	long used_positions = 0;
+
+	int longest_game = 0;
+	for (int i = 0; i < game_moves.size(); i++)
+	{
+		if (game_moves[i].size() > longest_game)
+		{
+			longest_game = game_moves[i].size();
+		}
+	}
+
+	std::cout << "longest_game: " << longest_game << "\n";
 
 	for (int i = 0; i < game_moves.size(); i++)
 	{
@@ -346,44 +481,20 @@ void leonardo_overlord::train_duration_nnet()
 			continue;
 		}
 
-		if ((i + 1) % games_per_training == 0)
+		if ((i + 1) % games_per_test == 0)
 		{
-			data_space ds(
-				leonardo_util::get_input_format_duration_nnet(),
-				vector3(1, 1, 1),
-				inputs,
-				labels);
-
-			std::cout << "testing\n";
-			test_result res = duration_nnet.test_on_ds(ds);
-			std::cout << res.to_string() << "\n";
-			std::cout << "learning \n";
-			duration_nnet.learn_on_ds(ds, 1, 128, 0.0001f, false);
-
-			inputs.clear();
-			labels.clear();
-
-			if (!std::filesystem::exists("models"))
+			for (int i = 0; i < inputs.size(); i++)
 			{
-				std::filesystem::create_directory("models");
+				duration_nnet.forward_propagation(inputs[i]);
+				float nnet_val = duration_nnet.get_output_readonly().get_at_flat_host(0);
+				nnet_val *= 100;
+
+				nnet_val = std::round(nnet_val);
+
+				int actual = (int)(labels[i].get_at_flat_host(0) * 100);
+
+				std::cout << "nnet: " << nnet_val << " \tactual: " << actual << "\n";
 			}
-			std::string folder_name = "models/duration_" + name + "_epoch_" + std::to_string(i);
-			if (!std::filesystem::exists(folder_name))
-			{
-				std::filesystem::create_directory(folder_name);
-			}
-			std::string path = folder_name + "/duration.parameters";
-			best_policy_nnet.save_to_file(path);
-
-
-			auto stop = std::chrono::high_resolution_clock::now();
-			long duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
-			long remaining_ms = remaining_time(duration_ms, i, game_moves.size());
-
-			std::cout << (i + 1) << "/" << game_moves.size() << " games  " << ((((float)i + 1) / (float)game_moves.size()) * 100.0f) << "%\n";
-			std::cout << "positions: " << positions << " used: " << used_positions << " (" << ((float)used_positions / (std::max(1.0f, (float)positions))) * 100 << "%)\n";
-			std::cout << "elapsed: " << ms_to_str(duration_ms) << " remaining: " << ms_to_str(remaining_ms) << "\n";
-			std::cout << "---------------\n";
 		}
 	}
 

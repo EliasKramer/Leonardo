@@ -778,3 +778,33 @@ int leonardo_util::get_board_val(
 
 	return output;
 }
+
+int leonardo_util::get_ms_to_think(
+	neural_network& duration_nnet,
+	matrix& input,
+	chess::Board& board,
+	int time_to_move,
+	int time_remaining,
+	int time_increment)
+{
+	if (time_to_move != -1)
+		return time_to_move;
+
+	time_increment = time_increment == -1 ? 0 : time_increment;
+
+	time_remaining = std::max(20, time_remaining);
+
+	int total_time_remaining = time_remaining + time_increment;
+	if (total_time_remaining < 1000 || board.plies_played_ < 10)
+		return (time_remaining / 20) + time_increment;
+
+	set_matrix_from_chessboard_duration_nnet(board, input);
+	duration_nnet.forward_propagation(input);
+	int remaining_moves = std::round(duration_nnet.get_output().get_at_flat_host(0) * 100.0f);
+
+	remaining_moves = std::clamp(remaining_moves, 5, 80);
+
+	int ms_to_think = (total_time_remaining / remaining_moves) + time_increment;
+
+	return std::clamp(ms_to_think, 1, 25000);
+}

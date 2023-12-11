@@ -71,4 +71,12 @@ namespace leonardo_util
 		nnet_table& table,
 		bool white_to_move
 	);
+
+	int get_ms_to_think(
+		neural_network& duration_nnet,
+		matrix& input,
+		chess::Board& board,
+		int time_to_move,
+		int time_remaining,
+		int time_increment);
 }

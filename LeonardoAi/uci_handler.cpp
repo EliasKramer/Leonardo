@@ -25,7 +25,9 @@ std::vector<std::string> split(std::string str, std::string token = " ")
 
 uci_handler::uci_handler()
 	:bot(3000, 1),//1.5),
-	board(DEFAULT_FEN)
+	board(DEFAULT_FEN),
+	duration_nnet("duration.parameters"),
+	duration_nnet_input(leonardo_util::get_input_format_duration_nnet())
 {}
 
 void uci_handler::log(const char* msg)
@@ -242,18 +244,19 @@ void uci_handler::receive_command(std::string& message)
 			}
 		}
 
-		int ms_given = move_time == -1 ? get_ms_to_make_move(time, increment) : move_time;
-		ms_given = std::max(ms_given, 1);
-
-		if (time == -1 && increment == -1 && ms_given == -1)
-		{
-			log("fall back to default 1000ms time");
-			ms_given = 1000;
-		}
-
-		log("time log: time:" + std::to_string(time) + " move_time:" + std::to_string(move_time) + " increment:" + std::to_string(increment) + " chosen_time:" + std::to_string(ms_given));
 
 		std::string log_output = "";
+		int ms_given = leonardo_util::get_ms_to_think(
+			duration_nnet,
+			duration_nnet_input,
+			board,
+			move_time,
+			time,
+			increment
+		);
+
+		log("time log: time:" + std::to_string(time) + " move_time:" + std::to_string(move_time) + " increment:" + std::to_string(increment) + " chosen_time:" + std::to_string(ms_given));
+		
 		chess::Move gotten_move = bot.get_move(board, ms_given, log_output);
 		log("engine log: " + log_output);
 
@@ -282,7 +285,6 @@ void uci_handler::uci_loop()
 	std::string command;
 	do
 	{
-		log("Waiting for command");
 		std::getline(std::cin, command);
 		log("Command received: " + command);
 		receive_command(command);

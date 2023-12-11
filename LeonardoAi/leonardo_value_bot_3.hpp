@@ -7,33 +7,33 @@
 #include "nnet_table.hpp"
 //Credit to https://web.archive.org/web/20071031100051/http://www.brucemo.com/compchess/programming/hashing.htm
 
+typedef enum _TT_ITEM_TYPE : uint8_t
+{
+	empty = 0,
+	exact = 1,
+	upper_bound = 2,
+	lower_bound = 3
+} TT_ITEM_TYPE;
+
+class tt_item
+{
+public:
+	static const int hashf_exact = 0;
+	static const int hashf_alpha = 1;
+	static const int hashf_beta = 2;
+
+	static const int unknown_eval = -987654321;
+	static const unsigned long long empty_key = 0xBEEF;
+
+	unsigned long long key = empty_key;
+	uint8_t depth = 0;
+	TT_ITEM_TYPE flags = TT_ITEM_TYPE::empty;
+	int value = unknown_eval;
+	chess::Move best_move;
+};
 
 class leonardo_value_bot_3 : public chess_player
 {
-	typedef enum _TT_ITEM_TYPE : uint8_t
-	{
-		empty = 0,
-		exact = 1,
-		upper_bound = 2,
-		lower_bound = 3
-	} TT_ITEM_TYPE;
-
-	class tt_item
-	{
-	public:
-		static const int hashf_exact = 0;
-		static const int hashf_alpha = 1;
-		static const int hashf_beta = 2;
-
-		static const int unknown_eval = -987654321;
-		static const unsigned long long empty_key = 0xBEEF;
-
-		unsigned long long key = empty_key;
-		uint8_t depth = 0;
-		TT_ITEM_TYPE flags = TT_ITEM_TYPE::empty;
-		int value = unknown_eval;
-		chess::Move best_move;
-	};
 private:
 	bool we_are_white = true;
 	int pruned = 0;
@@ -48,8 +48,6 @@ private:
 	bool searched_at_least_one_move = false;
 	int iterative_deepening_depth = 1;
 	std::chrono::steady_clock::time_point start_time;
-
-	//int nnet_mult = 1;
 
 	nnet_table pawn_nnet_table;
 	chess::Bitboard pawn_w_bb;
@@ -74,7 +72,7 @@ private:
 	int eval(chess::Board& board, chess::Movelist& moves, int depth, bool only_caputes_in_moves);
 
 	bool stored_move_is_draw(chess::Board& board, int ply_from_root);
-
+	
 	void order_moves_quiescene(chess::Movelist& moves, chess::Board& board);
 	int quiescene(chess::Board& board, int alpha, int beta);
 

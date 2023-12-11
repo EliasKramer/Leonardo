@@ -6,6 +6,7 @@
 #include "stockfish_interface.hpp"
 #include "nnet_table.hpp"
 //Credit to https://web.archive.org/web/20071031100051/http://www.brucemo.com/compchess/programming/hashing.htm
+constexpr int max_killer_ply = 32;
 
 class leonardo_value_bot_2 : public chess_player
 {
@@ -33,6 +34,41 @@ class leonardo_value_bot_2 : public chess_player
 		int value = unknown_eval;
 		chess::Move best_move;
 	};
+
+	class killer_move
+	{
+	public:
+		chess::Move moveA;
+		chess::Move moveB;
+
+		killer_move() :
+			moveA(chess::Move::NULL_MOVE),
+			moveB(chess::Move::NULL_MOVE)
+		{}
+		killer_move(chess::Move moveA, chess::Move moveB) : moveA(moveA), moveB(moveB) {}
+
+		bool match(const chess::Move& other) const
+		{
+			return  moveA == other ||
+				moveB == other;
+		}
+
+		void add(chess::Move& move)
+		{
+			if (move != moveA)
+			{
+				moveB = moveA;
+				moveA = move;
+			}
+		}
+
+		void reset()
+		{
+			moveA = chess::Move::NULL_MOVE;
+			moveB = chess::Move::NULL_MOVE;
+		}
+	};
+
 private:
 	bool we_are_white = true;
 	int pruned = 0;
@@ -48,7 +84,9 @@ private:
 	int iterative_deepening_depth = 1;
 	std::chrono::steady_clock::time_point start_time;
 	int nmp_pruned = 0;
+	killer_move killer_moves[max_killer_ply];
 	//int nnet_mult = 1;
+	int history[2][64][64] = { 0 };
 
 	nnet_table pawn_nnet_table;
 	chess::Bitboard pawn_w_bb;
@@ -88,7 +126,8 @@ private:
 
 	int get_opening_move(size_t hash);
 
-	void sort_move_list(chess::Movelist& moves, chess::Board& board);
+	bool static_exchange_evaluation(chess::Board& board, chess::Move& move, int threshold);
+	void sort_move_list(chess::Movelist& moves, chess::Board& board, int ply_from_root);
 
 	void setup_nnet_for_move(const chess::Board& board);
 public:

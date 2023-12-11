@@ -165,8 +165,8 @@ void play_pawn()
 
 void play(int* scores, std::mutex& m)
 {
-	leonardo_value_bot_2 player1(1000, 1);
-	leonardo_value_bot_3 player2(1000, 1);
+	leonardo_value_bot_2 player1(100, 1);
+	leonardo_value_bot_3 player2(100, 1);
 
 	chess_game game(
 		&player1,
@@ -204,9 +204,12 @@ void uci()
 
 int main()
 {
-	//leonardo_overlord ov("superv");
-	//ov.train_duration_nnet();
-	//uci();
+	//test_see();
 	async_play();
+	//leonardo_overlord ov("pred_nnet");
+	//ov.train_duration_nnet();
+	//ov.test_duration_nnet();
+	//uci();
+	//async_play();
 }
 //play_pawn();
