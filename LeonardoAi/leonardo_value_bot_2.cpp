@@ -609,23 +609,13 @@ int leonardo_value_bot_2::recursive_eval(
 	chess::Move pv = tt_get_move(board.hash());
 	for (chess::Move move : moves)
 	{
-		/*
-		throw std::exception("SEE is bs in this form"); // not even see
-		if (board.isCapture(move))
+		throw std::exception("not implemented");
+		if (move != pv &&
+			board.isCapture(move) && 
+			!static_exchange_evaluation(board, move, -20 * ply_remaining))
 		{
-			chess::PieceType from_piece_type = board.at<chess::PieceType>(move.from());
-			chess::PieceType to_piece_type = board.at<chess::PieceType>(move.to());
-
-			int see_threshold = -10;
-			see_threshold -= (10 * (ply_remaining));
-			if ((PIECE_EVAL[(int)to_piece_type] - PIECE_EVAL[(int)from_piece_type]) < see_threshold)
-			{
-				std::cout << board << "\nsee pruned " << chess::uci::moveToUci(move) << "\n";
-				std::cout << "______________________\n";
-				continue;
-			}
+			continue;
 		}
-		*/
 
 		board.makeMove(move);
 		int score = -recursive_eval(move == pv, ply_remaining - 1, ply_from_root + 1, board, -beta, -alpha, best_move);
@@ -805,7 +795,7 @@ static uint64_t allAttackersToSquare(chess::Board& board,uint64_t occupied, ches
 /* cedits to
 https://github.com/AndyGrant/Ethereal/blob/master/src/search.c#L916
 */
-int static_exchange_evaluation(chess::Board& board, chess::Move& move, int threshold) 
+bool leonardo_value_bot_2::static_exchange_evaluation(chess::Board& board, chess::Move& move, int threshold) 
 {
 	uint64_t bishops, rooks, occupied, attackers, myAttackers;
 
@@ -824,14 +814,14 @@ int static_exchange_evaluation(chess::Board& board, chess::Move& move, int thres
 	int balance = estimate_capture_move_value(board, move) - threshold;
 
 	// Best case still fails to beat the threshold
-	if (balance < 0) return 0;
+	if (balance < 0) return false;
 
 	// Worst case is losing the moved piece
 	balance -= SEE_PIECE_EVAL[nextVictim];
 
 	// If the balance is positive even if losing the moved piece,
 	// the exchange is guaranteed to beat the threshold.
-	if (balance >= 0) return 1;
+	if (balance >= 0) return true;
 
 	// Grab sliders for updating revealed attackers
 	bishops = board.pieces(chess::PieceType::BISHOP) | board.pieces(chess::PieceType::QUEEN);
@@ -897,57 +887,6 @@ int static_exchange_evaluation(chess::Board& board, chess::Move& move, int thres
 	// Side to move after the loop loses
 	return board.sideToMove() != color;
 }
-
-
-
-
-
-
-
-
-
-
-static int see_recursive(chess::Board& board, chess::Square sq)
-{
-	const int PIECE_EVAL[5] = { 100, 320, 330, 500, 900 };
-
-	if (!board.isAttacked(sq, board.sideToMove()))
-		return 0;
-
-	chess::Movelist moves;
-	chess::movegen::legalmoves<chess::MoveGenType::CAPTURE>(moves, board);
-
-	chess::Move recapture_move = chess::Move::NULL_MOVE;
-	int recapturer_value = 10000000;
-	for (chess::Move& move : moves)
-	{
-		if (move.to() == sq)
-		{
-			chess::PieceType from_piece_type = board.at<chess::PieceType>(move.from());
-			int current_recapturer_value = PIECE_EVAL[(int)from_piece_type];
-
-			if (current_recapturer_value < recapturer_value)
-			{
-				recapturer_value = current_recapturer_value;
-				recapture_move = move;
-			}
-		}
-	}
-
-	if (recapture_move == chess::Move::NULL_MOVE)
-		return 0;
-
-	chess::PieceType captured_piece_type = board.at<chess::PieceType>(recapture_move.to());
-
-	board.makeMove(recapture_move);
-	const int threshold = 0;
-	int score = std::max(threshold, PIECE_EVAL[(int)captured_piece_type] - see_recursive(board, sq));
-	board.unmakeMove(recapture_move);
-
-	return score;
-}
-
-
 
 void leonardo_value_bot_2::sort_move_list(chess::Movelist& moves, chess::Board& board, int ply_from_root)
 {
