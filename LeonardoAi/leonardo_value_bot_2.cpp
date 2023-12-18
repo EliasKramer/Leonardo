@@ -24,9 +24,7 @@ static int store_corrected_score(int score, int ply)
 
 		//we need to save the difference
 		int sign = score > 0 ? 1 : -1;
-		int score_before = score;
 		score = sign * (MATE_SCORE - corrected_ply);
-		std::cout << "store score " << score_before << " ply: " << ply << " corrected: " << score << "\n";
 	}
 
 	return score;
@@ -44,9 +42,7 @@ static int retrieve_corrected_score(int score, int ply)
 
 		//we add the difference to the score
 		int sign = score > 0 ? 1 : -1;
-		int score_before = score;
 		score = sign * (MATE_SCORE - actual_ply);
-		std::cout << "retrieve score " << score_before << " ply: " << ply << " corrected: " << score << "\n";
 	}
 
 	return score;
