@@ -657,14 +657,22 @@ int leonardo_value_bot_2::search(
 	chess::Move pv = tt_get_move(board.hash());
 	for (chess::Move move : moves)
 	{
-		/*
-		throw std::exception("not implemented");
-		if (move != pv &&
+		if (pv != chess::Move::NULL_MOVE &&
+			move != pv &&
+			!board.inCheck() &&
 			board.isCapture(move) &&
+			//quiesence is -64
 			!static_exchange_evaluation(board, move, -20 * ply_remaining))
 		{
+			/*
+			std::cout << "SEE PRUNING\n";
+			std::cout << board << "\n";
+			std::cout << move << "\n";
+			std::cout << "threshold: " << -20 * ply_remaining << "\n";
+			std::cout << "------------\n";
+			*/
 			continue;
-		}*/
+		}
 
 		board.makeMove(move);
 		int score = -search(move == pv, ply_remaining - 1, ply_from_root + 1, board, -beta, -alpha, best_move);
@@ -806,15 +814,21 @@ static int estimate_capture_move_value(chess::Board& board, chess::Move& move)
 {
 	if (board.isCapture(move))
 	{
-		int capturer_value = move.typeOf() == chess::Move::PROMOTION ?
-			SEE_PIECE_EVAL[(int)move.promotionType()] :
-			SEE_PIECE_EVAL[(int)board.at<chess::PieceType>(move.from())];
+		if (move.typeOf() == chess::Move::ENPASSANT)
+		{
+			return SEE_PIECE_EVAL[(int)chess::PieceType::PAWN];
+		}
 
-		int captured_value = move.typeOf() == chess::Move::ENPASSANT ?
+		int value = move.typeOf() == chess::Move::ENPASSANT ?
 			SEE_PIECE_EVAL[(int)chess::PieceType::PAWN] :
 			SEE_PIECE_EVAL[(int)board.at<chess::PieceType>(move.to())];
 
-		return capturer_value - captured_value;
+		if (move.typeOf() == chess::Move::PROMOTION)
+		{
+			value += SEE_PIECE_EVAL[(int)move.promotionType()] - SEE_PIECE_EVAL[(int)chess::PieceType::PAWN];
+		}
+
+		return value;
 	}
 	else {
 		return 0;
