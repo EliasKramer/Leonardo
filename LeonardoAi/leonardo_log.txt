@@ -38,3 +38,69 @@ nodes visited: 17133
 11.12 22:47: Started Uci Loop
 11.12 22:47: Command received: uci
 14.12 23:14: Started Uci Loop
+18.12 22:59: Started Uci Loop
+18.12 23:05: Started Uci Loop
+18.12 23:05: Command received: go movetime 60000
+18.12 23:05: time log: time:-1 move_time:60000 increment:-1 chosen_time:60000
+18.12 23:10: Started Uci Loop
+18.12 23:10: Command received: go movetime 60000
+18.12 23:10: time log: time:-1 move_time:60000 increment:-1 chosen_time:60000
+18.12 23:10: engine log: 
+18.12 23:10: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+18.12 23:11: Started Uci Loop
+18.12 23:11: Command received: go movetime 60000
+18.12 23:11: time log: time:-1 move_time:60000 increment:-1 chosen_time:60000
+18.12 23:11: engine log: 
+18.12 23:11: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+18.12 23:12: Command received: position startpos moves e2e4 g8f6 e4e5 f6d5 c2c4 d5b6 c4c5 b6d5 b1c3 e7e6 f1c4
+18.12 23:12: set pos: rnbqkb1r/pppp1ppp/4p3/2PnP3/2B5/2N5/PP1P1PPP/R1BQK1NR b KQkq - 1 6
+18.12 23:12: Command received: go movetime 60000
+18.12 23:12: time log: time:-1 move_time:60000 increment:-1 chosen_time:60000
+18.12 23:12: engine log: depth reached: 5
+nodes visited: 32493
+time: 3270ms
+
+18.12 23:12: made move. fen: rnbqkb1r/pppp1ppp/4p3/2PnP3/2B5/2N5/PP1P1PPP/R1BQK1NR b KQkq - 1 6 move: d5c3
+18.12 23:16: Started Uci Loop
+18.12 23:16: Command received: startpos moves e2e4 g8f6 e4e5 f6d5 c2c4 d5b6 c4c5 b6d5 b1c3 e7e6 f1c4
+18.12 23:16: unrecognized command: startpos moves e2e4 g8f6 e4e5 f6d5 c2c4 d5b6 c4c5 b6d5 b1c3 e7e6 f1c4
+18.12 23:16: Command received: go movetime 60000
+18.12 23:16: time log: time:-1 move_time:60000 increment:-1 chosen_time:60000
+18.12 23:16: engine log: 
+18.12 23:16: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+18.12 23:16: Command received: position startpos moves e2e4 g8f6 e4e5 f6d5 c2c4 d5b6 c4c5 b6d5 b1c3 e7e6 f1c4
+18.12 23:16: set pos: rnbqkb1r/pppp1ppp/4p3/2PnP3/2B5/2N5/PP1P1PPP/R1BQK1NR b KQkq - 1 6
+18.12 23:16: Command received: go movetime 60000
+18.12 23:16: time log: time:-1 move_time:60000 increment:-1 chosen_time:60000
+18.12 23:17: engine log: depth reached: 5
+nodes visited: 32493
+time: 3209ms
+ms per move: 60000ms
+
+18.12 23:17: made move. fen: rnbqkb1r/pppp1ppp/4p3/2PnP3/2B5/2N5/PP1P1PPP/R1BQK1NR b KQkq - 1 6 move: d5c3
+18.12 23:17: Started Uci Loop
+18.12 23:17: Command received: position startpos moves e2e4 g8f6 e4e5 f6d5 c2c4 d5b6 c4c5 b6d5 b1c3 e7e6 f1c4
+18.12 23:17: set pos: rnbqkb1r/pppp1ppp/4p3/2PnP3/2B5/2N5/PP1P1PPP/R1BQK1NR b KQkq - 1 6
+18.12 23:17: Command received: go movetime 60000
+18.12 23:17: time log: time:-1 move_time:60000 increment:-1 chosen_time:60000
+18.12 23:20: Started Uci Loop
+18.12 23:20: Command received: position startpos moves e2e4 g8f6 e4e5 f6d5 c2c4 d5b6 c4c5 b6d5 b1c3 e7e6 f1c4
+18.12 23:20: set pos: rnbqkb1r/pppp1ppp/4p3/2PnP3/2B5/2N5/PP1P1PPP/R1BQK1NR b KQkq - 1 6
+18.12 23:20: Command received: go movetime 60000
+18.12 23:20: time log: time:-1 move_time:60000 increment:-1 chosen_time:60000
+18.12 23:21: engine log: depth reached: 8 partial
+nodes visited: 1651736
+time: 60001ms
+ms per move: 60000ms
+
+18.12 23:21: made move. fen: rnbqkb1r/pppp1ppp/4p3/2PnP3/2B5/2N5/PP1P1PPP/R1BQK1NR b KQkq - 1 6 move: d5c3
+18.12 23:22: Started Uci Loop
+18.12 23:22: Command received: position startpos moves e2e4 g8f6 e4e5 f6d5 c2c4 d5b6 c4c5 b6d5 b1c3 e7e6 f1c4
+18.12 23:22: set pos: rnbqkb1r/pppp1ppp/4p3/2PnP3/2B5/2N5/PP1P1PPP/R1BQK1NR b KQkq - 1 6
+18.12 23:22: Command received: go movetime 60000
+18.12 23:22: time log: time:-1 move_time:60000 increment:-1 chosen_time:60000
+18.12 23:23: engine log: depth reached: 10 partial
+nodes visited: 61606719
+time: 60001ms
+
+18.12 23:23: made move. fen: rnbqkb1r/pppp1ppp/4p3/2PnP3/2B5/2N5/PP1P1PPP/R1BQK1NR b KQkq - 1 6 move: d5c3

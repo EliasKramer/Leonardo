@@ -79,7 +79,7 @@ private:
 	int print_count = 0;
 	int transpositions_count = 0;
 	int tt_inserts = 0;
-	int ms_per_move = 100;
+	int ms_per_move = -1;
 	bool searched_at_least_one_move = false;
 	int iterative_deepening_depth = 1;
 	std::chrono::steady_clock::time_point start_time;

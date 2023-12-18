@@ -1002,16 +1002,12 @@ chess::Move leonardo_value_bot_2::get_move(chess::Board& board)
 
 chess::Move leonardo_value_bot_2::get_move(chess::Board& board, int ms_left, std::string& info)
 {
-	int prev_ms_per_move = ms_per_move;
-	ms_per_move = std::min(ms_per_move, ms_left);
-
+	ms_per_move = ms_left;
 	we_are_white = board.sideToMove() == chess::Color::WHITE;
 
 	int opening_move_idx = get_opening_move(board.hash());
 	if (opening_move_idx != -1)
 	{
-		ms_per_move = prev_ms_per_move;
-		//std::cout << "opening move found\n\n";
 		return openings[opening_move_idx].second;
 	}
 
@@ -1052,6 +1048,7 @@ chess::Move leonardo_value_bot_2::get_move(chess::Board& board, int ms_left, std
 	setup_nnet_for_move(board);
 
 	int score = 0;
+
 
 	int reached_depth = 0;
 	chess::Move best_move = chess::Move::NULL_MOVE;
@@ -1112,8 +1109,12 @@ chess::Move leonardo_value_bot_2::get_move(chess::Board& board, int ms_left, std
 			}
 		}
 	}
+	auto stop = std::chrono::high_resolution_clock::now();
+	long long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start_time).count();
+	
 	info = "depth reached: " + std::to_string(iterative_deepening_depth) + (partial ? " partial\n" : "\n") +
-		"nodes visited: " + std::to_string(nodes_visited) + "\n";
+		"nodes visited: " + std::to_string(nodes_visited) + "\n" + 
+		"time: " + std::to_string(ms_taken) + "ms\n";
 
 	transpositions_count = transpositions_last;
 
@@ -1122,8 +1123,6 @@ chess::Move leonardo_value_bot_2::get_move(chess::Board& board, int ms_left, std
 		best_move = moves[0];
 		std::cout << "move was null\n";
 	}
-
-	ms_per_move = prev_ms_per_move;
 
 	return best_move;
 }

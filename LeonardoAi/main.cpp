@@ -210,9 +210,9 @@ void uci()
 
 int main()
 {
-	//uci();
+	uci();
 	//test_see();
-	async_play();
+	//async_play();
 	//leonardo_overlord ov("pred_nnet");
 	//ov.train_duration_nnet();
 	//ov.test_duration_nnet();
