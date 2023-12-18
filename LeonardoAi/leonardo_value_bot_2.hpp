@@ -100,22 +100,22 @@ private:
 	neural_network value_nnet;
 	matrix input_matrix;
 
-	int probe_tt(chess::U64 hash, int depth, int alpha, int beta);
+	int probe_tt(chess::U64 hash, int ply, int depth, int alpha, int beta);
 	const chess::Move& tt_get_move(chess::U64 hash);
-	void record_tt(chess::U64 hash, int depth, int value, TT_ITEM_TYPE flags, const chess::Move& best_move);
+	void record_tt(chess::U64 hash, int ply, int depth, int value, TT_ITEM_TYPE flags, const chess::Move& best_move);
 
 	bool search_cancelled();
 
 	void load_openings();
 
-	int eval(chess::Board& board, chess::Movelist& moves, int depth, bool only_caputes_in_moves);
+	int eval(chess::Board& board, chess::Movelist& moves, int ply, bool only_caputes_in_moves);
 
 	bool stored_move_is_draw(chess::Board& board, int ply_from_root);
 
 	void order_moves_quiescene(chess::Movelist& moves, chess::Board& board);
 	int quiescene(chess::Board& board, int alpha, int beta);
 
-	int recursive_eval(
+	int search(
 		bool is_pv,
 		int ply_remaining,
 		int ply_from_root,

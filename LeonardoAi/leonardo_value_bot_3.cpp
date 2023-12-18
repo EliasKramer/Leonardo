@@ -526,7 +526,7 @@ int leonardo_value_bot_3::quiescene(chess::Board& board, int alpha, int beta)
 	return alpha;
 }
 
-int leonardo_value_bot_3::recursive_eval(
+int leonardo_value_bot_3::search(
 	int ply_remaining,
 	int ply_from_root,
 	chess::Board& board,
@@ -593,7 +593,7 @@ int leonardo_value_bot_3::recursive_eval(
 	for (chess::Move move : moves)
 	{
 		board.makeMove(move);
-		int score = -recursive_eval(ply_remaining - 1, ply_from_root + 1, board, -beta, -alpha, best_move);
+		int score = -search(ply_remaining - 1, ply_from_root + 1, board, -beta, -alpha, best_move);
 		board.unmakeMove(move);
 
 		if (search_cancelled())
@@ -847,7 +847,7 @@ chess::Move leonardo_value_bot_3::get_move(chess::Board& board, int ms_left, std
 		transpositions_count = 0;
 		chess::Move tmp = chess::Move::NULL_MOVE;
 
-		score = recursive_eval(
+		score = search(
 			iterative_deepening_depth,
 			0,
 			board,

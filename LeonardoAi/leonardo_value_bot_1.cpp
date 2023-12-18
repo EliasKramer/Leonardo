@@ -177,7 +177,7 @@ float leonardo_value_bot_1::eval(chess::Board& board, int depth, chess::Movelist
 	return score;
 }
 
-float leonardo_value_bot_1::recursive_eval(
+float leonardo_value_bot_1::search(
 	int depth,
 	int depth_addition,
 	int max_depth_addition,
@@ -255,7 +255,7 @@ float leonardo_value_bot_1::recursive_eval(
 				new_max_depth_addition = 0;
 		}
 
-		float score = recursive_eval(
+		float score = search(
 			new_depth,
 			new_depth_addition,
 			new_max_depth_addition,
@@ -361,7 +361,7 @@ void leonardo_value_bot_1::pre_sort_move_list(
 		int depth_reached = 0;
 		bool maximizing = board.sideToMove() == chess::Color::WHITE;
 		board.makeMove(move);
-		float score = recursive_eval(
+		float score = search(
 			1,
 			0,
 			0,
@@ -444,7 +444,7 @@ void leonardo_value_bot_1::thread_task(
 		int depth_reached = 0;
 		float alpha = -FLT_MAX;
 		float beta = FLT_MAX;
-		float score = recursive_eval(
+		float score = search(
 			1,
 			0,
 			depth_addition,

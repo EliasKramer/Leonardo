@@ -172,12 +172,18 @@ void play(int* scores, std::mutex& m)
 		&player1,
 		&player2);
 
+	int count = 0;
 	while (true)
 	{
 		int idx = game.play() + 1;
 		std::lock_guard<std::mutex> lock(m);
 		scores[idx] += 1;
 		std::cout << "b(" << scores[0] << ") d(" << scores[1] << ") w(" << scores[2] << ")\n";
+		count++;
+		if (count == 100)
+		{
+			return;
+		}
 	}
 }
 
@@ -204,6 +210,7 @@ void uci()
 
 int main()
 {
+	//uci();
 	//test_see();
 	async_play();
 	//leonardo_overlord ov("pred_nnet");

@@ -21,7 +21,7 @@ private:
 	float eval(chess::Board& board, int depth);
 	float eval(chess::Board& board, int depth, chess::Movelist* move_list);
 
-	float recursive_eval(
+	float search(
 		int depth,
 		int depth_addition,
 		int max_depth_addition,

@@ -28,7 +28,9 @@ uci_handler::uci_handler()
 	board(DEFAULT_FEN),
 	duration_nnet("duration.parameters"),
 	duration_nnet_input(leonardo_util::get_input_format_duration_nnet())
-{}
+{
+
+}
 
 void uci_handler::log(const char* msg)
 {

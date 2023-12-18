@@ -17,7 +17,7 @@ private:
 
 	float eval(chess::Board& board, int depth);
 
-	float recursive_eval(
+	float search(
 		int depth,
 		int depth_addition,
 		chess::Board& board,

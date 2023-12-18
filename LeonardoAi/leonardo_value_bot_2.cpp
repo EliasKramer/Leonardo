@@ -3,34 +3,85 @@
 #include <filesystem>
 
 #define MATE_SCORE 10000000
-#define DRAW_SCORE  -1000
+#define DRAW_SCORE		  0
 #define MAX_DEPTH		256
 #define MIN_DEPTH		  5
 
-int leonardo_value_bot_2::probe_tt(chess::U64 hash, int depth, int alpha, int beta)
+static bool is_mate_score(int score)
 {
+	return std::abs(score) >= MATE_SCORE - MAX_DEPTH;
+}
+
+static int store_corrected_score(int score, int ply)
+{
+	if (is_mate_score(score)) // is mate 
+	{
+		//ply from root to checkmate node
+		int all_ply = std::abs(MATE_SCORE - std::abs(score));
+
+		//ply from current node to checkmate node
+		int corrected_ply = all_ply - ply;
+
+		//we need to save the difference
+		int sign = score > 0 ? 1 : -1;
+		int score_before = score;
+		score = sign * (MATE_SCORE - corrected_ply);
+		std::cout << "store score " << score_before << " ply: " << ply << " corrected: " << score << "\n";
+	}
+
+	return score;
+}
+
+static int retrieve_corrected_score(int score, int ply)
+{
+	if (is_mate_score(score)) // is mate 
+	{
+		//ply difference from curr node to checkmate node
+		int ply_before_mate_found = std::abs(MATE_SCORE - std::abs(score));
+
+		//we saved the difference. now we need to add it to the current ply
+		int actual_ply = ply_before_mate_found + ply;
+
+		//we add the difference to the score
+		int sign = score > 0 ? 1 : -1;
+		int score_before = score;
+		score = sign * (MATE_SCORE - actual_ply);
+		std::cout << "retrieve score " << score_before << " ply: " << ply << " corrected: " << score << "\n";
+	}
+
+	return score;
+}
+
+int leonardo_value_bot_2::probe_tt(chess::U64 hash, int ply, int depth, int alpha, int beta)
+{
+	//mate ply 4 depth 6 current ply 2
+	//mate ply 3 depth 6 current ply 2
+	tt_item::unknown_eval;
+
 	tt_item& item = tt[hash % tt.size()];
 
 	if (item.key == hash) //entry is acutally the same
 	{
 		if (item.depth >= depth)
 		{
+			int corrected_value = retrieve_corrected_score(item.value, ply);
+
 			if (item.flags == TT_ITEM_TYPE::exact)
 			{
-				return item.value;
+				return corrected_value;
 			}
 
 			// We have stored the upper bound of the eval for this position. If it's less than alpha then we don't need to
 			// search the moves in this position as they won't interest us; otherwise we will have to search to find the exact value
 			// the current position is less worth, than the best available move - skip
-			if ((item.flags == TT_ITEM_TYPE::upper_bound) && (item.value <= alpha))
+			if ((item.flags == TT_ITEM_TYPE::upper_bound) && (corrected_value <= alpha))
 			{
 				return alpha;
 			}
 
 			// We have stored the lower bound of the eval for this position. Only return if it causes a beta cut-off.
 			// beta cut-off means, that the opponent will not allow us to reach this position, because they have a better move
-			if ((item.flags == TT_ITEM_TYPE::lower_bound) && (item.value >= beta))
+			if ((item.flags == TT_ITEM_TYPE::lower_bound) && (corrected_value >= beta))
 			{
 				return beta;
 			}
@@ -54,6 +105,7 @@ const chess::Move& leonardo_value_bot_2::tt_get_move(chess::U64 hash)
 
 void leonardo_value_bot_2::record_tt(
 	chess::U64 hash,
+	int ply,
 	int depth,
 	int value,
 	TT_ITEM_TYPE flags,
@@ -63,7 +115,7 @@ void leonardo_value_bot_2::record_tt(
 
 	item.key = hash;
 	item.best_move = best_move;
-	item.value = value;
+	item.value = store_corrected_score(value, ply);
 	item.flags = flags;
 	item.depth = depth;
 	tt_inserts++;
@@ -292,7 +344,7 @@ static inline int is_double_pawn(int sq, chess::Bitboard our_pawns)
 	return (our_pawns & file_mask) != 0 ? 1 : 0;
 }
 
-int leonardo_value_bot_2::eval(chess::Board& board, chess::Movelist& moves, int depth, bool only_caputes_in_moves) //depth remaining
+int leonardo_value_bot_2::eval(chess::Board& board, chess::Movelist& moves, int ply, bool only_caputes_in_moves)
 {
 	int score = 0.0f;
 	int side_mult = board.sideToMove() == chess::Color::WHITE ? 1 : -1;
@@ -304,13 +356,13 @@ int leonardo_value_bot_2::eval(chess::Board& board, chess::Movelist& moves, int 
 		switch (res.second)
 		{
 		case chess::GameResult::WIN:
-			val = MATE_SCORE + depth;
+			val = MATE_SCORE - ply;
 			break;
 		case chess::GameResult::LOSE:
-			val = -MATE_SCORE - depth;
+			val = -MATE_SCORE + ply;
 			break;
 		case chess::GameResult::DRAW:
-			val = DRAW_SCORE - depth;
+			val = DRAW_SCORE + ply;
 			break;
 		}
 
@@ -486,7 +538,7 @@ int leonardo_value_bot_2::quiescene(chess::Board& board, int alpha, int beta)
 	chess::Movelist moves;
 	chess::movegen::legalmoves<chess::MoveGenType::CAPTURE>(moves, board);
 
-	int score = eval(board, moves, -MAX_DEPTH, true);
+	int score = eval(board, moves, MAX_DEPTH, true);
 	if (board.isInsufficientMaterial() || board.isRepetition() || board.isHalfMoveDraw())
 	{
 		return score;
@@ -535,7 +587,7 @@ int leonardo_value_bot_2::quiescene(chess::Board& board, int alpha, int beta)
 	return alpha;
 }
 
-int leonardo_value_bot_2::recursive_eval(
+int leonardo_value_bot_2::search(
 	bool is_pv,
 	int ply_remaining,
 	int ply_from_root,
@@ -550,7 +602,7 @@ int leonardo_value_bot_2::recursive_eval(
 	nodes_visited++;
 
 	TT_ITEM_TYPE tt_flag = TT_ITEM_TYPE::upper_bound;
-	int value = probe_tt(board.hash(), ply_remaining, alpha, beta);
+	int value = probe_tt(board.hash(), ply_from_root, ply_remaining, alpha, beta);
 	if (value != tt_item::unknown_eval
 		&& !board.isRepetition()
 		&& !board.isHalfMoveDraw()
@@ -577,7 +629,7 @@ int leonardo_value_bot_2::recursive_eval(
 		board.isInsufficientMaterial())
 	{
 		leaf_nodes++;
-		return eval(board, moves, ply_remaining, false);
+		return eval(board, moves, ply_from_root, false);
 	}
 
 	if (ply_remaining <= 0)
@@ -591,7 +643,7 @@ int leonardo_value_bot_2::recursive_eval(
 		board.makeNullMove();
 
 		//the score represents the value of the position after the null move
-		int score = -recursive_eval(false, ply_remaining - 3 - (ply_remaining / 3), ply_from_root + 1, board, -beta, -alpha, best_move);
+		int score = -search(false, ply_remaining - 3 - (ply_remaining / 3), ply_from_root + 1, board, -beta, -alpha, best_move);
 
 		board.unmakeNullMove();
 
@@ -609,16 +661,17 @@ int leonardo_value_bot_2::recursive_eval(
 	chess::Move pv = tt_get_move(board.hash());
 	for (chess::Move move : moves)
 	{
+		/*
 		throw std::exception("not implemented");
 		if (move != pv &&
-			board.isCapture(move) && 
+			board.isCapture(move) &&
 			!static_exchange_evaluation(board, move, -20 * ply_remaining))
 		{
 			continue;
-		}
+		}*/
 
 		board.makeMove(move);
-		int score = -recursive_eval(move == pv, ply_remaining - 1, ply_from_root + 1, board, -beta, -alpha, best_move);
+		int score = -search(move == pv, ply_remaining - 1, ply_from_root + 1, board, -beta, -alpha, best_move);
 		board.unmakeMove(move);
 
 		if (search_cancelled())
@@ -626,11 +679,11 @@ int leonardo_value_bot_2::recursive_eval(
 
 
 		//current score is better than our opponent can achieve. our opponent will not pick this path
-		if (score >= beta) 
+		if (score >= beta)
 		{
 			//store lower bound
 			//maye killer move
-			record_tt(board.hash(), ply_remaining, beta, TT_ITEM_TYPE::lower_bound, move); // BEST LOCAL MOVE
+			record_tt(board.hash(), ply_from_root, ply_remaining, beta, TT_ITEM_TYPE::lower_bound, move); // BEST LOCAL MOVE
 			pruned++;
 
 			if (ply_from_root == 0)
@@ -654,7 +707,7 @@ int leonardo_value_bot_2::recursive_eval(
 		}
 	}
 
-	record_tt(board.hash(), ply_remaining, alpha, tt_flag, best_current_move); //best local move TODOODODODODOODODO
+	record_tt(board.hash(), ply_from_root, ply_remaining, alpha, tt_flag, best_current_move);
 
 	return alpha;
 }
@@ -772,7 +825,7 @@ static int estimate_capture_move_value(chess::Board& board, chess::Move& move)
 	}
 }
 
-static uint64_t allAttackersToSquare(chess::Board& board,uint64_t occupied, chess::Square to)
+static uint64_t allAttackersToSquare(chess::Board& board, uint64_t occupied, chess::Square to)
 {
 	uint64_t attackers = 0;
 	uint64_t knights = board.pieces(chess::PieceType::KNIGHT, board.sideToMove());
@@ -790,17 +843,17 @@ static uint64_t allAttackersToSquare(chess::Board& board,uint64_t occupied, ches
 /* cedits to
 https://github.com/AndyGrant/Ethereal/blob/master/src/search.c#L916
 */
-bool leonardo_value_bot_2::static_exchange_evaluation(chess::Board& board, chess::Move& move, int threshold) 
+bool leonardo_value_bot_2::static_exchange_evaluation(chess::Board& board, chess::Move& move, int threshold)
 {
 	uint64_t bishops, rooks, occupied, attackers, myAttackers;
 
 	chess::Square from = move.from();
 	chess::Square to = move.to();
 	uint16_t type = move.typeOf();
-	
+
 	// Next victim is moved piece or promotion type
 	//its type is a piecetype, but we need the ++ operator. touching the chess engine could break stome stuff xd
-	int nextVictim = (int)( type != chess::Move::PROMOTION
+	int nextVictim = (int)(type != chess::Move::PROMOTION
 		? board.at<chess::PieceType>(move.from())
 		: move.promotionType());
 
@@ -851,7 +904,7 @@ bool leonardo_value_bot_2::static_exchange_evaluation(chess::Board& board, chess
 
 		// A diagonal move may reveal bishop or queen attackers
 		if (nextVictim == (int)chess::PieceType::PAWN || nextVictim == (int)chess::PieceType::BISHOP || nextVictim == (int)chess::PieceType::QUEEN)
-			attackers |=  chess::attacks::bishop(to, occupied) & bishops;
+			attackers |= chess::attacks::bishop(to, occupied) & bishops;
 
 		// A vertical or horizontal move may reveal rook or queen attackers
 		if (nextVictim == (int)chess::PieceType::ROOK || nextVictim == (int)chess::PieceType::QUEEN)
@@ -917,7 +970,7 @@ void leonardo_value_bot_2::sort_move_list(chess::Movelist& moves, chess::Board& 
 			}
 
 			//if a move caused a cutoff previously, it is likely to be a good move now
-			bool is_killer = ply_from_root < max_killer_ply && killer_moves[ply_from_root].match(move);
+			bool is_killer = ply_from_root < max_killer_ply&& killer_moves[ply_from_root].match(move);
 			score += is_killer ? 2000 : 0;
 
 			score += history[(int)board.sideToMove()][move.from()][move.to()];
@@ -1003,7 +1056,6 @@ chess::Move leonardo_value_bot_2::get_move(chess::Board& board, int ms_left, std
 	setup_nnet_for_move(board);
 
 	int score = 0;
-	auto start = std::chrono::high_resolution_clock::now();
 
 	int reached_depth = 0;
 	chess::Move best_move = chess::Move::NULL_MOVE;
@@ -1018,7 +1070,7 @@ chess::Move leonardo_value_bot_2::get_move(chess::Board& board, int ms_left, std
 		transpositions_count = 0;
 		chess::Move tmp = chess::Move::NULL_MOVE;
 
-		score = recursive_eval(
+		score = search(
 			true,
 			iterative_deepening_depth,
 			0,
@@ -1075,18 +1127,6 @@ chess::Move leonardo_value_bot_2::get_move(chess::Board& board, int ms_left, std
 		std::cout << "move was null\n";
 	}
 
-	auto end = std::chrono::high_resolution_clock::now();
-	long long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-
-	if (board.sideToMove() == chess::Color::BLACK)
-		score *= -1;
-
-	/*
-	std::cout << "nmp: " << nmp_pruned << "\n";
-	std::cout << "nodes: " << nodes_visited << "\n";
-	std::cout << info;
-	std::cout << "--------------------\n";
-	*/
 	ms_per_move = prev_ms_per_move;
 
 	return best_move;

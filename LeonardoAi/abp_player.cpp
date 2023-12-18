@@ -235,7 +235,7 @@ static float eval(chess::Board& board)
 	return eval(board, 0);
 }
 
-static float recursive_eval(
+static float search(
 	int depth,
 	chess::Board& board,
 	bool maximizing,
@@ -256,7 +256,7 @@ static float recursive_eval(
 	for (chess::Move move : moves)
 	{
 		board.makeMove(move);
-		float score = recursive_eval(depth - 1, board, !maximizing, alpha, beta);
+		float score = search(depth - 1, board, !maximizing, alpha, beta);
 		board.unmakeMove(move);
 		if (maximizing)
 		{
@@ -376,7 +376,7 @@ chess::Move abp_player::get_move(chess::Board& board)
 	{
 
 		board.makeMove(move);
-		float score = recursive_eval(start_depth - 1, board, board.sideToMove() == chess::Color::WHITE, -FLT_MAX, FLT_MAX);
+		float score = search(start_depth - 1, board, board.sideToMove() == chess::Color::WHITE, -FLT_MAX, FLT_MAX);
 		//std::cout << "move: " << chess::uci::moveToUci(move) << ": " << score << "\n";
 		board.unmakeMove(move);
 		if (black)

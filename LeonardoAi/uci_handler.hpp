@@ -1,12 +1,12 @@
 #pragma once
-#include "leonardo_value_bot_3.hpp"
+#include "leonardo_value_bot_2.hpp"
 #include "./NeuroFox/util.hpp"
 #include "./leonardo_util.hpp"
 
 class uci_handler
 {
 private:
-	leonardo_value_bot_3 bot;
+	leonardo_value_bot_2 bot;
 	chess::Board board;
 
 	neural_network duration_nnet;

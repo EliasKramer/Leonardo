@@ -76,7 +76,7 @@ private:
 	void order_moves_quiescene(chess::Movelist& moves, chess::Board& board);
 	int quiescene(chess::Board& board, int alpha, int beta);
 
-	int recursive_eval(
+	int search(
 		int ply_remaining,
 		int ply_from_root,
 		chess::Board& board,
