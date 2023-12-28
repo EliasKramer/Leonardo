@@ -808,3 +808,16 @@ int leonardo_util::get_ms_to_think(
 
 	return std::clamp(ms_to_think, 1, 25000);
 }
+
+chess::Move leonardo_util::get_move_from_uci(const chess::Board& board, const std::string uci_move)
+{
+	chess::Movelist move_list;
+	chess::movegen::legalmoves(move_list, board);
+	for (int i = 0; i < move_list.size(); i++)
+	{
+		chess::Move move = move_list[i];
+		if (uci_move == chess::uci::moveToUci(move))
+			return move;
+	}
+	throw std::runtime_error("move not found");
+}

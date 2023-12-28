@@ -5,6 +5,7 @@
 #include "NeuroFox/neural_network.hpp"
 #include "stockfish_interface.hpp"
 #include "nnet_table.hpp"
+#include "leonardo_util.hpp"
 //Credit to https://web.archive.org/web/20071031100051/http://www.brucemo.com/compchess/programming/hashing.htm
 constexpr int max_killer_ply = 32;
 
@@ -122,13 +123,14 @@ private:
 		chess::Board& board,
 		int alpha,
 		int beta,
-		chess::Move& best_move);
+		chess::Move& best_move,
+		bool allow_nmp
+	);
 
 	int get_opening_move(size_t hash);
 
 	bool static_exchange_evaluation_better_than_threshold(chess::Board& board, chess::Move& move, int threshold);
-	int static_exchange_evaluation(chess::Board& board, chess::Move& move);
-	void sort_move_list(chess::Movelist& moves, chess::Board& board, int ply_from_root);
+	void sort_move_list(chess::Movelist& moves, chess::Board& board, int ply_from_root, int depth);
 
 	void setup_nnet_for_move(const chess::Board& board);
 public:

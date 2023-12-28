@@ -79,4 +79,6 @@ namespace leonardo_util
 		int time_to_move,
 		int time_remaining,
 		int time_increment);
+
+	chess::Move get_move_from_uci(const chess::Board& board, const std::string uci_move);
 }
