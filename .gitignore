@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++,cuda,visualstudio
 *.parameters
 *.nnue
+leonardo_log.txt
 games.txt
 dataset.txt
 ### C++ ###
