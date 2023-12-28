@@ -792,8 +792,10 @@ int leonardo_util::get_ms_to_think(
 
 	time_increment = time_increment == -1 ? 0 : time_increment;
 
-	time_remaining = std::max(20, time_remaining);
+	time_remaining = std::max(1, time_remaining);
 
+	return std::clamp(time_remaining / 20 + time_increment / 2, 1, 25000);
+	/*
 	int total_time_remaining = time_remaining + time_increment;
 	if (total_time_remaining < 1000 || board.plies_played_ < 10)
 		return (time_remaining / 20) + time_increment;
@@ -806,7 +808,7 @@ int leonardo_util::get_ms_to_think(
 
 	int ms_to_think = (total_time_remaining / remaining_moves) + time_increment;
 
-	return std::clamp(ms_to_think, 1, 25000);
+	return std::clamp(ms_to_think, 1, 25000);*/
 }
 
 chess::Move leonardo_util::get_move_from_uci(const chess::Board& board, const std::string uci_move)
