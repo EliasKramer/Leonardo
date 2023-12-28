@@ -7,10 +7,10 @@
 #include "nnet_table.hpp"
 #include "leonardo_util.hpp"
 //Credit to https://web.archive.org/web/20071031100051/http://www.brucemo.com/compchess/programming/hashing.htm
-constexpr int max_killer_ply = 32;
 
 class leonardo_value_bot_2 : public chess_player
 {
+	static const int max_killer_ply = 32;
 	typedef enum _TT_ITEM_TYPE : uint8_t
 	{
 		empty = 0,
