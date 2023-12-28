@@ -18,7 +18,7 @@ const std::string OUTCOME_STR[6] = {
 };
 int chess_game::play()
 {
-	chess::Board board = chess::Board(DEFAULT_FEN);
+	chess::Board board = chess::Board("k7/2b1q3/8/4q3/3K1P2/8/8/8 w - - 0 1");
 	bool white_to_move = true;
 
 	std::string moves_str = "";

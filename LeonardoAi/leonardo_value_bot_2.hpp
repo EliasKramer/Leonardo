@@ -126,7 +126,8 @@ private:
 
 	int get_opening_move(size_t hash);
 
-	bool static_exchange_evaluation(chess::Board& board, chess::Move& move, int threshold);
+	bool static_exchange_evaluation_better_than_threshold(chess::Board& board, chess::Move& move, int threshold);
+	int static_exchange_evaluation(chess::Board& board, chess::Move& move);
 	void sort_move_list(chess::Movelist& moves, chess::Board& board, int ply_from_root);
 
 	void setup_nnet_for_move(const chess::Board& board);

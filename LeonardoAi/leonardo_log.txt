@@ -104,3 +104,5 @@ nodes visited: 61606719
 time: 60001ms
 
 18.12 23:23: made move. fen: rnbqkb1r/pppp1ppp/4p3/2PnP3/2B5/2N5/PP1P1PPP/R1BQK1NR b KQkq - 1 6 move: d5c3
+19.12 00:22: Started Uci Loop
+19.12 19:12: Started Uci Loop

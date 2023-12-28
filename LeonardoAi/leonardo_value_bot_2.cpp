@@ -129,7 +129,8 @@ bool leonardo_value_bot_2::search_cancelled()
 
 //PAWN, KNIGHT, BISHOP, ROOK, QUEEN
 const int PIECE_EVAL[5] = { 100, 320, 330, 500, 900 };
-const int SEE_PIECE_EVAL[5] = { 100, 330, 330, 500, 900 };
+//accounts for kings aswell
+const int SEE_PIECE_EVAL[6] = { 100, 330, 330, 500, 900, 2000 };
 //helps determin if a position is equal if you only count piece values and skip pawns
 const int PIECE_VALUE_EQL_POSITIONS[5] = { 100, 300, 300, 500, 900 };
 
@@ -661,15 +662,18 @@ int leonardo_value_bot_2::search(
 			move != pv &&
 			!board.inCheck() &&
 			board.isCapture(move) &&
+			move.score() > -20 * ply_remaining
 			//quiesence is -64
-			!static_exchange_evaluation(board, move, -20 * ply_remaining))
+			//!static_exchange_evaluation_better_than_threshold(board, move, -20 * ply_remaining))
+			)
 		{
-			/*
 			std::cout << "SEE PRUNING\n";
 			std::cout << board << "\n";
 			std::cout << move << "\n";
+			std::cout << "val: " << move.score() << "\n";
 			std::cout << "threshold: " << -20 * ply_remaining << "\n";
 			std::cout << "------------\n";
+			/*
 			*/
 			continue;
 		}
@@ -835,25 +839,19 @@ static int estimate_capture_move_value(chess::Board& board, chess::Move& move)
 	}
 }
 
-static uint64_t allAttackersToSquare(chess::Board& board, uint64_t occupied, chess::Square to)
+static uint64_t allAttackersToSquare(chess::Board& board, uint64_t occupied, chess::Square sq)
 {
-	uint64_t attackers = 0;
-	uint64_t knights = board.pieces(chess::PieceType::KNIGHT, board.sideToMove());
-	uint64_t bishops = board.pieces(chess::PieceType::BISHOP, board.sideToMove());
-	uint64_t rooks = board.pieces(chess::PieceType::ROOK, board.sideToMove());
-	uint64_t queens = board.pieces(chess::PieceType::QUEEN, board.sideToMove());
-	uint64_t pawns = board.pieces(chess::PieceType::PAWN, board.sideToMove());
-	attackers |= chess::attacks::knight(to) & knights;
-	attackers |= chess::attacks::bishop(to, occupied) & (bishops | queens);
-	attackers |= chess::attacks::rook(to, occupied) & (rooks | queens);
-	attackers |= chess::attacks::pawn(board.sideToMove(), to) & pawns;
-	return attackers;
+	return	
+		(chess::attacks::pawn(chess::Color::WHITE, sq) & board.us(chess::Color::BLACK) & board.pieces(chess::PieceType::PAWN)) |
+		(chess::attacks::pawn(chess::Color::BLACK, sq) & board.us(chess::Color::WHITE) & board.pieces(chess::PieceType::PAWN)) |
+		(chess::attacks::knight(sq) & board.pieces(chess::PieceType::KNIGHT)) |
+		(chess::attacks::bishop(sq, occupied) & (board.pieces(chess::PieceType::BISHOP) | board.pieces(chess::PieceType::QUEEN))) |
+		(chess::attacks::rook(sq, occupied) & (board.pieces(chess::PieceType::ROOK) | board.pieces(chess::PieceType::QUEEN))) |
+		(chess::attacks::king(sq) & board.pieces(chess::PieceType::KING));
 }
 
-/* cedits to
-https://github.com/AndyGrant/Ethereal/blob/master/src/search.c#L916
-*/
-bool leonardo_value_bot_2::static_exchange_evaluation(chess::Board& board, chess::Move& move, int threshold)
+//cedits to https://github.com/AndyGrant/Ethereal/blob/master/src/search.c#L916
+bool leonardo_value_bot_2::static_exchange_evaluation_better_than_threshold(chess::Board& board, chess::Move& move, int threshold)
 {
 	uint64_t bishops, rooks, occupied, attackers, myAttackers;
 
@@ -946,6 +944,111 @@ bool leonardo_value_bot_2::static_exchange_evaluation(chess::Board& board, chess
 	return board.sideToMove() != color;
 }
 
+int leonardo_value_bot_2::static_exchange_evaluation(chess::Board& board, chess::Move& move)
+{
+	uint64_t bishops, rooks, occupied, attackers, myAttackers;
+
+	chess::Square from = move.from();
+	chess::Square to = move.to();
+	uint16_t type = move.typeOf();
+
+	// Next victim is moved piece or promotion type
+	//its type is a piecetype, but we need the ++ operator. touching the chess engine could break stome stuff xd
+	int nextVictim = (int)(type != chess::Move::PROMOTION
+		? board.at<chess::PieceType>(move.from())
+		: move.promotionType());
+
+	// Balance is the value of the move minus threshold. Function
+	// call takes care for Enpass, Promotion (and Castling moves.) castling moves are not captures?
+	int balance = estimate_capture_move_value(board, move);
+
+	// Best case still fails to beat the threshold
+	//if (balance < 0) return false; - no bool eval
+
+
+	// If the balance is positive even if losing the moved piece,
+	// the exchange is guaranteed to beat the threshold.
+	//if (balance > 0) return balance;
+
+	// Grab sliders for updating revealed attackers
+	bishops = board.pieces(chess::PieceType::BISHOP) | board.pieces(chess::PieceType::QUEEN);
+	rooks = board.pieces(chess::PieceType::ROOK) | board.pieces(chess::PieceType::QUEEN);
+
+	// Let occupied suppose that the move was actually made
+	occupied = board.occ();
+	occupied = (occupied ^ (1ull << from)) | (1ull << to);
+	if (type == chess::Move::ENPASSANT) occupied ^= (1ull << board.enpassantSq());
+
+	// Get all pieces which attack the target square. And with occupied
+	// so that we do not let the same piece attack twice
+	attackers = allAttackersToSquare(board, occupied, to) & occupied;
+
+	if (attackers & board.them(board.sideToMove()))
+	{
+		balance -= SEE_PIECE_EVAL[nextVictim];
+	}
+
+	// Now our opponents turn to recapture
+	chess::Color color = ~board.sideToMove();
+
+	while (1) {
+
+		// If we have no more attackers left we lose
+		myAttackers = attackers & board.us(color);
+		if (myAttackers == 0ull) break;
+
+		// Find our weakest piece to attack with
+		for (nextVictim = (int)chess::PieceType::PAWN; nextVictim <= (int)chess::PieceType::QUEEN; nextVictim++)
+			if (myAttackers & board.pieces((chess::PieceType)nextVictim))
+				break;
+
+		// Remove our attacker from the occupied
+		chess::builtin::lsb(myAttackers);
+		occupied ^= (1ull << chess::builtin::lsb(myAttackers & board.pieces((chess::PieceType)nextVictim)));
+
+		// A diagonal move may reveal bishop or queen attackers
+		if (nextVictim == (int)chess::PieceType::PAWN || nextVictim == (int)chess::PieceType::BISHOP || nextVictim == (int)chess::PieceType::QUEEN)
+			attackers |= chess::attacks::bishop(to, occupied) & bishops;
+
+		// A vertical or horizontal move may reveal rook or queen attackers
+		if (nextVictim == (int)chess::PieceType::ROOK || nextVictim == (int)chess::PieceType::QUEEN)
+			attackers |= chess::attacks::rook(to, occupied) & rooks;
+
+		// Make sure we did not add any already used attacks
+		attackers &= occupied;
+
+		// Swap the turn
+		color = ~color;
+
+		// Negamax the balance and add the value of the next victim
+		//balance = (-balance) - 1 - SEE_PIECE_EVAL[nextVictim];
+
+		//the opponent has -100
+		//this means we are 100 and we are winning the exchange
+		balance = -balance;
+		//? 
+		balance -= 1;
+		//we subtract our current attacking piece, because it will be captured
+		balance -= SEE_PIECE_EVAL[nextVictim];
+
+		// if we still have an advantage after our piece is captured, we can break the loop
+		// If the balance is non negative after giving away our piece then we win
+		if (balance >= 0) {
+
+			// As a slide speed up for move legality checking, if our last attacking
+			// piece is a king, and our opponent still has attackers, then we've
+			// lost as the move we followed would be illegal
+			if (nextVictim == (int)chess::PieceType::KING && (attackers & board.us(color)))
+				color = ~color;
+
+			break;
+		}
+	}
+
+	// Side to move after the loop loses
+	return board.sideToMove() == color ? -balance : balance;
+}
+
 void leonardo_value_bot_2::sort_move_list(chess::Movelist& moves, chess::Board& board, int ply_from_root)
 {
 	chess::Move tt_move = tt_get_move(board.hash());
@@ -962,12 +1065,16 @@ void leonardo_value_bot_2::sort_move_list(chess::Movelist& moves, chess::Board& 
 		}
 		else if (board.isCapture(move))
 		{
+			/*
 			chess::PieceType from_piece_type = board.at<chess::PieceType>(move.from());
 			chess::PieceType to_piece_type = board.at<chess::PieceType>(move.to());
 
-			//some bias that is added if the opponent does not attack this current square 
+			//some bias that is added if the opponent does not attack this current square
 			int no_recapture_bias = !board.isAttacked(move.to(), ~board.sideToMove()) ? 5 : 0;
 			move.setScore(((PIECE_EVAL[(int)to_piece_type] - PIECE_EVAL[(int)from_piece_type]) * 2) + no_recapture_bias);
+			*/
+			//move.setScore(static_exchange_evaluation_better_than_threshold(board, move, 0));
+			move.setScore(static_exchange_evaluation(board, move));
 		}
 		else
 		{
@@ -1125,9 +1232,9 @@ chess::Move leonardo_value_bot_2::get_move(chess::Board& board, int ms_left, std
 	}
 	auto stop = std::chrono::high_resolution_clock::now();
 	long long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start_time).count();
-	
+
 	info = "depth reached: " + std::to_string(iterative_deepening_depth) + (partial ? " partial\n" : "\n") +
-		"nodes visited: " + std::to_string(nodes_visited) + "\n" + 
+		"nodes visited: " + std::to_string(nodes_visited) + "\n" +
 		"time: " + std::to_string(ms_taken) + "ms\n";
 
 	transpositions_count = transpositions_last;

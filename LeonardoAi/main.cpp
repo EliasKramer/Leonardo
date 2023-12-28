@@ -166,7 +166,7 @@ void play_pawn()
 void play(int* scores, std::mutex& m)
 {
 	leonardo_value_bot_2 player1(100, 1);
-	leonardo_value_bot_3 player2(100, 1);
+	leonardo_value_bot_2 player2(100, 1);
 
 	chess_game game(
 		&player1,
