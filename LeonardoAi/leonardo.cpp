@@ -33,7 +33,7 @@ bool leonardo::move_causes_draw(chess::Board& board, chess::Move& move)
 	return ret_val;
 }
 
-int32_t leonardo::eval(chess::Board& board, chess::Movelist& moves, int ply, bool only_caputes_in_moves)
+int32_t leonardo::eval(chess::Board& board)
 {
 	int32_t score = 0.0f;
 	int32_t side_mult = board.sideToMove() == chess::Color::WHITE ? 1 : -1;
@@ -66,6 +66,53 @@ int32_t leonardo::eval(chess::Board& board, chess::Movelist& moves, int ply, boo
 	return score * side_mult;
 }
 
+int32_t leonardo::quiescene_search(chess::Board& board, int alpha, int beta)
+{
+	chess::Movelist moves;
+	chess::movegen::legalmoves<chess::MoveGenType::CAPTURE>(moves, board);
+
+	int32_t score = eval(board);
+
+	if (board.isInsufficientMaterial() || board.isRepetition() || board.isHalfMoveDraw())
+	{
+		return corrected_result_score(chess::GameResult::DRAW, chess_constants::MAX_DEPTH);
+	}
+
+	if (score >= beta)
+	{
+		return beta;
+	}
+	if (score > alpha)
+	{
+		alpha = score;
+	}
+
+	if (search_cancelled())
+	{
+		return 0;
+	}
+
+	//order_moves_quiescene(moves, board);
+
+	for (chess::Move& move : moves)
+	{
+		board.makeMove(move);
+		score = -quiescene_search(board, -beta, -alpha);
+		board.unmakeMove(move);
+
+		if (score >= beta)
+		{
+			return beta;
+		}
+		if (score > alpha)
+		{
+			alpha = score;
+		}
+	}
+
+	return alpha;
+}
+
 int32_t leonardo::search(
 	int32_t depth,
 	int32_t ply_from_root,
@@ -96,7 +143,7 @@ int32_t leonardo::search(
 
 	if (depth <= 0)
 	{
-		return eval(board, moves, ply_from_root, false);
+		return quiescene_search(board, alpha, beta);
 	}
 
 	tt::entry_type tt_flag = tt::entry_type::upper_bound;

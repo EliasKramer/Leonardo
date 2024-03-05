@@ -27,7 +27,9 @@ private:
 	[[nodiscard]] int32_t corrected_result_score(chess::GameResult result, int32_t ply_from_root);
 	[[nodiscard]] bool move_causes_draw(chess::Board& board, chess::Move& move);
 
-	[[nodiscard]] int32_t eval(chess::Board& board, chess::Movelist& moves, int ply, bool only_caputes_in_moves);
+	[[nodiscard]] int32_t eval(chess::Board& board);
+	
+	[[nodiscard]] int32_t quiescene_search(chess::Board& board, int32_t alpha, int32_t beta);
 
 	int32_t search(
 		int32_t ply_remaining,
