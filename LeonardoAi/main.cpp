@@ -12,8 +12,6 @@
 
 int main()
 {
-	uint32_t hashtable_size_mb = 500;
-
 	uci_handler uci(false);
 	uci.uci_loop();
 }

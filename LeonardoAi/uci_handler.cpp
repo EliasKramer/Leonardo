@@ -24,10 +24,8 @@ std::vector<std::string> split(std::string str, std::string token = " ")
 }
 
 uci_handler::uci_handler(bool logging_enabled)
-	:bot(3000, 1),//1.5),
+	:bot(100),
 	board(DEFAULT_FEN),
-	duration_nnet("duration.parameters"),
-	duration_nnet_input(leonardo_util::get_input_format_duration_nnet()),
 	logging_enabled(logging_enabled)
 {}
 
@@ -90,58 +88,20 @@ static bool is_digit(const std::string& s)
 	return !s.empty() && std::find_if(s.begin(),
 		s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
 }
-static int get_ms_to_make_move(int time, int inc)
+uint32_t uci_handler::get_ms_to_think(
+	int time_to_move,
+	int time_remaining,
+	int time_increment)
 {
-	int result = 1;
+	if (time_to_move != -1)
+		return time_to_move;
 
-	if (time == -1)
-	{
-		return -1;
-	}
+	time_increment = time_increment == -1 ? 0 : time_increment;
 
+	time_remaining = std::max(1, time_remaining);
 
-	if (time < 1000)
-	{
-		result = time / 2;
-	}
-	else if (time < 2000)
-	{
-		result = time / 5;
-	}
-	else if (time < 5000)
-	{
-		result = time / 8;
-	}
-	else if (time < 60000)
-	{
-		result = time / 10;
-	}
-	else if (time < 300000)
-	{
-		result = time / 40;
-	}
-	else if (time < 600000)
-	{
-		result = time / 60;
-	}
-	else if (time < 1800000)
-	{
-		result = time / 80;
-	}
-	else
-	{
-		result = time / 100;
-	}
-
-
-	if (inc != -1)
-	{
-		result += inc;
-	}
-
-	return result;
+	return std::clamp(time_remaining / 20 + time_increment / 2, 1, 25000);
 }
-
 void uci_handler::receive_command(std::string& message)
 {
 	//Console.WriteLine(message);
@@ -191,7 +151,6 @@ void uci_handler::receive_command(std::string& message)
 			}
 			log("set pos: " + board.getFen());
 		}
-		/*
 		else if (tokens[1] == "fen")
 		{
 			std::string fen = "";
@@ -201,16 +160,23 @@ void uci_handler::receive_command(std::string& message)
 			}
 			fen = fen.substr(0, fen.size() - 1);
 			board = chess::Board(fen);
+
 			if (tokens.size() > 8)
 			{
-				for (int i = 9; i < tokens.size(); i++)
+				if (tokens[8] == "moves")
 				{
-					chess::Move move = chess::uci::uciToMove(tokens[i], board);
-					board.makeMove(move);
+					for (int i = 9; i < tokens.size(); i++)
+					{
+						chess::Move move = chess::uci::uciToMove(board, tokens[i]);
+						board.makeMove(move);
+					}
+				}
+				else 
+				{
+					log("unrecognized position command: + message");
 				}
 			}
 		}
-		*/
 		else
 		{
 			log("unrecognized position command: " + message);
@@ -249,21 +215,16 @@ void uci_handler::receive_command(std::string& message)
 			}
 		}
 
-
 		std::string log_output = "";
-		int ms_given = leonardo_util::get_ms_to_think(
-			duration_nnet,
-			duration_nnet_input,
-			board,
+		int ms_given = get_ms_to_think(
 			move_time,
 			time,
-			increment
-		);
+			increment);
 
 		ms_given = std::min(ms_given, 1000);
 
 		log("time log: time:" + std::to_string(time) + " move_time:" + std::to_string(move_time) + " increment:" + std::to_string(increment) + " chosen_time:" + std::to_string(ms_given));
-		
+
 		chess::Move gotten_move = bot.get_move(board, ms_given, log_output);
 		log("engine log: " + log_output);
 
