@@ -19,26 +19,17 @@
     <Filter Include="sf">
       <UniqueIdentifier>{abe71d9b-5af9-4a31-bdd5-389e6f46d8b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\leonardo_value_bot">
-      <UniqueIdentifier>{8334a3bb-34eb-4e79-905d-15ebda54241c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="header\chess_util">
       <UniqueIdentifier>{1c51a7a6-755f-41ec-b2b1-1e30b4db1011}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\chess_util">
-      <UniqueIdentifier>{1d4b3147-67db-47c8-a698-e0224e043625}</UniqueIdentifier>
     </Filter>
     <Filter Include="engine">
       <UniqueIdentifier>{aa19eaa6-6dee-4584-82fe-6e4f533d44da}</UniqueIdentifier>
     </Filter>
-    <Filter Include="header\chess_util\player">
-      <UniqueIdentifier>{75eb45de-cb1d-4437-a2e2-e8fac0fcff19}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\chess_util\player">
-      <UniqueIdentifier>{ffcc816e-44c6-4c1c-9d8d-60bbbf78df9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="header\chess_util\leonardo_value_bot">
+    <Filter Include="header\chess_util\leonardo">
       <UniqueIdentifier>{92ec8588-1412-4099-97e0-50452c615434}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\leonardo">
+      <UniqueIdentifier>{8334a3bb-34eb-4e79-905d-15ebda54241c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -157,31 +148,19 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="leonardo.cpp">
-      <Filter>source\leonardo_value_bot</Filter>
-    </ClCompile>
-    <ClCompile Include="chess_game.cpp">
-      <Filter>source\chess_util</Filter>
+      <Filter>source\leonardo</Filter>
     </ClCompile>
     <ClCompile Include="NeuroFox\softmax_layer.cpp">
       <Filter>source\nnet</Filter>
     </ClCompile>
-    <ClCompile Include="random_player.cpp">
-      <Filter>source\chess_util\player</Filter>
-    </ClCompile>
-    <ClCompile Include="minimax_player.cpp">
-      <Filter>source\chess_util\player</Filter>
-    </ClCompile>
-    <ClCompile Include="human_player.cpp">
-      <Filter>source\chess_util\player</Filter>
-    </ClCompile>
-    <ClCompile Include="abp_player.cpp">
-      <Filter>source\chess_util\player</Filter>
-    </ClCompile>
     <ClCompile Include="nnet_table.cpp">
-      <Filter>source\leonardo_value_bot</Filter>
+      <Filter>source\leonardo</Filter>
     </ClCompile>
     <ClCompile Include="uci_handler.cpp">
       <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="chess_eval_constants.cpp">
+      <Filter>source\leonardo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -336,13 +315,7 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="leonardo.hpp">
-      <Filter>header\chess_util\leonardo_value_bot</Filter>
-    </ClInclude>
-    <ClInclude Include="chess_game.hpp">
-      <Filter>header\chess_util</Filter>
-    </ClInclude>
-    <ClInclude Include="chess_player.hpp">
-      <Filter>header\chess_util</Filter>
+      <Filter>header\chess_util\leonardo</Filter>
     </ClInclude>
     <ClInclude Include="NeuroFox\softmax_layer.hpp">
       <Filter>header\nnet</Filter>
@@ -350,23 +323,14 @@
     <ClInclude Include="chess.hpp">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="random_player.hpp">
-      <Filter>header\chess_util\player</Filter>
-    </ClInclude>
-    <ClInclude Include="minimax_player.hpp">
-      <Filter>header\chess_util\player</Filter>
-    </ClInclude>
-    <ClInclude Include="human_player.hpp">
-      <Filter>header\chess_util\player</Filter>
-    </ClInclude>
-    <ClInclude Include="abp_player.hpp">
-      <Filter>header\chess_util\player</Filter>
-    </ClInclude>
     <ClInclude Include="nnet_table.hpp">
-      <Filter>header\chess_util\leonardo_value_bot</Filter>
+      <Filter>header\chess_util\leonardo</Filter>
     </ClInclude>
     <ClInclude Include="uci_handler.hpp">
       <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="chess_eval_constants.hpp">
+      <Filter>header\chess_util\leonardo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

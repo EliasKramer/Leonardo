@@ -1,34 +1,37 @@
 #pragma once
-//#define DEBUG_PRINT
 
 #include "chess_player.hpp"
 #include "NeuroFox/neural_network.hpp"
 #include "stockfish_interface.hpp"
 #include "nnet_table.hpp"
 #include "leonardo_util.hpp"
-//Credit to https://web.archive.org/web/20071031100051/http://www.brucemo.com/compchess/programming/hashing.htm
+#include "chess_eval_constants.hpp"
 
 class leonardo
 {
 private:
-	int ms_per_move = -1;
-	bool searched_at_least_one_move = false;
-	int iterative_deepening_depth = 1;
-	std::chrono::steady_clock::time_point start_time;
+	//time control
+	std::chrono::steady_clock::time_point deadline;
+	
+	//iterative deepening
+	uint32_t iterative_deepening_depth = 1;
+	uint32_t reached_depth = 0;
 
 	bool search_cancelled();
 
-	int eval(chess::Board& board, chess::Movelist& moves, int ply, bool only_caputes_in_moves);
+	[[nodiscard]] int32_t eval(chess::Board& board, chess::Movelist& moves, int ply, bool only_caputes_in_moves);
 
-	int search(
-		int ply_remaining,
-		int ply_from_root,
+	int32_t search(
+		int32_t ply_remaining,
+		int32_t ply_from_root,
 		chess::Board& board,
-		int alpha,
-		int beta,
+		int32_t alpha,
+		int32_t beta,
 		chess::Move& best_move);
+
+	void setup_members(int32_t ms_left);
 public:
 	leonardo(uint32_t hash_table_size_mb);
 
-	chess::Move get_move(chess::Board& board, int ms_left, std::string& info);
+	chess::Move get_move(chess::Board& board, int32_t ms_left, std::string& info);
 };

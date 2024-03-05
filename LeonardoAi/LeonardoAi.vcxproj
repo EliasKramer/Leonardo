@@ -33,15 +33,12 @@
     <ClCompile Include="..\StockFish\tune.cpp" />
     <ClCompile Include="..\StockFish\uci.cpp" />
     <ClCompile Include="..\StockFish\ucioption.cpp" />
-    <ClCompile Include="abp_player.cpp" />
-    <ClCompile Include="chess_game.cpp" />
-    <ClCompile Include="human_player.cpp" />
+    <ClCompile Include="chess_eval_constants.cpp" />
     <ClCompile Include="leonardo_policy_bot.cpp" />
     <ClCompile Include="leonardo_overlord.cpp" />
     <ClCompile Include="leonardo_util.cpp" />
     <ClCompile Include="leonardo.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="minimax_player.cpp" />
     <ClCompile Include="NeuroFox\convolutional_layer.cpp" />
     <ClCompile Include="NeuroFox\data_space.cpp" />
     <ClCompile Include="NeuroFox\fully_connected_layer.cpp" />
@@ -55,7 +52,6 @@
     <ClCompile Include="NeuroFox\util.cpp" />
     <ClCompile Include="NeuroFox\vector3.cpp" />
     <ClCompile Include="nnet_table.cpp" />
-    <ClCompile Include="random_player.cpp" />
     <ClCompile Include="stockfish_interface.cpp" />
     <ClCompile Include="uci_handler.cpp" />
   </ItemGroup>
@@ -92,16 +88,12 @@
     <ClInclude Include="..\StockFish\tune.h" />
     <ClInclude Include="..\StockFish\types.h" />
     <ClInclude Include="..\StockFish\uci.h" />
-    <ClInclude Include="abp_player.hpp" />
     <ClInclude Include="chess.hpp" />
-    <ClInclude Include="chess_game.hpp" />
-    <ClInclude Include="chess_player.hpp" />
-    <ClInclude Include="human_player.hpp" />
+    <ClInclude Include="chess_eval_constants.hpp" />
     <ClInclude Include="leonardo_policy_bot.hpp" />
     <ClInclude Include="leonardo_overlord.hpp" />
     <ClInclude Include="leonardo_util.hpp" />
     <ClInclude Include="leonardo.hpp" />
-    <ClInclude Include="minimax_player.hpp" />
     <ClInclude Include="NeuroFox\assert_throw.hpp" />
     <ClInclude Include="NeuroFox\convolutional_layer.hpp" />
     <ClInclude Include="NeuroFox\data_space.hpp" />
@@ -118,7 +110,6 @@
     <ClInclude Include="NeuroFox\util.hpp" />
     <ClInclude Include="NeuroFox\vector3.hpp" />
     <ClInclude Include="nnet_table.hpp" />
-    <ClInclude Include="random_player.hpp" />
     <ClInclude Include="stockfish_interface.hpp" />
     <ClInclude Include="uci_handler.hpp" />
   </ItemGroup>
