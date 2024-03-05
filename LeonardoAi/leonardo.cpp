@@ -14,6 +14,21 @@ bool leonardo::search_cancelled()
 		iterative_deepening_depth >= MIN_DEPTH; //we have searched at least a bit
 }
 
+int32_t leonardo::corrected_result_score(chess::GameResult result, int32_t ply_from_root)
+{
+	switch (result)
+	{
+	case chess::GameResult::WIN:
+		throw std::runtime_error("a win cannot occur. only the loss of the opponent is a win");
+	case chess::GameResult::LOSE:
+		return -MATE_SCORE + ply_from_root; //its better to have a lot of ply between us and mate
+	case chess::GameResult::DRAW:
+		return -DRAW_SCORE + ply_from_root; //a draw is better if it is further in the future
+	default:
+		throw std::runtime_error("cannot occur. game result not recognized.");
+	}
+}
+
 int32_t leonardo::eval(chess::Board& board, chess::Movelist& moves, int ply, bool only_caputes_in_moves)
 {
 	int32_t score = 0.0f;
@@ -64,15 +79,15 @@ int32_t leonardo::search(
 	if (moves.size() == 0)
 	{
 		return board.inCheck() ? 
-			-MATE_SCORE + ply_from_root : //its better to have a lot of ply between us and mate
-			DRAW_SCORE + ply_from_root; //a draw is less bad if it's further away
+			corrected_result_score(chess::GameResult::LOSE, ply_from_root) :
+			corrected_result_score(chess::GameResult::DRAW, ply_from_root);
 	}
 
 	if (board.isRepetition() ||
 		board.isHalfMoveDraw() ||
 		board.isInsufficientMaterial())
 	{
-		return eval(board, moves, ply_from_root, false);
+		return corrected_result_score(chess::GameResult::DRAW, ply_from_root);
 	}
 
 	if (depth <= 0)
@@ -83,12 +98,12 @@ int32_t leonardo::search(
 	chess::Move& best_current_move = moves[0];
 	for (chess::Move move : moves)
 	{
+		if (search_cancelled())
+			return 0;
+
 		board.makeMove(move);
 		int score = -search(depth - 1, ply_from_root + 1, board, -beta, -alpha, chosen_move_to_play);
 		board.unmakeMove(move);
-
-		if (search_cancelled())
-			return 0;
 
 		//current score is better than our opponent can achieve. our opponent will not pick this path
 		if (score >= beta)

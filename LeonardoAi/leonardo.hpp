@@ -18,7 +18,8 @@ private:
 	uint32_t reached_depth = 0;
 
 	bool search_cancelled();
-
+	
+	[[nodiscard]] int32_t corrected_result_score(chess::GameResult result, int32_t ply_from_root);
 	[[nodiscard]] int32_t eval(chess::Board& board, chess::Movelist& moves, int ply, bool only_caputes_in_moves);
 
 	int32_t search(
