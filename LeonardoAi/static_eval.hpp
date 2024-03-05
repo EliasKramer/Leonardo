@@ -1,13 +1,15 @@
+#include <cstdint>
+
 #pragma once
 namespace static_eval {
 	//PAWN, KNIGHT, BISHOP, ROOK, QUEEN
-	const int PIECE_EVAL[5] = { 100, 320, 330, 500, 900 };
+	const int16_t PIECE_EVAL[5] = { 100, 320, 330, 500, 900 };
 	//accounts for kings aswell
-	const int SEE_PIECE_EVAL[6] = { 100, 330, 330, 500, 900, 2000 };
+	const int16_t SEE_PIECE_EVAL[6] = { 100, 330, 330, 500, 900, 2000 };
 	//helps determin if a position is equal if you only count piece values and skip pawns
-	const int PIECE_VALUE_EQL_POSITIONS[5] = { 100, 300, 300, 500, 900 };
+	const int16_t PIECE_VALUE_EQL_POSITIONS[5] = { 100, 300, 300, 500, 900 };
 
-	const int POSITION_VALUE[2][5][64]
+	const int16_t POSITION_VALUE[2][5][64]
 	{
 		//it seems to be flipped, but look at with indexes
 		//index 0 is a1 - index 63 is h8
@@ -118,7 +120,7 @@ namespace static_eval {
 			 -20,-10,-10, -5, -5,-10,-10,-20}
 		}
 	};
-	const int POSITION_VALUE_KING[2][2][64] =
+	const int16_t POSITION_VALUE_KING[2][2][64] =
 	{
 		//white	
 		{

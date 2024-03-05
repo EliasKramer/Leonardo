@@ -488,10 +488,10 @@ struct Move {
 
     /// @brief Set the score for a move. Useful if you later want to sort the moves.
     /// @param score
-    constexpr void setScore(int score) { score_ = score; }
+    constexpr void setScore(uint16_t score) { score_ = score; }
 
-    [[nodiscard]] constexpr int move() const { return move_; }
-    [[nodiscard]] constexpr int score() const { return score_; }
+    [[nodiscard]] constexpr uint16_t move() const { return move_; }
+    [[nodiscard]] constexpr uint16_t score() const { return score_; }
 
     bool operator==(const Move &rhs) const { return move_ == rhs.move_; }
     bool operator!=(const Move &rhs) const { return move_ != rhs.move_; }
@@ -507,7 +507,7 @@ struct Move {
 
    private:
     uint16_t move_;
-    int score_;
+    uint16_t score_;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Move &move) {

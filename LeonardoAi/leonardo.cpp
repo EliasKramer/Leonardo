@@ -1,17 +1,12 @@
 #include "leonardo.hpp"
 
-constexpr int32_t MATE_SCORE = 10000000;
-constexpr int32_t DRAW_SCORE = 0;
-constexpr int32_t MAX_DEPTH = 256;
-constexpr int32_t MIN_DEPTH = 2;
-
 bool leonardo::search_cancelled()
 {
 	std::chrono::steady_clock::time_point now = std::chrono::high_resolution_clock::now();
 
 	return
 		now > deadline &&						//search time over
-		iterative_deepening_depth >= MIN_DEPTH; //we have searched at least a bit
+		iterative_deepening_depth >= chess_constants::MIN_DEPTH; //we have searched at least a bit
 }
 
 int32_t leonardo::corrected_result_score(chess::GameResult result, int32_t ply_from_root)
@@ -21,12 +16,21 @@ int32_t leonardo::corrected_result_score(chess::GameResult result, int32_t ply_f
 	case chess::GameResult::WIN:
 		throw std::runtime_error("a win cannot occur. only the loss of the opponent is a win");
 	case chess::GameResult::LOSE:
-		return -MATE_SCORE + ply_from_root; //its better to have a lot of ply between us and mate
+		return -chess_constants::MATE_SCORE + ply_from_root; //its better to have a lot of ply between us and mate
 	case chess::GameResult::DRAW:
-		return -DRAW_SCORE + ply_from_root; //a draw is better if it is further in the future
+		return -chess_constants::DRAW_SCORE + ply_from_root; //a draw is better if it is further in the future
 	default:
 		throw std::runtime_error("cannot occur. game result not recognized.");
 	}
+}
+
+bool leonardo::move_causes_draw(chess::Board& board, chess::Move& move)
+{
+	board.makeMove(move);
+	bool ret_val = board.isHalfMoveDraw() || board.isRepetition() || board.isInsufficientMaterial();
+	board.unmakeMove(move);
+
+	return ret_val;
 }
 
 int32_t leonardo::eval(chess::Board& board, chess::Movelist& moves, int ply, bool only_caputes_in_moves)
@@ -78,7 +82,7 @@ int32_t leonardo::search(
 
 	if (moves.size() == 0)
 	{
-		return board.inCheck() ? 
+		return board.inCheck() ?
 			corrected_result_score(chess::GameResult::LOSE, ply_from_root) :
 			corrected_result_score(chess::GameResult::DRAW, ply_from_root);
 	}
@@ -95,6 +99,25 @@ int32_t leonardo::search(
 		return eval(board, moves, ply_from_root, false);
 	}
 
+	tt::entry_type tt_flag = tt::entry_type::upper_bound;
+	int32_t tt_value = tt.get_stored_score(board.hash(), ply_from_root, depth, alpha, beta);
+	if (tt_value != tt::unknown_eval)
+	{
+		chess::Move stored_move = tt.get_move(board.hash());
+
+		if (!move_causes_draw(board, stored_move))
+		{
+			if (ply_from_root == 0)
+			{
+				chosen_move_to_play = tt.get_move(board.hash());
+			}
+
+			return tt_value;
+		}
+	}
+
+	sort_move_list(moves, board, ply_from_root, depth);
+
 	chess::Move& best_current_move = moves[0];
 	for (chess::Move move : moves)
 	{
@@ -108,11 +131,14 @@ int32_t leonardo::search(
 		//current score is better than our opponent can achieve. our opponent will not pick this path
 		if (score >= beta)
 		{
+			tt.store(board.hash(), ply_from_root, depth, beta, tt::entry_type::lower_bound, move);
+
 			return beta;
 		}
 		if (score > alpha)
 		{
 			alpha = score;
+			tt_flag = tt::entry_type::exact;
 			if (ply_from_root == 0)
 			{
 				chosen_move_to_play = move;
@@ -120,8 +146,28 @@ int32_t leonardo::search(
 			best_current_move = move;
 		}
 	}
-
+	
+	tt.store(board.hash(), ply_from_root, depth, alpha, tt_flag, best_current_move);
+	
 	return alpha;
+}
+
+void leonardo::sort_move_list(chess::Movelist& moves, chess::Board& board, int32_t ply_from_root, int32_t depth)
+{
+	chess::Move tt_move = tt.get_move(board.hash());
+
+	for (chess::Move& move : moves)
+	{
+		if (move == tt_move)
+		{
+			move.setScore(30000);
+		}
+		else {
+			move.setScore(0);
+		}
+	}
+
+	moves.sort();
 }
 
 void leonardo::setup_members(int32_t ms_left)
@@ -132,6 +178,7 @@ void leonardo::setup_members(int32_t ms_left)
 }
 
 leonardo::leonardo(uint32_t hash_table_size_mb)
+	:tt(hash_table_size_mb)
 {}
 
 chess::Move leonardo::get_move(chess::Board& board, int32_t ms_left, std::string& info)
@@ -142,7 +189,7 @@ chess::Move leonardo::get_move(chess::Board& board, int32_t ms_left, std::string
 	chess::movegen::legalmoves(moves, board);
 
 	chess::Move best_move = chess::Move::NULL_MOVE;
-	for (iterative_deepening_depth = 1; !search_cancelled() && iterative_deepening_depth < MAX_DEPTH; iterative_deepening_depth++)
+	for (iterative_deepening_depth = 1; !search_cancelled() && iterative_deepening_depth < chess_constants::MAX_DEPTH; iterative_deepening_depth++)
 	{
 		chess::Move current_best_move = chess::Move::NULL_MOVE;
 
@@ -167,4 +214,9 @@ chess::Move leonardo::get_move(chess::Board& board, int32_t ms_left, std::string
 	}
 
 	return best_move;
+}
+
+void leonardo::resize_tt(uint32_t hash_table_size_mb)
+{
+	tt = transposition_table(hash_table_size_mb);
 }

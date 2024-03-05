@@ -33,7 +33,8 @@
     <ClCompile Include="..\StockFish\tune.cpp" />
     <ClCompile Include="..\StockFish\uci.cpp" />
     <ClCompile Include="..\StockFish\ucioption.cpp" />
-    <ClCompile Include="chess_eval_constants.cpp" />
+    <ClCompile Include="chess_constants.cpp" />
+    <ClCompile Include="static_eval.cpp" />
     <ClCompile Include="leonardo_policy_bot.cpp" />
     <ClCompile Include="leonardo_overlord.cpp" />
     <ClCompile Include="leonardo_util.cpp" />
@@ -53,6 +54,7 @@
     <ClCompile Include="NeuroFox\vector3.cpp" />
     <ClCompile Include="nnet_table.cpp" />
     <ClCompile Include="stockfish_interface.cpp" />
+    <ClCompile Include="transposition_table.cpp" />
     <ClCompile Include="uci_handler.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -89,7 +91,8 @@
     <ClInclude Include="..\StockFish\types.h" />
     <ClInclude Include="..\StockFish\uci.h" />
     <ClInclude Include="chess.hpp" />
-    <ClInclude Include="chess_eval_constants.hpp" />
+    <ClInclude Include="chess_constants.hpp" />
+    <ClInclude Include="static_eval.hpp" />
     <ClInclude Include="leonardo_policy_bot.hpp" />
     <ClInclude Include="leonardo_overlord.hpp" />
     <ClInclude Include="leonardo_util.hpp" />
@@ -111,6 +114,7 @@
     <ClInclude Include="NeuroFox\vector3.hpp" />
     <ClInclude Include="nnet_table.hpp" />
     <ClInclude Include="stockfish_interface.hpp" />
+    <ClInclude Include="transposition_table.hpp" />
     <ClInclude Include="uci_handler.hpp" />
   </ItemGroup>
   <ItemGroup>

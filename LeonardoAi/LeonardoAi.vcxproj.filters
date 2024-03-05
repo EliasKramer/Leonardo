@@ -159,7 +159,13 @@
     <ClCompile Include="uci_handler.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="chess_eval_constants.cpp">
+    <ClCompile Include="static_eval.cpp">
+      <Filter>source\leonardo</Filter>
+    </ClCompile>
+    <ClCompile Include="transposition_table.cpp">
+      <Filter>source\leonardo</Filter>
+    </ClCompile>
+    <ClCompile Include="chess_constants.cpp">
       <Filter>source\leonardo</Filter>
     </ClCompile>
   </ItemGroup>
@@ -329,7 +335,13 @@
     <ClInclude Include="uci_handler.hpp">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="chess_eval_constants.hpp">
+    <ClInclude Include="static_eval.hpp">
+      <Filter>header\chess_util\leonardo</Filter>
+    </ClInclude>
+    <ClInclude Include="transposition_table.hpp">
+      <Filter>header\chess_util\leonardo</Filter>
+    </ClInclude>
+    <ClInclude Include="chess_constants.hpp">
       <Filter>header\chess_util\leonardo</Filter>
     </ClInclude>
   </ItemGroup>
