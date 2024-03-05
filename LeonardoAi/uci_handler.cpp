@@ -23,14 +23,13 @@ std::vector<std::string> split(std::string str, std::string token = " ")
 	return result;
 }
 
-uci_handler::uci_handler()
+uci_handler::uci_handler(bool logging_enabled)
 	:bot(3000, 1),//1.5),
 	board(DEFAULT_FEN),
 	duration_nnet("duration.parameters"),
-	duration_nnet_input(leonardo_util::get_input_format_duration_nnet())
-{
-
-}
+	duration_nnet_input(leonardo_util::get_input_format_duration_nnet()),
+	logging_enabled(logging_enabled)
+{}
 
 void uci_handler::log(const char* msg)
 {
@@ -40,6 +39,10 @@ void uci_handler::log(const char* msg)
 
 void uci_handler::log(std::string msg)
 {
+	if (!logging_enabled)
+	{
+		return;
+	}
 	std::ofstream log_file;
 	log_file.open(log_file_name, std::ios_base::app);
 	log_file << get_current_time_str() << ": ";
@@ -257,6 +260,8 @@ void uci_handler::receive_command(std::string& message)
 			increment
 		);
 
+		ms_given = std::min(ms_given, 1000);
+
 		log("time log: time:" + std::to_string(time) + " move_time:" + std::to_string(move_time) + " increment:" + std::to_string(increment) + " chosen_time:" + std::to_string(ms_given));
 		
 		chess::Move gotten_move = bot.get_move(board, ms_given, log_output);
@@ -275,7 +280,6 @@ void uci_handler::receive_command(std::string& message)
 		log("quitting");
 		log("------------------------");
 	}
-	//else if (messageType == "d") {}
 	else
 	{
 		log("unrecognized command: " + message);

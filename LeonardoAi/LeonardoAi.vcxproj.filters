@@ -156,16 +156,7 @@
     <ClCompile Include="stockfish_interface.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="leonardo_value_bot.cpp">
-      <Filter>source\leonardo_value_bot</Filter>
-    </ClCompile>
-    <ClCompile Include="leonardo_value_bot_1.cpp">
-      <Filter>source\leonardo_value_bot</Filter>
-    </ClCompile>
-    <ClCompile Include="leonardo_value_bot_2.cpp">
-      <Filter>source\leonardo_value_bot</Filter>
-    </ClCompile>
-    <ClCompile Include="leonardo_value_bot_3.cpp">
+    <ClCompile Include="leonardo.cpp">
       <Filter>source\leonardo_value_bot</Filter>
     </ClCompile>
     <ClCompile Include="chess_game.cpp">
@@ -344,16 +335,7 @@
     <ClInclude Include="stockfish_interface.hpp">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="leonardo_value_bot.hpp">
-      <Filter>header\chess_util\leonardo_value_bot</Filter>
-    </ClInclude>
-    <ClInclude Include="leonardo_value_bot_1.hpp">
-      <Filter>header\chess_util\leonardo_value_bot</Filter>
-    </ClInclude>
-    <ClInclude Include="leonardo_value_bot_2.hpp">
-      <Filter>header\chess_util\leonardo_value_bot</Filter>
-    </ClInclude>
-    <ClInclude Include="leonardo_value_bot_3.hpp">
+    <ClInclude Include="leonardo.hpp">
       <Filter>header\chess_util\leonardo_value_bot</Filter>
     </ClInclude>
     <ClInclude Include="chess_game.hpp">

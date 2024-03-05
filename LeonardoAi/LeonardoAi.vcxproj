@@ -39,10 +39,7 @@
     <ClCompile Include="leonardo_policy_bot.cpp" />
     <ClCompile Include="leonardo_overlord.cpp" />
     <ClCompile Include="leonardo_util.cpp" />
-    <ClCompile Include="leonardo_value_bot.cpp" />
-    <ClCompile Include="leonardo_value_bot_1.cpp" />
-    <ClCompile Include="leonardo_value_bot_2.cpp" />
-    <ClCompile Include="leonardo_value_bot_3.cpp" />
+    <ClCompile Include="leonardo.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="minimax_player.cpp" />
     <ClCompile Include="NeuroFox\convolutional_layer.cpp" />
@@ -103,10 +100,7 @@
     <ClInclude Include="leonardo_policy_bot.hpp" />
     <ClInclude Include="leonardo_overlord.hpp" />
     <ClInclude Include="leonardo_util.hpp" />
-    <ClInclude Include="leonardo_value_bot.hpp" />
-    <ClInclude Include="leonardo_value_bot_1.hpp" />
-    <ClInclude Include="leonardo_value_bot_2.hpp" />
-    <ClInclude Include="leonardo_value_bot_3.hpp" />
+    <ClInclude Include="leonardo.hpp" />
     <ClInclude Include="minimax_player.hpp" />
     <ClInclude Include="NeuroFox\assert_throw.hpp" />
     <ClInclude Include="NeuroFox\convolutional_layer.hpp" />

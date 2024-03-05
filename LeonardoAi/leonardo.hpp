@@ -8,7 +8,7 @@
 #include "leonardo_util.hpp"
 //Credit to https://web.archive.org/web/20071031100051/http://www.brucemo.com/compchess/programming/hashing.htm
 
-class leonardo_value_bot_3 : public chess_player
+class leonardo : public chess_player
 {
 	static const int max_killer_ply = 32;
 	typedef enum _TT_ITEM_TYPE : uint8_t
@@ -124,9 +124,7 @@ private:
 		int alpha,
 		int beta,
 		chess::Move& best_move,
-		bool allow_nmp,
-		int extension_count
-	);
+		bool allow_nmp);
 
 	int get_opening_move(size_t hash);
 
@@ -135,8 +133,8 @@ private:
 
 	void setup_nnet_for_move(const chess::Board& board);
 public:
-	leonardo_value_bot_3();
-	leonardo_value_bot_3(int ms_per_move, float nnet_mult);
+	leonardo();
+	leonardo(int ms_per_move, float nnet_mult);
 
 	chess::Move get_move(chess::Board& board) override;
 	chess::Move get_move(chess::Board& board, int ms_left, std::string& info);

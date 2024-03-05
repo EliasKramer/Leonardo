@@ -1,4 +1,4 @@
-#include "leonardo_value_bot_2.hpp"
+#include "leonardo.hpp"
 #include "leonardo_util.hpp"
 #include <filesystem>
 
@@ -48,7 +48,7 @@ static int retrieve_corrected_score(int score, int ply)
 	return score;
 }
 
-int leonardo_value_bot_2::probe_tt(chess::U64 hash, int ply, int depth, int alpha, int beta)
+int leonardo::probe_tt(chess::U64 hash, int ply, int depth, int alpha, int beta)
 {
 	//mate ply 4 depth 6 current ply 2
 	//mate ply 3 depth 6 current ply 2
@@ -87,7 +87,7 @@ int leonardo_value_bot_2::probe_tt(chess::U64 hash, int ply, int depth, int alph
 	return tt_item::unknown_eval;
 }
 
-const chess::Move& leonardo_value_bot_2::tt_get_move(chess::U64 hash)
+const chess::Move& leonardo::tt_get_move(chess::U64 hash)
 {
 	tt_item& item = tt[hash % tt.size()];
 
@@ -99,7 +99,7 @@ const chess::Move& leonardo_value_bot_2::tt_get_move(chess::U64 hash)
 	return chess::Move::NULL_MOVE;
 }
 
-void leonardo_value_bot_2::record_tt(
+void leonardo::record_tt(
 	chess::U64 hash,
 	int ply,
 	int depth,
@@ -117,7 +117,7 @@ void leonardo_value_bot_2::record_tt(
 	tt_inserts++;
 }
 
-bool leonardo_value_bot_2::search_cancelled()
+bool leonardo::search_cancelled()
 {
 	std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
 	long long ms_taken = std::chrono::duration_cast<std::chrono::milliseconds>(end - start_time).count();
@@ -341,7 +341,7 @@ static inline int is_double_pawn(int sq, chess::Bitboard our_pawns)
 	return (our_pawns & file_mask) != 0 ? 1 : 0;
 }
 
-int leonardo_value_bot_2::eval(chess::Board& board, chess::Movelist& moves, int ply, bool only_caputes_in_moves)
+int leonardo::eval(chess::Board& board, chess::Movelist& moves, int ply, bool only_caputes_in_moves)
 {
 	int score = 0.0f;
 	int side_mult = board.sideToMove() == chess::Color::WHITE ? 1 : -1;
@@ -492,7 +492,7 @@ int leonardo_value_bot_2::eval(chess::Board& board, chess::Movelist& moves, int 
 	return score * side_mult;
 }
 
-bool leonardo_value_bot_2::stored_move_is_draw(chess::Board& board, int ply_from_root)
+bool leonardo::stored_move_is_draw(chess::Board& board, int ply_from_root)
 {
 	if (ply_from_root != 0)
 	{
@@ -514,7 +514,7 @@ bool leonardo_value_bot_2::stored_move_is_draw(chess::Board& board, int ply_from
 	return ret_val;
 }
 
-void leonardo_value_bot_2::order_moves_quiescene(chess::Movelist& moves, chess::Board& board)
+void leonardo::order_moves_quiescene(chess::Movelist& moves, chess::Board& board)
 {
 	for (chess::Move& m : moves)
 	{
@@ -538,7 +538,7 @@ void leonardo_value_bot_2::order_moves_quiescene(chess::Movelist& moves, chess::
 	moves.sort();
 }
 
-int leonardo_value_bot_2::quiescene(chess::Board& board, int alpha, int beta)
+int leonardo::quiescene(chess::Board& board, int alpha, int beta)
 {
 	nodes_visited++;
 	chess::Movelist moves;
@@ -591,7 +591,7 @@ int leonardo_value_bot_2::quiescene(chess::Board& board, int alpha, int beta)
 	return alpha;
 }
 
-int leonardo_value_bot_2::search(
+int leonardo::search(
 	bool is_pv,
 	int ply_remaining,
 	int ply_from_root,
@@ -733,7 +733,7 @@ int leonardo_value_bot_2::search(
 	return alpha;
 }
 
-void leonardo_value_bot_2::load_openings()
+void leonardo::load_openings()
 {
 	std::ifstream file("openings.txt");
 
@@ -778,7 +778,7 @@ void leonardo_value_bot_2::load_openings()
 	}
 	file.close();
 }
-int leonardo_value_bot_2::get_opening_move(size_t hash)
+int leonardo::get_opening_move(size_t hash)
 {
 	std::vector<int> indices;
 	for (int i = 0; i < openings.size(); i++)
@@ -799,10 +799,10 @@ int leonardo_value_bot_2::get_opening_move(size_t hash)
 
 	return indices[dis(gen)];
 }
-leonardo_value_bot_2::leonardo_value_bot_2()
-	: leonardo_value_bot_2(5, false)
+leonardo::leonardo()
+	: leonardo(5, false)
 {}
-leonardo_value_bot_2::leonardo_value_bot_2(int ms_per_move, float nnet_mult)
+leonardo::leonardo(int ms_per_move, float nnet_mult)
 	: ms_per_move(ms_per_move),
 	nnet_mult(nnet_mult),
 	pawn_nnet_table(500) //in megabyte
@@ -858,7 +858,7 @@ static uint64_t allAttackersToSquare(chess::Board& board, uint64_t occupied, che
 }
 
 //cedits to https://github.com/AndyGrant/Ethereal/blob/master/src/search.c#L916
-bool leonardo_value_bot_2::static_exchange_evaluation_better_than_threshold(chess::Board& board, chess::Move& move, int threshold)
+bool leonardo::static_exchange_evaluation_better_than_threshold(chess::Board& board, chess::Move& move, int threshold)
 {
 	uint64_t bishops, rooks, occupied, attackers, my_attackers;
 
@@ -951,7 +951,7 @@ bool leonardo_value_bot_2::static_exchange_evaluation_better_than_threshold(ches
 	return board.sideToMove() != color;
 }
 
-void leonardo_value_bot_2::sort_move_list(chess::Movelist& moves, chess::Board& board, int ply_from_root, int depth)
+void leonardo::sort_move_list(chess::Movelist& moves, chess::Board& board, int ply_from_root, int depth)
 {
 	chess::Move tt_move = tt_get_move(board.hash());
 
@@ -997,7 +997,7 @@ void leonardo_value_bot_2::sort_move_list(chess::Movelist& moves, chess::Board& 
 	moves.sort();
 }
 
-void leonardo_value_bot_2::setup_nnet_for_move(const chess::Board& board)
+void leonardo::setup_nnet_for_move(const chess::Board& board)
 {
 	if (nnet_mult == 0)
 		return;
@@ -1013,13 +1013,13 @@ void leonardo_value_bot_2::setup_nnet_for_move(const chess::Board& board)
 	value_nnet.forward_propagation(input_matrix);
 }
 
-chess::Move leonardo_value_bot_2::get_move(chess::Board& board)
+chess::Move leonardo::get_move(chess::Board& board)
 {
 	std::string info = "";
 	return get_move(board, ms_per_move, info);
 }
 
-chess::Move leonardo_value_bot_2::get_move(chess::Board& board, int ms_left, std::string& info)
+chess::Move leonardo::get_move(chess::Board& board, int ms_left, std::string& info)
 {
 	ms_per_move = ms_left;
 	we_are_white = board.sideToMove() == chess::Color::WHITE;

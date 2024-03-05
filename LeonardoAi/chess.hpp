@@ -28,8 +28,7 @@ Source: https://github.com/Disservin/chess-library
 VERSION: 0.2.0
 */
 
-#ifndef CHESS_HPP
-#define CHESS_HPP
+#pragma once
 #include <string>
 const std::string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 #include <algorithm>
@@ -3503,4 +3502,3 @@ inline std::optional<Game> readGame(std::ifstream &file) {
 
 }  // namespace chess
 
-#endif  // CHESS_HPP

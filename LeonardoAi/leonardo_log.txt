@@ -113,3 +113,43 @@ time: 60001ms
 28.12 23:19: Started Uci Loop
 29.12 00:38: Started Uci Loop
 >>>>>>> 986656642a987bd04547f54098a7d7fc3c5367a5
+29.12 00:41: Started Uci Loop
+22.01 13:18: Started Uci Loop
+22.01 14:43: Started Uci Loop
+26.01 11:24: Started Uci Loop
+26.01 11:34: Started Uci Loop
+29.02 16:25: Started Uci Loop
+29.02 16:25: Command received: uci
+29.02 16:25: Command received: ucinewgame
+29.02 16:25: setup default position
+29.02 16:25: Command received: isready
+29.02 16:26: Command received: position startpos
+29.02 16:26: set pos: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+29.02 16:26: Command received: go wtime 6000 btime 6000
+29.02 16:26: time log: time:6000 move_time:-1 increment:-1 chosen_time:300
+29.02 16:26: engine log: 
+29.02 16:26: made move. fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 move: e2e4
+29.02 16:26: Command received: 
+29.02 16:26: Error: empty command
+29.02 16:26: Command received: 
+29.02 16:26: Error: empty command
+29.02 16:26: Command received: 
+29.02 16:26: Error: empty command
+29.02 16:26: Command received: 
+29.02 16:26: Error: empty command
+29.02 16:26: Command received: 
+29.02 16:26: Error: empty command
+29.02 16:26: Command received: 
+29.02 16:26: Error: empty command
+29.02 16:26: Command received: 
+29.02 16:26: Error: empty command
+29.02 16:26: Command received: 
+29.02 16:26: Started Uci Loop
+29.02 16:26: Command received: uci
+29.02 16:27: Command received: ucinewgame
+29.02 16:27: setup default position
+29.02 16:27: Command received: isready
+29.02 16:28: Command received: position startpos
+29.02 16:28: set pos: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+05.03 10:21: Started Uci Loop
+05.03 10:21: Command received: uci
