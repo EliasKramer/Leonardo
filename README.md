@@ -20,6 +20,10 @@ Leonardo is currently at about 1900elo in Lichess https://lichess.org/@/Leonardo
 * etc
 
 ### Some Details about the NNUE
-Another Project of mine is a neural network (https://github.com/EliasKramer/NeuroFox), which I managed to incorperate into this project. 
+Another Project of mine is a neural network (https://github.com/EliasKramer/NeuroFox), which I incorperated into this project. 
 The most important features of a NNUE (e.g. partial forward feeding) were implemented. 
-The difference to other NNUEs is that it only takes pawn structure as input.
+The difference to other NNUEs is that it only takes pawn structure as input. This makes it a lot faster than a common NNUE, but it doesnt boost the elo that much.
+
+## Thoughts
+
+This project has probably a serious bug, because a Bot with these features should be in the range of 2700 elo
